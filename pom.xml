@@ -1,6 +1,6 @@
 <project>
   <parent>
-    <artifactId>freehep-maven-plugins</artifactId>
+    <artifactId>maven-plugins</artifactId>
     <groupId>org.freehep</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
