@@ -1,0 +1,47 @@
+<model>
+    <parent>
+        <artifactId>freehep-nar-plugin</artifactId>
+        <groupId>org.freehep</groupId>
+        <version>2.0-alpha-1-SNAPSHOT</version>
+    </parent>
+    
+    <name>FreeHEP NAR Plugin Test</name>
+    <description>Test for FreeHEP NAR plugin.</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.freehep</groupId>
+    <artifactId>freehep-nar-plugin-test</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0-SNAPSHOT</version>
+
+    <build>
+        <plugins>            
+            <plugin>
+                <groupId>org.freehep</groupId>
+                <artifactId>freehep-nar-plugin</artifactId>
+                <version>2.0-alpha-1-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>NAR-Javah</id>
+                        <goals>
+                            <goal>javah</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>NAR-Compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <outType>jni</outType>
+                            <cpp>
+                                <debug>true</debug>
+                                <includePaths/>
+                            </cpp>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>            
+        </plugins>
+    </build>    
+    
+</model>

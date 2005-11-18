@@ -1,0 +1,85 @@
+CompileMojo
+
+<configuration>
+  <arch/>
+  <os/>
+  <javaHome/>
+  <aol/>
+  <targetDirectory/>
+  <output/>
+  <type/>
+  <failOnError/>
+  <runtime/>
+  <libtool/>
+
+  <linker>
+    <name/>
+    <incremental/>
+    <map/>
+    <options>
+      <option/>
+    </options>
+    <libs>
+      <lib>
+        <name/>
+        <type/>
+        <directory/>
+      </lib>
+    </libs>
+    <sysLibs>
+      <sysLib>
+        <name/>
+        <type/>
+      </sysLib>
+    </sysLibs>
+  </linker>    
+
+  <cpp>
+    <name/>
+    <sourceDirectory/>
+    <includes>
+      <include>
+    </includes>
+    <excludes>
+      <exclude>
+    </excludes>
+    <debug/>
+    <exceptions/>
+    <rtti/>
+    <optimize/>
+    <multiThreaded/>
+    <defines>
+      <define/>
+    </defines>
+    <undefines>
+      <undefine/>
+    </undefines>
+    <includePaths>
+      <includePath/>
+    </includePaths>
+    <systemIncludePaths>
+      <systemIncludePath/>
+    </systemIncludePaths>
+    <options>
+      <option/>
+    </options>
+  </cpp>
+  <c>
+    ... same as for <cpp>
+  </c>
+  <fortran>
+    ... same as for <cpp>
+  </fortran>
+  <java>
+    <include/>
+    <includePaths>
+      <includePath/>
+    </includePaths>
+    <link/>
+    <runtimeDirectory/>
+    <runtime/>
+  </java>
+  
+  // added for TestCompileMojo
+  <link/>
+</configuration>

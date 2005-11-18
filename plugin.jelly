@@ -1,0 +1,985 @@
+<?xml version="1.0"?>
+<!-- 
+   A plugin for Native Archive handling.
+   
+   @author Mark Donszelmann
+   @version $Id$
+ -->
+
+<project xmlns:j="jelly:core" 
+         xmlns:u="jelly:util" 
+         xmlns:m="jelly:maven"
+         xmlns:d="jelly:define"
+         xmlns:a="jelly:ant"
+         xmlns:n="nar"
+         xmlns:f="freehep"
+         xmlns:artifact="artifact">
+
+    <d:taglib uri="nar">  
+        <d:jellybean name="osset"
+                     method="doTag"     
+                     className="org.freehep.maven.nar.OsSetTag"/>
+
+        <d:jellybean name="aolset"
+                     method="doTag"     
+                     className="org.freehep.maven.nar.AolSetTag"/>
+    </d:taglib>
+    
+    
+    <goal name="nar" description="Create Native Archive file(s)" prereqs="nar:nar"/>
+
+    <goal name="nar:init">
+        <path id="nar.classpath">
+            <pathelement location="${plugin.getDependencyPath('ant-contrib:cpptasks')}" />
+            <pathelement location="${plugin.getDependencyPath('bcel:bcel')}" />
+        </path>
+
+        <!-- define cpptasks -->
+        <taskdef name="cc" classname="net.sf.antcontrib.cpptasks.CCTask" classpathref="nar.classpath"/>
+        <typedef name="linker" classname="net.sf.antcontrib.cpptasks.LinkerDef" classpathref="nar.classpath"/>
+        <typedef name="compiler" classname="net.sf.antcontrib.cpptasks.CompilerDef" classpathref="nar.classpath"/>
+ 
+        <!-- define our own tools -->
+        <j:useBean var="narTool" class="org.freehep.maven.nar.Nar"/>
+        <j:new var="narTypeHandler" className="org.freehep.maven.nar.NarArtifactTypeHandler" />
+
+        <!-- General -->
+
+        <!-- derive os -->
+        <j:set var="os" value="${freehep.nar.os}"/>
+        <j:if test="${os.indexOf('Windows')>=0}">
+            <j:set var="os" value="win32"/>
+        </j:if>
+        <j:if test="${os=='Mac OS X'}">
+            <j:set var="os" value="MacOSX"/>
+        </j:if>
+        
+        <!-- derive arch -->
+        <j:set var="arch" value="${freehep.nar.arch}"/> 
+
+        <!-- derive linker -->
+        <n:osset dst="link" arch="${arch}" os="${os}" linker="" name="freehep.nar.linker" />
+
+
+        <!-- Architecture/OS Independent Settings -->
+        <j:set var="src" value="${freehep.nar.src}" />
+        <j:set var="cppSrcIncludes" value="${freehep.nar.cpp.src.includes}" />
+        <j:set var="cppSrcExcludes" value="${freehep.nar.cpp.src.excludes}" />
+        <j:set var="cSrcIncludes" value="${freehep.nar.c.src.includes}" />
+        <j:set var="cSrcExcludes" value="${freehep.nar.c.src.excludes}" />
+        <j:set var="fortranSrcIncludes" value="${freehep.nar.fortran.src.includes}" />
+        <j:set var="fortranSrcExcludes" value="${freehep.nar.fortran.src.excludes}" />
+        <j:set var="testSrc" value="${freehep.nar.test.src}" />
+        <j:set var="compileIncludePath" value="${freehep.nar.compile.includepath}" />
+        <j:set var="compileSysIncludePath" value="${freehep.nar.compile.sysincludepath}" />
+        <j:set var="compileWithJava" value="${freehep.nar.compile.withjava}" />
+        <j:set var="testCompileIncludePath" value="${freehep.nar.test.compile.includepath}" />
+        <j:set var="linkWithJava" value="${freehep.nar.link.withjava}" />
+        <j:set var="jniClasspath" value="${freehep.nar.jni.classpath}" />
+        <j:set var="tests" value="${freehep.nar.tests}" />
+        <j:set var="includeFilesOnly" value="${freehep.nar.includefilesonly}" />
+        <j:set var="aol" value="${freehep.nar.aol}" defaultValue="${arch}-${os}-${link}"/> 
+        <j:set var="dest" value="${freehep.nar.dest}"/>
+        <j:set var="testDest" value="${freehep.nar.test.dest}"/>
+
+
+        <!-- Compilers and Linkers -->
+        <n:osset dst="cppCompiler" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.cpp.compiler" />
+        <n:osset dst="cCompiler" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.c.compiler" />
+        <n:osset dst="fortranCompiler" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.fortran.compiler" />        
+        <n:osset dst="linkerName" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker" />
+
+        
+        <!-- Unified Compiler and Linker Options -->
+        <n:osset dst="rtti" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.rtti" />
+        <n:osset dst="exceptions" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.exceptions" />
+        <n:osset dst="runtime" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.runtime" />
+        <n:osset dst="optimize" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.optimize" />
+        <n:osset dst="multithreaded" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.multithreaded" />
+        <n:osset dst="incremental" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.incremental" />
+        <n:osset dst="failOnError" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.failonerror" />
+        <n:osset dst="libtool" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.libtool" />
+        <n:osset dst="debug" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.debug" />
+        <n:osset dst="outType" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.outtype" />
+        <n:osset dst="testOutType" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.test.outtype" />
+        
+        <!-- Additional Compiler and Linker Options -->
+        <n:osset dst="compilerArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.compiler.arg.start" />
+        <n:osset dst="compilerArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.compiler.arg.mid" />
+        <n:osset dst="compilerArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.compiler.arg.end" />
+        
+        <n:osset dst="cppCompilerArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.cpp.compiler.arg.start" />
+        <n:osset dst="cppCompilerArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.cpp.compiler.arg.mid" />
+        <n:osset dst="cppCompilerArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.cpp.compiler.arg.end" />
+        
+        <n:osset dst="cCompilerArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.c.compiler.arg.start" />
+        <n:osset dst="cCompilerArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.c.compiler.arg.mid" />
+        <n:osset dst="cCompilerArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.c.compiler.arg.end" />
+        
+        <n:osset dst="fortranCompilerArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.fortran.compiler.arg.start" />
+        <n:osset dst="fortranCompilerArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.fortran.compiler.arg.mid" />
+        <n:osset dst="fortranCompilerArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.fortran.compiler.arg.end" />
+        
+        <n:osset dst="linkerArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.arg.start" />
+        <n:osset dst="linkerArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.arg.mid" />
+        <n:osset dst="linkerArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.arg.end" />
+        
+        <n:osset dst="linkerTestArgStart" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.test.arg.start" />
+        <n:osset dst="linkerTestArgMid" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.test.arg.mid" />
+        <n:osset dst="linkerTestArgEnd" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.linker.test.arg.end" />
+
+        
+        <!-- Java Settings -->
+        <n:osset dst="javaHome" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.java.home" />
+        <n:osset dst="javaInclude" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.java.include" />
+        <n:osset dst="javaIncludeOs" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.java.include.os" />
+        <n:osset dst="jvm" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.java.vm" />              
+        
+        
+        <!-- File Prefixes, Suffixes and Extensions -->
+        <n:osset dst="libPrefix" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.lib.prefix" />
+        <n:osset dst="staticExtension" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.static.extension" />
+        <n:osset dst="sharedExtension" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.shared.extension" />
+        <n:osset dst="pluginExtension" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.plugin.extension" />
+        <n:osset dst="executableExtension" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.executable.extension" />              
+        
+        
+        <!-- Extra Libraries -->
+        <j:set var="libsType" value="${freehep.nar.libs.type}"/>
+        <j:set var="libs" value="${freehep.nar.libs}"/>
+                
+        
+        <!-- NAR Packaging -->
+        <n:osset dst="archIncludes" arch="${arch}" os="${os}" linker="${link}" name="freehep.nar.arch.includes" />              
+
+        
+        <echo>Nar for ${aol}</echo>        
+    </goal>
+
+
+
+    <goal name="nar:info" description="Show all the (deduced) property settings" prereqs="nar:init">
+        <echo>
+NAR Properties
+=============================================================================    
+        
+General
+-------
+    freehep.nar.arch                        ${arch}
+    freehep.nar.os                          ${os}
+    freehep.nar.linker                      ${link}
+    
+Archiceture/OS Independent Settings
+-----------------------------------
+    freehep.nar.src                         ${src}
+    freehep.nar.cpp.src.includes            ${cppSrcIncludes}
+    freehep.nar.cpp.src.excludes            ${cppSrcExcludes}
+    freehep.nar.c.src.includes              ${cSrcIncludes}
+    freehep.nar.c.src.excludes              ${cSrcExcludes}
+    freehep.nar.fortran.src.includes        ${fortranSrcIncludes}
+    freehep.nar.fortran.src.excludes        ${fortranSrcExcludes}
+    freehep.nar.test.src                    ${testSrc}
+    freehep.nar.compile.includepath         ${compileIncludePath}
+    freehep.nar.compile.sysincludepath      ${compileSysIncludePath}
+    freehep.nar.compile.withjava            ${compileWithJava}
+    freehep.nar.test.compile.includepath    ${testCompileIncludePath}
+    freehep.nar.link.withjava               ${linkWithJava}
+    freehep.nar.jni.classpath               ${jniClassPath}
+    freehep.nar.tests                       ${tests}
+    freehep.nar.includefilesonly            ${includeFileOnly}
+    freehep.nar.aol                         ${aol}
+    freehep.nar.dest                        ${dest}
+    freehep.nar.test.dest                   ${testDest}
+
+Compilers and Linkers
+---------------------
+    freehep.nar.cpp.compiler                ${cppCompiler}
+    freehep.nar.c.compiler                  ${cCompiler}
+    freehep.nar.fortran.compiler            ${fortranCompiler}
+    ${arch}.${os}.${link}.freehep.nar.linker       ${linkerName}
+    
+Unified Compiler and Linker Options
+-----------------------------------
+    freehep.nar.rtti                        ${rtti}
+    freehep.nar.exceptions                  ${exceptions}
+    freehep.nar.runtime                     ${runtime}
+    freehep.nar.optimize                    ${optimize}
+    freehep.nar.multithreaded               ${multithreaded}
+    freehep.nar.incremental                 ${incremental}
+    freehep.nar.failonerror                 ${failOnError}
+    freehep.nar.libtool                     ${libtool}
+    freehep.nar.debug                       ${debug}
+    freehep.nar.outtype                     ${outType}
+    freehep.nar.test.outtype                ${testOutType}
+    
+Additional Compiler and Linker Options
+--------------------------------------
+    freehep.nar.compiler.arg.start          ${compilerArgStart}
+    freehep.nar.compiler.arg.mid            ${compilerArgMid}
+    freehep.nar.compiler.arg.end            ${compilerArgEnd}
+
+    freehep.nar.cpp.compiler.arg.start      ${cppCompilerArgStart}
+    freehep.nar.cpp.compiler.arg.mid        ${cppCompilerArgMid}
+    freehep.nar.cpp.compiler.arg.end        ${cppCompilerArgEnd}
+
+    freehep.nar.c.compiler.arg.start        ${cCompilerArgStart}
+    freehep.nar.c.compiler.arg.mid          ${cCompilerArgMid}
+    freehep.nar.c.compiler.arg.end          ${cCompilerArgEnd}
+
+    freehep.nar.fortran.compiler.arg.start  ${fortranCompilerArgStart}
+    freehep.nar.fortran.compiler.arg.mid    ${fortranCompilerArgMid}
+    freehep.nar.fortran.compiler.arg.end    ${fortranCompilerArgEnd}
+
+    freehep.nar.linker.arg.start            ${linkerArgStart}
+    freehep.nar.linker.arg.mid              ${linkerArgMid}
+    freehep.nar.linker.arg.end              ${linkerArgEnd}
+
+    freehep.nar.linker.test.arg.start       ${linkerTestArgStart}
+    freehep.nar.linker.test.arg.mid         ${linkerTestArgMid}
+    freehep.nar.linker.test.arg.end         ${linkerTestArgEnd}
+
+Java Settings
+-------------
+    freehep.nar.java.home                   ${javaHome}
+    freehep.nar.java.include                ${javaInclude}
+    freehep.nar.java.include.os             ${javaIncludeOs}
+    freehep.nar.java.vm                     ${jvm}
+
+File Prefixes, Suffixes and Extensions
+--------------------------------------
+    freehep.nar.lib.prefix                  ${libPrefix}
+    freehep.nar.static.extension            ${staticExtension}
+    freehep.nar.shared.extension            ${sharedExtension}
+    freehep.nar.plugin.extension            ${pluginExtension}
+    freehep.nar.executable.extension        ${executableExtension}
+    
+Extra Libraries
+---------------
+    freehep.nar.libs.type                   ${libsType}
+    freehep.nar.libs                        ${libs}
+    
+NAR Packaging
+-------------
+    freehep.nar.arch.includes               ${archIncludes}
+
+=============================================================================    
+        </echo>
+    </goal>
+
+
+
+    <goal name="nar:unpack" description="Unpack the nar files inside the local repository" prereqs="nar:init">
+        <j:if test="${verbose!=null}">
+            <attainGoal name="nar:info"/>
+        </j:if>
+
+        <j:forEach var="dep" items="${pom.dependencies}">
+            <j:if test="${dep.type == 'nar'}">                
+                <j:set var="narSrcDir" value="${maven.repo.local}/${dep.groupId}/${dep.type}s" />
+                <j:set var="narPropFile" value="${narSrcDir}/${dep.artifactId}-${dep.version}.${dep.type}" />
+                <j:if test="${verbose!=null}">
+                    <echo>Reading property file from: ${narPropFile}</echo>
+                </j:if>
+                
+                <u:properties var="narProp" file="${narPropFile}" />
+                <n:osset dst="narAol" arch="" os="" linker="" prefix="${dep.artifactId}" name="${aol}" defaultValue="${aol}" properties="${narProp}"/>
+
+                <!-- check that the user does NOT override the location of this library -->
+                <n:osset dst="local" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="local" defaultValue="false" properties="${narProp}"/>
+                <j:if test="${verbose!=null}">
+                    <echo>${dep.artifactId} is local: ${local}</echo>
+                </j:if>
+                <j:if test="${local != 'true'}">              
+                    <j:set var="narDstDir" value="${narSrcDir}/${dep.artifactId}-${dep.version}" />
+
+                    <j:set var="files" value="${narProp.getProperty('freehep.nar.nars')}" />
+                    <u:tokenize var="fileList" delim=" " trim="true">${files}</u:tokenize>
+                    <j:forEach var="file" items="${fileList}">
+                        <n:aolset dst="fileName" value="${file}" aol="${narAol}" />
+                                        
+                        <!-- check the unpack flag is not available or that it is a SNAPSHOT -->
+                        <j:set var="narFlag" value="${narDstDir}/${fileName}.flag" />
+                        <j:set var="unpackedVar" value="${fileName}.unpacked" />
+                        <available property="${unpackedVar}" file="${narFlag}" />               
+                        <j:set var="unpacked" value="${pom.context.getVariable(unpackedVar)}"/>
+                        <j:if test="${(unpacked == null) or (dep.version.indexOf('SNAPSHOT') >= 0)}">
+     
+                            <!-- check if the NAR is absent, if so, download -->
+                            <j:set var="force" value="false" />
+                            <j:set var="online" value="${maven.mode.online}"/>
+                            <j:if test="${dep.version.indexOf('SNAPSHOT') >= 0}">
+                                <j:set var="force" value="true" />
+                                <j:if test="${online != 'true'}">
+                                    <echo>You are working offline so the build will continue, but ${fileName} may be out of date!.</echo>
+                                </j:if>
+                            </j:if>        
+                            <j:if test="${online == 'true'}">
+                                <f:download name="${fileName}" path="${dep.groupId}/${dep.type}s" url="${dep.url}" force="${force}" />
+                            </j:if>
+                                                                        
+                            <!-- unpack and delete -->
+                            <j:if test="${unpacked == null}">  
+                                <mkdir dir="${narDstDir}" />
+                                <unjar src="${narSrcDir}/${fileName}"
+                                       dest="${narDstDir}" 
+                                       overwrite="true"/> 
+                                <touch file="${narFlag}"/>
+                                <j:file name="${narSrcDir}/${fileName}"
+                                    omitXmlDeclaration="true"
+                                    trim="false">File was unpacked.
+                                </j:file>
+                            </j:if>
+                        </j:if>
+                    </j:forEach>
+                </j:if>    
+            </j:if>
+        </j:forEach>
+    </goal>
+
+
+
+    <goal name="nar:jni" description="Run javah over native classes" prereqs="java:compile,nar:init">
+       
+        <fileScanner var="classFiles">
+            <fileset dir="${maven.build.dest}">
+                <patternset>
+                    <include name="**/*.class"/>
+                </patternset>
+            </fileset>
+        </fileScanner>
+
+        <!--Do we need to run javah -->
+        <j:set var="classDir" value="${maven.build.dest}" />
+        <j:set var="headerDir" value="${dest}/jni" />
+        <j:set var="compileJNI" value="false"/>
+
+        <j:forEach var="file" items="${classFiles.iterator()}">
+            <j:set var="isNative" value="false"/>
+            <j:set var="clazz" value="${narTool.getBcelClass(file.toString())}"/>
+            <j:forEach var="method" items="${clazz.getMethods()}">
+                <j:if test="${method.isNative() == 'true'}">
+                    <j:set var="isNative" value="true"/>
+                </j:if>
+            </j:forEach>
+            <j:if test="${isNative == 'true'}">
+                <j:set var="header" value="${narTool.getHeaderName(classDir, file.toString())}"/>
+                <j:set var="uptodateVar" value="${header}.uptodate" />
+                <uptodate property="${uptodateVar}" srcfile="${file.toString()}" targetfile="${headerDir}/${header}" />
+                <j:set var="uptodate" value="${pom.context.getVariable(uptodateVar)}"/>
+                <j:if test="${uptodate == null}">            
+                    <j:set var="compileJNI" value="true"/>
+                </j:if>
+            </j:if>  
+        </j:forEach>
+    
+        <j:if test="${compileJNI == 'true'}">
+            <echo>Running Javah on java classes</echo>
+            <mkdir dir="${headerDir}"/>
+
+<!-- FIXME, seems to work only with ANT 1.6.x
+            <javah destdir="${headerDir}" verbose="true">        
+                <classpath>
+                    <pathelement path="${maven.build.dest}"/>
+                    <pathelement path="${jniClasspath}"/>
+                    <path refid="maven.dependency.classpath"/>
+                </classpath>
+                
+                <j:forEach var="file" items="${classFiles.iterator()}">
+                    <j:set var="isNative" value="false"/>
+                    <j:set var="clazz" value="${narTool.getBcelClass(file.toString())}"/>
+                    <j:forEach var="method" items="${clazz.getMethods()}">
+                        <j:if test="${method.isNative() == 'true'}">
+                            <j:set var="isNative" value="true"/>
+                        </j:if>
+                    </j:forEach>
+                    <j:if test="${isNative == 'true'}">
+                        <j:set var="header" value="${narTool.getHeaderName(classDir, file.toString())}"/>
+                        <j:set var="uptodateVar" value="${header}.uptodate" />
+                        <j:set var="uptodate" value="${pom.context.getVariable(uptodateVar)}"/>
+                        <j:if test="${uptodate == null}">            
+                            <class name="${clazz.className}"/>
+                        </j:if>
+                    </j:if>
+                </j:forEach>
+            </javah>
+-->         
+            <!-- FIXME NARPLUGIN-9: maven.dependency.classpath missing... -->
+            <exec executable="${javaHome}/bin/javah" failonerror="true">
+                <arg value="-verbose" />
+                <arg value="-d" />
+                <arg file="${headerDir}" />
+                <arg value="-classpath" />
+                <arg path="${maven.build.dest};${jniClasspath}" />         
+      
+                <j:forEach var="file" items="${classFiles.iterator()}">
+                    <j:set var="isNative" value="false"/>
+                    <j:set var="clazz" value="${narTool.getBcelClass(file.toString())}"/>
+                    <j:forEach var="method" items="${clazz.getMethods()}">
+                        <j:if test="${method.isNative() == 'true'}">
+                            <j:set var="isNative" value="true"/>
+                        </j:if>
+                    </j:forEach>
+                    <j:if test="${isNative == 'true'}">
+                        <j:set var="header" value="${narTool.getHeaderName(classDir, file.toString())}"/>
+                        <j:set var="uptodateVar" value="${header}.uptodate" />
+                        <j:set var="uptodate" value="${pom.context.getVariable(uptodateVar)}"/>
+                        <j:if test="${uptodate == null}">            
+                            <arg value="${clazz.className}"/>
+                             <j:if test="${verbose!=null}">
+                                <echo>Class: ${clazz.className}</echo>
+                            </j:if>           
+                        </j:if>
+                    </j:if>
+                </j:forEach>
+            </exec>
+        </j:if>
+    </goal>
+
+
+
+    <goal name="nar:compile" description="Compile native code" prereqs="nar:unpack,nar:jni">
+
+        <j:if test="${includeFilesOnly != 'true'}">
+
+            <mkdir dir="${dest}/lib/${aol}"/>
+                    
+            <available property="jniFilesPresent" file="${maven.build.dir}/nar/jni"/>
+            
+            <j:set var="addJavaIncludes" value="${jniFilesPresent}" defaultValue="${compileWithJava}" />
+            <j:set var="addJavaLibs" value="${jniFilesPresent}" defaultValue="${linkWithJava}" />
+            <j:if test="${verbose!=null}">
+                <echo>Adding java includes: ${addJavaIncludes}</echo>
+                <echo>Adding java libs: ${addJavaLibs}</echo>
+            </j:if>
+
+            <j:set var="libType" value="${outType}" />
+            <j:if test="${libType == 'jni'}">
+                <j:set var="libType" value="plugin" />
+            </j:if>
+
+            <cc name="${linkerName}"
+                outfile="${dest}/lib/${aol}/${pom.artifactId}-nar-${pom.currentVersion}" 
+                outtype="${libType}" 
+                debug="${debug}" 
+                failonerror="${failOnError}"
+                exceptions="${exceptions}"
+                rtti="${rtti}"
+                runtime="${runtime}"
+                optimize="${optimize}"
+                incremental="${incremental}"
+                libtool="${libtool}"
+                multithreaded="${multithreaded}">
+       
+                <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgStart}</u:tokenize>
+                <j:forEach var="arg" items="${argumentList}">
+                    <compilerarg location="start" value="${arg}"/>
+                </j:forEach>
+      
+                <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgMid}</u:tokenize>
+                <j:forEach var="arg" items="${argumentList}">
+                    <compilerarg location="mid" value="${arg}"/>
+                </j:forEach>
+      
+                <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgEnd}</u:tokenize>
+                <j:forEach var="arg" items="${argumentList}">
+                    <compilerarg location="end" value="${arg}"/>
+                </j:forEach>
+    
+                <!-- c++ -->        
+                <compiler name="${cppCompiler}">
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgStart}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="start" value="${arg}"/>
+                    </j:forEach>
+      
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgMid}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="mid" value="${arg}"/>
+                    </j:forEach>
+                    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgEnd}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="end" value="${arg}"/>
+                    </j:forEach>
+
+                    <fileset dir="${src}" includes="${cppSrcIncludes}" excludes="${cppSrcExcludes}"/>
+                </compiler>
+             
+                <!-- c -->        
+                <compiler name="${cCompiler}">
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgStart}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="start" value="${arg}"/>
+                    </j:forEach>
+      
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgMid}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="mid" value="${arg}"/>
+                    </j:forEach>
+                    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgEnd}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="end" value="${arg}"/>
+                    </j:forEach>
+
+                    <fileset dir="${src}" includes="${cSrcIncludes}" excludes="${cSrcExcludes}"/>
+                </compiler>
+             
+                <!-- fortran -->        
+                <compiler name="${fortranCompiler}">
+                    <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgStart}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="start" value="${arg}"/>
+                    </j:forEach>
+      
+                    <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgMid}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="mid" value="${arg}"/>
+                    </j:forEach>
+                    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgEnd}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="end" value="${arg}"/>
+                    </j:forEach>
+
+                    <fileset dir="${src}" includes="${fortranSrcIncludes}" excludes="${fortranSrcExcludes}"/>
+                </compiler>
+             
+                <linker name="${linkerName}">         
+                    <u:tokenize var="argumentList" delim=" " trim="true">${linkerArgStart}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <linkerarg location="start" value="${arg}"/>
+                    </j:forEach>
+    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${linkerArgMid}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <linkerarg location="mid" value="${arg}"/>
+                    </j:forEach>
+    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${linkerArgEnd}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <linkerarg location="end" value="${arg}"/>
+                    </j:forEach>
+                </linker>
+    
+                <j:if test="${addJavaIncludes == 'true'}">
+                    <includepath location="${javaInclude}"/>
+                    <includepath location="${javaIncludeOs}"/>
+                </j:if>   
+             
+                <j:if test="${jniFilesPresent == 'true'}">
+                    <includepath location="${maven.build.dir}/nar/jni"/>
+                </j:if>   
+    
+                <!-- add dependency nar includes -->
+                <j:forEach var="dep" items="${pom.dependencies}">
+                    <j:if test="${dep.type == 'nar'}">
+                        <j:set var="narSrcDir" value="${maven.repo.local}/${dep.groupId}/${dep.type}s" />
+                        <u:properties var="narProp" file="${narSrcDir}/${dep.artifactId}-${dep.version}.${dep.type}" />
+                        <n:osset dst="local" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="local" defaultValue="false" properties="${narProp}"/>
+                        <j:choose>
+                            <j:when test="${local == 'true'}">              
+                                <n:osset dst="incDir" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="include" properties="${narProp}"/>
+                            </j:when>
+                            <j:otherwise>
+                                <j:set var="incDir" value="${narSrcDir}/${dep.artifactId}-${dep.version}/include" />                                
+                            </j:otherwise>
+                        </j:choose>
+                        <includepath location="${incDir}" />
+                    </j:if>
+                </j:forEach>
+             
+                <u:tokenize var="includePathList" delim=" " trim="true">${compileIncludePath}</u:tokenize>
+                <j:forEach var="includePath" items="${includePathList}">    
+                    <includepath location="${includePath}"/>
+                </j:forEach>         
+            
+                <u:tokenize var="sysincludePathList" delim=" " trim="true">${compileSysIncludePath}</u:tokenize>
+                <j:forEach var="sysincludePath" items="${sysincludePathList}">    
+                    <sysincludepath location="${sysincludePath}"/>
+                </j:forEach>             
+            
+                <!-- add additional libs -->
+                <u:tokenize var="libList" delim=" " trim="true">${libs}</u:tokenize>
+                <j:forEach var="libSet" items="${libList}">
+                    <j:set var="libLibsName" value="freehep.nar.lib.${libSet}.libs"/>
+                    <m:property var="libLibs" name="${libLibsName}" defaultValue="${libSet}" />
+                    <j:set var="libDirName" value="freehep.nar.lib.${libSet}.dir"/>
+                    <m:property var="libDir" name="${libDirName}" defaultValue="${freehep.nar.lib.X.dir}" />      
+                    <j:set var="libLinkTypeName" value="freehep.nar.lib.${libSet}.type"/>
+                    <m:property var="libLinkType" name="${libLinkTypeName}" defaultValue="${freehep.nar.lib.X.type}" />    
+                    
+                    <libset dir="${basedir}/${libDir}/${aol}" libs="${libLibs}" type="${libLinkType}"/>
+                </j:forEach>
+    
+                <!-- add dependency nar libs -->
+                <j:forEach var="dep" items="${pom.dependencies}">
+                    <j:if test="${dep.type == 'nar'}">
+                        <j:set var="narSrcDir" value="${maven.repo.local}/${dep.groupId}/${dep.type}s" />
+                        <u:properties var="narProp" file="${narSrcDir}/${dep.artifactId}-${dep.version}.${dep.type}" />
+                        <n:osset dst="narAol" arch="" os="" linker="" prefix="${dep.artifactId}" name="${aol}" defaultValue="${aol}" properties="${narProp}"/>
+                        <n:osset dst="libLink" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="linkLibs" defaultValue="true" properties="${narProp}"/>
+                        <j:if test="${libLink == 'true'}">                           
+                            <n:osset dst="libNames" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="libs" defaultValue="${dep.artifactId}-${dep.version}" properties="${narProp}"/>
+                            <n:osset dst="libLinkType" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="type" defaultValue="${libsType}" properties="${narProp}"/>
+                            <n:osset dst="libLocal" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="local" defaultValue="false" properties="${narProp}"/>
+                            <j:choose>
+                                <j:when test="${libLocal == 'true'}">              
+                                    <n:osset dst="libNames" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="local.libs" defaultValue="${libNames}" properties="${narProp}"/>
+                                    <n:osset dst="libDir" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="dir" properties="${narProp}"/>
+                                </j:when>
+                                <j:otherwise>
+                                    <j:set var="libDir" value="${narSrcDir}/${dep.artifactId}-${dep.version}/lib/${narAol}" />                                
+                                </j:otherwise>
+                            </j:choose>
+                            <libset dir="${libDir}" libs="${libNames}" type="${libLinkType}"/>
+                            <j:if test="${verbose!=null}">
+                                <echo>Linking with '${libLinkType}' libraries: '${libNames}' from: '${libDir}'</echo>
+                            </j:if>
+                        </j:if>
+                    </j:if>
+                </j:forEach>
+    
+                <j:if test="${addJavaLibs == 'true'}">
+                    <j:if test="${os != 'MacOSX'}">
+                        <libset dir="${jvm}" libs="jvm"/>           
+                    </j:if> 
+                </j:if> 
+            </cc>
+
+            <!-- rename jnimodule on MacOS X-->
+            <j:if test="${(outType == 'jni') and (os == 'MacOSX')}" >
+               <move file="${dest}/lib/${aol}/lib${pom.artifactId}-nar-${pom.currentVersion}.bundle" 
+                     tofile="${dest}/lib/${aol}/lib${pom.artifactId}-nar-${pom.currentVersion}.jnilib"/>
+            </j:if>
+        </j:if>
+           
+        <!-- copy include files -->
+        <j:set var="compileIncludePath" value="${compileIncludePath}" />
+        <j:if test="${compileIncludePath != ''}">
+            <mkdir dir="${maven.build.dir}/nar/include" />
+            <copy todir="${maven.build.dir}/nar/include" 
+                  overwrite="true" 
+                  preservelastmodified="true">
+                <u:tokenize var="includePathList" delim=" " trim="true">${compileIncludePath}</u:tokenize>
+                <j:forEach var="includePath" items="${includePathList}">    
+                    <fileset dir="${includePath}" />
+                </j:forEach>         
+            </copy>
+        </j:if>
+    </goal>
+
+
+
+
+
+    <goal name="nar:compile-tests" description="Compile native tests" prereqs="nar:compile">
+
+        <j:if test="${includeFilesOnly != 'true'}">
+            <mkdir dir="${testDest}/${aol}"/>
+
+            <u:tokenize var="testList" delim=" " trim="true">${tests}</u:tokenize>
+            <j:forEach var="testName" items="${testList}">    
+                <echo>Test: ${testName}</echo>
+                                              
+                <cc name="${linkerName}"
+                    outfile="${testDest}/${aol}/${testName}" 
+                    outtype="${testOutType}" 
+                    debug="${debug}" 
+                    failonerror="${failOnError}"
+                    exceptions="${exceptions}"
+                    rtti="${rtti}"
+                    runtime="${runtime}"
+                    optimize="${optimize}"
+                    incremental="${incremental}"
+                    libtool="${libtool}"
+                    multithreaded="${multithreaded}">
+    
+                    <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgStart}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="start" value="${arg}"/>
+                    </j:forEach>
+          
+                    <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgMid}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="mid" value="${arg}"/>
+                    </j:forEach>
+          
+                    <u:tokenize var="argumentList" delim=" " trim="true">${compilerArgEnd}</u:tokenize>
+                    <j:forEach var="arg" items="${argumentList}">
+                        <compilerarg location="end" value="${arg}"/>
+                    </j:forEach>
+      
+               
+                    <!-- c++ -->        
+                    <compiler name="${cppCompiler}">
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgStart}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="start" value="${arg}"/>
+                        </j:forEach>
+          
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgMid}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="mid" value="${arg}"/>
+                        </j:forEach>
+                        
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cppCompilerArgEnd}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="end" value="${arg}"/>
+                        </j:forEach>
+
+                        <fileset dir="${testSrc}" includes="**/${testName}.cpp, **/${testName}.cc, **/${testName}.cxx"/>
+                    </compiler>
+               
+                    <!-- c -->        
+                    <compiler name="${cCompiler}">
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgStart}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="start" value="${arg}"/>
+                        </j:forEach>
+          
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgMid}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="mid" value="${arg}"/>
+                        </j:forEach>
+                        
+                        <u:tokenize var="argumentList" delim=" " trim="true">${cCompilerArgEnd}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="end" value="${arg}"/>
+                        </j:forEach>
+
+                        <fileset dir="${testSrc}" includes="**/${testName}.c"/>
+                    </compiler>
+               
+                    <!-- fortran -->        
+                    <compiler name="${fortranCompiler}">
+                        <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgStart}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="start" value="${arg}"/>
+                        </j:forEach>
+          
+                        <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgMid}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="mid" value="${arg}"/>
+                        </j:forEach>
+                        
+                        <u:tokenize var="argumentList" delim=" " trim="true">${fortranCompilerArgEnd}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <compilerarg location="end" value="${arg}"/>
+                        </j:forEach>
+
+                        <fileset dir="${testSrc}" includes="**/${testName}.f"/>
+                    </compiler>
+               
+                    <linker name="${linkerName}">     
+      
+                        <u:tokenize var="argumentList" delim=" " trim="true">${linkerTestArgStart} ${linkerArgStart}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                           <linkerarg location="start" value="${arg}"/>
+                        </j:forEach>
+                        
+                        <u:tokenize var="argumentList" delim=" " trim="true">${linkerTestArgMid} ${linkerArgMid}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <linkerarg location="mid" value="${arg}"/>
+                        </j:forEach>
+                        
+                        <u:tokenize var="argumentList" delim=" " trim="true">${linkerTestArgEnd} ${linkerArgEnd}</u:tokenize>
+                        <j:forEach var="arg" items="${argumentList}">
+                            <linkerarg location="end" value="${arg}"/>
+                        </j:forEach>
+        
+                    </linker>
+    
+                    <j:if test="${addJavaIncludes == 'true'}">
+                        <includepath location="${javaInclude}"/>
+                        <includepath location="${javaIncludeOs}"/>
+                    </j:if>   
+                        
+                    <!-- add dependency nar includes -->
+                    <j:forEach var="dep" items="${pom.dependencies}">
+                        <j:if test="${dep.type == 'nar'}">
+                            <j:set var="narSrcDir" value="${maven.repo.local}/${dep.groupId}/${dep.type}s" />
+                            <u:properties var="narProp" file="${narSrcDir}/${dep.artifactId}-${dep.version}.${dep.type}" />
+                            <n:osset dst="local" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="local" defaultValue="false" properties="${narProp}"/>
+                            <j:choose>
+                                <j:when test="${local == 'true'}">              
+                                    <n:osset dst="incDir" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="include" properties="${narProp}"/>
+                                </j:when>
+                                <j:otherwise>
+                                    <j:set var="incDir" value="${narSrcDir}/${dep.artifactId}-${dep.version}/include" />                                
+                                </j:otherwise>
+                            </j:choose>
+                            <includepath location="${incDir}" />
+                        </j:if>
+                    </j:forEach>
+             
+                    <includepath location="${maven.build.dir}/nar/include"/>
+                               
+                    <u:tokenize var="includePathList" delim=" " trim="true">${testCompileIncludePath}</u:tokenize>
+                    <j:forEach var="includePath" items="${includePathList}">    
+                        <includepath location="${includePath}"/>
+                    </j:forEach>         
+            
+                    <u:tokenize var="sysincludePathList" delim=" " trim="true">${compileSysIncludePath}</u:tokenize>
+                    <j:forEach var="sysincludePath" items="${sysincludePathList}">    
+                        <sysincludepath location="${sysincludePath}"/>
+                    </j:forEach>             
+                    
+                    <libset dir="${dest}/lib/${aol}" libs="${pom.artifactId}-nar-${pom.currentVersion}" type="${libType}"/>
+                    <j:if test="${verbose!=null}">
+                        <echo>Linking with '${libType}' library: '${pom.artifactId}-nar-${pom.currentVersion}' from: '${dest}/lib/${aol}'</echo>
+                    </j:if>
+    
+                    <u:tokenize var="libList" delim=" " trim="true">${libs}</u:tokenize>
+                    <j:forEach var="libSet" items="${libList}">
+                        <j:set var="libLibsName" value="freehep.nar.lib.${libSet}.libs"/>
+                        <m:property var="libLibs" name="${libLibsName}" defaultValue="${libSet}" />
+                        <j:set var="libDirName" value="freehep.nar.lib.${libSet}.dir"/>
+                        <m:property var="libDir" name="${libDirName}" defaultValue="${freehep.nar.lib.X.dir}" />      
+                        <j:set var="libLinkTypeName" value="freehep.nar.lib.${libSet}.type"/>
+                        <m:property var="libLinkType" name="${libLinkTypeName}" defaultValue="${freehep.nar.lib.X.type}" />    
+    
+                        <libset dir="${basedir}/${libDir}/${aol}" libs="${libLibs}" type="${libLinkType}"/>
+                    </j:forEach>
+    
+                    <!-- add dependency nar libs -->
+                    <j:forEach var="dep" items="${pom.dependencies}">
+                        <j:if test="${dep.type == 'nar'}">
+                            <j:set var="narSrcDir" value="${maven.repo.local}/${dep.groupId}/${dep.type}s" />
+                            <u:properties var="narProp" file="${narSrcDir}/${dep.artifactId}-${dep.version}.${dep.type}" />
+                            <n:osset dst="narAol" arch="" os="" linker="" prefix="${dep.artifactId}" name="${aol}" defaultValue="${aol}" properties="${narProp}"/>
+                            <n:osset dst="libLink" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="linkLibs" defaultValue="true" properties="${narProp}"/>
+                            <j:if test="${libLink == 'true'}">                           
+                                <n:osset dst="libNames" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="libs" defaultValue="${dep.artifactId}-${dep.version}" properties="${narProp}"/>
+                                <n:osset dst="libLinkType" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="type" defaultValue="${libsType}" properties="${narProp}"/>
+                                <n:osset dst="libLocal" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="local" defaultValue="false" properties="${narProp}"/>
+                                <j:choose>
+                                    <j:when test="${libLocal == 'true'}">              
+                                        <n:osset dst="libNames" arch="${arch}" os="${os}" linker="${link}" name="${dep.artifactId}" suffix="local.libs" defaultValue="${libNames}" properties="${narProp}"/>
+                                        <n:osset dst="libDir" arch="${arch}" os="${os}" linker="${link}" prefix="${dep.artifactId}" name="dir" properties="${narProp}"/>
+                                    </j:when>
+                                    <j:otherwise>
+                                        <j:set var="libDir" value="${narSrcDir}/${dep.artifactId}-${dep.version}/lib/${narAol}" />                                
+                                    </j:otherwise>
+                                </j:choose>
+                                <libset dir="${libDir}" libs="${libNames}" type="${libLinkType}"/>
+                                <j:if test="${verbose!=null}">
+                                    <echo>Linking with '${libLinkType}' libraries: '${libNames}' from: '${libDir}'</echo>
+                                </j:if>
+                            </j:if>
+                        </j:if>
+                    </j:forEach>
+    
+                    <j:if test="${addJavaLibs == 'true'}">
+                        <j:if test="${os != 'MacOSX'}">
+                            <libset dir="${jvm}" libs="jvm"/>           
+                        </j:if> 
+                        <j:if test="${os == 'MacOSX'}">
+                            <!-- avoid argument quoting -->
+                            <linkerarg location="end" value="-framework"/>           
+                            <linkerarg location="end" value="JavaVM"/>           
+                        </j:if> 
+                    </j:if>             
+                </cc>
+            </j:forEach>
+        </j:if>       
+    </goal>
+    
+    
+
+
+
+<!-- FIXME, hardcoded sources -->
+    <goal name="nar:nar" 
+          description="Create Native Archive file(s)" 
+          prereqs="nar:compile-tests">
+        <j:set var="narFileContent" value="" />
+        <u:file var="narFile" name="nar.properties" /> 
+        <j:if test="${narFile.exists()}">
+            <u:loadText var="narFileContent" file="${narFile}" />
+        </j:if>
+        <j:file name="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.nar"
+                omitXmlDeclaration="true"
+                trim="false">#
+# NAR-Plugin generated properties file for ${pom.artifactId}-nar
+#
+freehep.nar.nars=${pom.artifactId}-nar-${pom.currentVersion}.noarch.nar
+
+${pom.artifactId}-nar.linkLibs=false
+${narFileContent}
+        </j:file>
+        <jar destfile="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.noarch.nar"
+             basedir="${dest}"
+             includes="include/**"/>
+        <j:if test="${includeFilesOnly != 'true'}">
+            <jar destfile="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.${aol}.nar" 
+                 basedir="${dest}" 
+                 includes="${archIncludes}" />
+            <j:file name="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.nar"
+                    omitXmlDeclaration="true"
+                    trim="false">#
+# NAR-Plugin generated properties file for ${pom.artifactId}-nar
+#
+freehep.nar.nars=${pom.artifactId}-nar-${pom.currentVersion}.noarch.nar \
+                 ${pom.artifactId}-nar-${pom.currentVersion}.$${aol}.nar
+
+${narFileContent}
+            </j:file>
+        </j:if>
+        
+        <!-- set upm library.path for junit -->
+        <m:set plugin="maven-test-plugin" property="maven.junit.jvmargs" value="-Djava.library.path=${freehep.nar.dest}/lib/${aol}" />
+    </goal>
+    
+
+
+    <goal name="nar:install" 
+          description="Install the nar(s) in the local repository"
+          prereqs="nar:nar">          
+        <artifact:install artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.nar"
+            type="nar"
+            project="${pom}"
+            typeHandler="${narTypeHandler}"
+        />
+        <artifact:install artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.noarch.nar"
+            type="nar.noarch"
+            project="${pom}"
+            typeHandler="${narTypeHandler}"
+        />
+        <delete file="${maven.repo.local}/${pom.groupId}/nars/${pom.artifactId}-nar-${pom.currentVersion}/${pom.artifactId}-nar.noarch" />
+        <j:if test="${includeFilesOnly != 'true'}">
+            <artifact:install artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.${aol}.nar"
+                type="nar.${aol}"
+                project="${pom}"
+                typeHandler="${narTypeHandler}"
+            />
+            <delete file="${maven.repo.local}/${pom.groupId}/nars/${pom.artifactId}-nar-${pom.currentVersion}/${pom.artifactId}-nar.${aol}" />
+        </j:if>
+    </goal>
+    
+
+
+
+    <goal name="nar:deploy" 
+          description="Deploy the nar(s) to the remote repositories" 
+          prereqs="nar:nar">
+        <artifact:deploy artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.nar"
+            type="nar"
+            project="${pom}"
+            typeHandler="${narTypeHandler}"
+        />
+        <artifact:deploy artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.noarch.nar"
+            type="nar.noarch"
+            project="${pom}"
+            typeHandler="${narTypeHandler}"
+        />
+        <j:if test="${includeFilesOnly != 'true'}">
+            <artifact:deploy artifact="${maven.build.dir}/${pom.artifactId}-nar-${pom.currentVersion}.${aol}.nar"
+                type="nar.${aol}"
+                project="${pom}"
+                typeHandler="${narTypeHandler}"
+            />
+        </j:if>
+    </goal>
+    
+</project>

@@ -1,0 +1,14 @@
+- nar download
+- nar unpack
+- nar install
+- nar deploy
+- jar and nar together
+
+- include all goals and phases easily for user.
+- move 1.0 doc.
+- example on how to run plugin
+- preferred source organization
+- example on how to change options
+- example on how to generate 2 libraries of different arch (MacOS X).
+
+
