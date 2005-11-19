@@ -1,18 +1,16 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
+import org.apache.maven.plugin.logging.Log;
 import org.apache.tools.ant.BuildEvent;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
-
-import org.apache.maven.plugin.logging.Log;
 
 /**
  * Logger to connect the Ant logging to the Maven logging.
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarLogger.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarLogger.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class NarLogger implements BuildListener {
     

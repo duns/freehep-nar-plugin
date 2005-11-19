@@ -1,14 +1,12 @@
 // Copyright 2005, FreeHEP.
 package org.freehep.maven.nar;
  
-import java.io.IOException;
-
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class NarUtil {
     

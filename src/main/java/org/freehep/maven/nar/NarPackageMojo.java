@@ -1,21 +1,18 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @description Jar up the NAR files.
@@ -23,7 +20,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class NarPackageMojo extends AbstractNarMojo {
             

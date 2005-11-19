@@ -1,16 +1,14 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
-
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.plugin.MojoFailureException;
-
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
-
-import org.apache.tools.ant.Project;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.CompilerDef;
@@ -20,14 +18,18 @@ import net.sf.antcontrib.cpptasks.types.CompilerArgument;
 import net.sf.antcontrib.cpptasks.types.ConditionalFileSet;
 import net.sf.antcontrib.cpptasks.types.DefineArgument;
 import net.sf.antcontrib.cpptasks.types.DefineSet;
-import net.sf.antcontrib.cpptasks.types.LibraryTypeEnum;
-import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
+
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public abstract class Compiler {
 

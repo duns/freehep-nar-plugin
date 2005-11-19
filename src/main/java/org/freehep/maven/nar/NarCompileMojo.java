@@ -1,35 +1,23 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.Artifact;
-
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.PropertyUtils;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
-import net.sf.antcontrib.cpptasks.CompilerDef;
-import net.sf.antcontrib.cpptasks.CompilerEnum;
 import net.sf.antcontrib.cpptasks.CUtil;
-import net.sf.antcontrib.cpptasks.OptimizationEnum;
 import net.sf.antcontrib.cpptasks.OutputTypeEnum;
 import net.sf.antcontrib.cpptasks.RuntimeType;
-
-import net.sf.antcontrib.cpptasks.types.CompilerArgument;
-import net.sf.antcontrib.cpptasks.types.ConditionalFileSet;
-import net.sf.antcontrib.cpptasks.types.DefineArgument;
-import net.sf.antcontrib.cpptasks.types.DefineSet;
-import net.sf.antcontrib.cpptasks.types.IncludePath;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @description Compile native source files.
@@ -37,7 +25,7 @@ import net.sf.antcontrib.cpptasks.types.LibrarySet;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         

@@ -1,9 +1,6 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
-
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -11,7 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal nar-javah
  * @phase compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarJavahMojo.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarJavahMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class NarJavahMojo extends AbstractNarMojo {
     

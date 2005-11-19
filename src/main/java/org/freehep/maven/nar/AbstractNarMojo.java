@@ -1,25 +1,23 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
-import java.util.jar.*;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.PropertyUtils;
 
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo {
 

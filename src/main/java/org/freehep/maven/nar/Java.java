@@ -1,27 +1,26 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import java.io.*;
-import java.util.*;
-
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-
-import org.apache.tools.ant.Project;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.types.CommandLineArgument;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
-import net.sf.antcontrib.cpptasks.types.LibraryTypeEnum;
 import net.sf.antcontrib.cpptasks.types.LinkerArgument;
-import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
+
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.Project;
 
 /**
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Java.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Java.java bcdae088c368 2005/11/19 07:52:18 duns $
  */
 public class Java {
 
