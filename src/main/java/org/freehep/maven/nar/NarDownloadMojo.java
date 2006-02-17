@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 1a10fb9cda6f 2006/02/17 15:00:43 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 3ed11cf5502d 2006/02/17 15:05:40 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 
@@ -68,11 +68,8 @@ public class NarDownloadMojo extends AbstractDependencyMojo {
 			
 		}
 	}
-
 	
-	// TODO this seems useless ????
 	public List getDependencies() {
 		return mavenProject.getRuntimeArtifacts();
 	}
-
 }
