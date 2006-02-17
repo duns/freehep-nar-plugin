@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java d3c3541ba06c 2006/02/17 15:08:52 duns $
  */
 public abstract class Compiler {
 
@@ -159,7 +159,7 @@ public abstract class Compiler {
     }
 
     protected List/*<String>*/ getIncludePaths(MavenProject mavenProject, String type) {
-        if (includePaths == null) {
+        if (includePaths == null || (includePaths.size() == 0)) {
             includePaths = new ArrayList();
             includePaths.add(new File(getSourceDirectory(mavenProject, type), "include").getPath());
         }
