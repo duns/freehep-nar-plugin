@@ -20,7 +20,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 0ab10759d9b8 2006/02/17 15:16:12 duns $
  */
 public class NarPackageMojo extends AbstractNarMojo {
             
@@ -102,7 +102,8 @@ public class NarPackageMojo extends AbstractNarMojo {
         artifact.setFile( artifactFile );
         artifact.setResolved( true );
   
-// FIXME, the build number retrieved for SNAPSHOT is one too high.      
-//        mavenProject.addAttachedArtifact( artifact );
+// FIXME, the build number retrieved for SNAPSHOT is one too high (mvn 2.0)
+// CHECK
+        mavenProject.addAttachedArtifact( artifact );
     }        
 }
