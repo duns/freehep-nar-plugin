@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -15,20 +18,61 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 1a10fb9cda6f 2006/02/17 15:00:43 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
-            
-    public void execute() throws MojoExecutionException, MojoFailureException {        
-        
-        List dependencies = getNarDependencies();
-        for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
-            Artifact dependency = (Artifact)i.next();
-            System.err.println("Download "+dependency);
-        }
-    }
-    
-    public List getDependencies() {
-        return mavenProject.getRuntimeArtifacts();
-    }    
+
+	/**
+	 * Artifact factory, needed to download source jars for inclusion in
+	 * classpath.
+	 * 
+	 * @component role="org.apache.maven.artifact.factory.ArtifactFactory"
+	 * @required
+	 * @readonly
+	 */
+//	private ArtifactFactory artifactFactory;
+
+	/**
+	 * Artifact resolver, needed to download source jars for inclusion in
+	 * classpath.
+	 * 
+	 * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
+	 * @required
+	 * @readonly
+	 */
+	private ArtifactResolver artifactResolver;
+
+	/**
+	 * Remote repositories which will be searched for source attachments.
+	 * 
+	 * @parameter expression="${project.remoteArtifactRepositories}"
+	 * @required
+	 * @readonly
+	 */
+	private List remoteArtifactRepositories;
+
+	public void execute() throws MojoExecutionException, MojoFailureException {
+
+		List dependencies = getAllNarDependencies();
+		for (Iterator i = dependencies.iterator(); i.hasNext();) {
+			Artifact dependency = (Artifact) i.next();
+
+			try {
+				artifactResolver.resolve(dependency, remoteArtifactRepositories, localRepository);
+			} catch (ArtifactNotFoundException e) {
+				// ignore, the jar has not been found
+			} catch (ArtifactResolutionException e) {
+				String message = "nar cannot resolve " + dependency.getId();
+				throw new MojoExecutionException(message, e);
+			}
+			
+		}
+	}
+
+	
+	// TODO this seems useless ????
+	public List getDependencies() {
+		return mavenProject.getRuntimeArtifacts();
+	}
+
 }

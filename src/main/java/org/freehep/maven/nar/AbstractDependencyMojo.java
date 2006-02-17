@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 1a10fb9cda6f 2006/02/17 15:00:43 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -28,7 +28,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         List narDependencies = new ArrayList();                
         for (Iterator i=getDependencies().iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
-            System.err.println("*** "+dependency);
+            //System.err.println("*** "+dependency);
 
             if (getNarProperties(dependency) != null) narDependencies.add(dependency);
         }
@@ -48,7 +48,15 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
                 String[] nar = nars[j].split(":", 5);
                 if (nar.length >= 5) {
                     try {
-                        allNarDependencies.add(new NarArtifact(nar[0], nar[1], nar[4], dependency.getScope(), nar[2], nar[3], dependency.isOptional()));
+                        String classifier = nar[3];
+                        if ("${aol}".equals(classifier)) {
+                            try {
+                                classifier = getAOL();
+                            } catch (MojoFailureException e) {
+                                throw new MojoExecutionException(e.getMessage(), e);
+                            }
+                        }
+                        allNarDependencies.add(new NarArtifact(nar[0], nar[1], nar[4], dependency.getScope(), nar[2], classifier, dependency.isOptional()));
                     } catch (InvalidVersionSpecificationException e) {
                         throw new MojoExecutionException("Error while reading nar file for dependency " + dependency, e );
                     }                             
