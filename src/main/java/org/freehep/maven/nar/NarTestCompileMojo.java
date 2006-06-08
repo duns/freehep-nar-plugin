@@ -1,10 +1,9 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -26,26 +25,27 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
-              
-    public void execute() throws MojoExecutionException, MojoFailureException { 
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
         // make sure destination is there
         getTargetDirectory().mkdirs();
 
-        for (Iterator i=getTests().iterator(); i.hasNext(); ) {
-            createTest(getAntProject(), (Test)i.next());  
+        for (Iterator i = getTests().iterator(); i.hasNext();) {
+            createTest(getAntProject(), (Test) i.next());
         }
-    }                
-        
-    private void createTest(Project antProject, Test test) throws MojoExecutionException, MojoFailureException {
+    }
+
+    private void createTest(Project antProject, Test test)
+            throws MojoExecutionException, MojoFailureException {
         String type = "test";
-        System.err.println("TESTING "+test.getName());
-                            
+        System.err.println("TESTING " + test.getName());
+
         // configure task
         CCTask task = new CCTask();
-        task.setProject(antProject);          
+        task.setProject(antProject);
 
         // outtype
         OutputTypeEnum outTypeEnum = new OutputTypeEnum();
@@ -60,8 +60,8 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // outFile
         File outFile = new File(outDir, test.getName());
-        getLog().info("NAR - output: '"+outFile+"'");
-        task.setOutfile(outFile); 
+        getLog().info("NAR - output: '" + outFile + "'");
+        task.setOutfile(outFile);
 
         // object directory
         File objDir = new File(getTargetDirectory(), "obj");
@@ -77,62 +77,77 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         RuntimeType runtimeType = new RuntimeType();
         runtimeType.setValue(getRuntime());
         task.setRuntime(runtimeType);
-        
+
         // add C++ compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getCpp().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, test.getName()));
+        task.addConfiguredCompiler(getCpp().getCompiler(mavenProject,
+                antProject, getOS(), getDefaults(), getAOLKey(), type,
+                test.getName()));
 
         // add C compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getC().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, test.getName()));
+        task.addConfiguredCompiler(getC().getCompiler(mavenProject, antProject,
+                getOS(), getDefaults(), getAOLKey(), type, test.getName()));
 
         // add Fortran compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getFortran().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, test.getName()));
+        task.addConfiguredCompiler(getFortran().getCompiler(mavenProject,
+                antProject, getOS(), getDefaults(), getAOLKey(), type,
+                test.getName()));
 
-        // add java include paths 
+        // add java include paths
         // FIXME, get rid of task
         getJava().addIncludePaths(mavenProject, task, this, type);
-        
+
         // add dependency include paths
-        for (Iterator i=getNarDependencies().iterator(); i.hasNext(); ) {
-            File include = new File(getNarFile((Artifact)i.next()).getParentFile(), "nar/include");
+        for (Iterator i = getNarDependencies("test").iterator(); i.hasNext();) {
+            File include = new File(getNarFile((Artifact) i.next())
+                    .getParentFile(), "nar/include");
             if (include.exists()) {
                 task.createIncludePath().setPath(include.getPath());
             }
         }
-                
+
         // add linker
-        task.addConfiguredLinker(getLinker().getLinker(this, antProject, getOS(), getDefaults(), getAOLKey()+"linker.", type));
+        task.addConfiguredLinker(getLinker().getLinker(this, antProject,
+                getOS(), getDefaults(), getAOLKey() + "linker.", type));
 
         // FIXME hardcoded values
         String libName = getFinalName();
-        File includeDir = new File(mavenProject.getBuild().getDirectory(), "nar/include");
-        File libDir = new File(mavenProject.getBuild().getDirectory(), "nar/lib/"+getAOL()+"/"+test.getLink());   
-        
+        File includeDir = new File(mavenProject.getBuild().getDirectory(),
+                "nar/include");
+        File libDir = new File(mavenProject.getBuild().getDirectory(),
+                "nar/lib/" + getAOL() + "/" + test.getLink());
+
         // copy shared library
         if (test.getLink().equals("shared")) {
             try {
                 // defaults are Unix
-                String libPrefix = getDefaults().getProperty(getAOLKey()+"lib.prefix", "lib");
-                String libExt = getDefaults().getProperty(getAOLKey()+"shared.extension", "so");
-                File copyDir = new File(getTargetDirectory(), (getOS().equals("Windows") ? "bin" : "lib")+"/"+getAOL()+"/"+test.getLink());
-                FileUtils.copyFileToDirectory(new File(libDir, libPrefix+libName+"."+libExt), copyDir);
+                String libPrefix = getDefaults().getProperty(
+                        getAOLKey() + "lib.prefix", "lib");
+                String libExt = getDefaults().getProperty(
+                        getAOLKey() + "shared.extension", "so");
+                File copyDir = new File(getTargetDirectory(), (getOS().equals(
+                        "Windows") ? "bin" : "lib")
+                        + "/" + getAOL() + "/" + test.getLink());
+                FileUtils.copyFileToDirectory(new File(libDir, libPrefix
+                        + libName + "." + libExt), copyDir);
                 if (!getOS().equals("Windows")) {
                     libDir = copyDir;
                 }
             } catch (IOException e) {
-                throw new MojoExecutionException("NAR: Could not copy shared library", e);
+                throw new MojoExecutionException(
+                        "NAR: Could not copy shared library", e);
             }
         }
-        
+
         // FIXME what about copying the other shared libs?
 
         // add include of this package
         if (includeDir.exists()) {
-            task.createIncludePath().setLocation(includeDir); 
+            task.createIncludePath().setLocation(includeDir);
         }
-        
+
         // add library of this package
         if (libDir.exists()) {
             LibrarySet libSet = new LibrarySet();
@@ -141,31 +156,35 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
             LibraryTypeEnum libType = new LibraryTypeEnum();
             libType.setValue(test.getLink());
             libSet.setType(libType);
-            libSet.setDir(libDir);        
+            libSet.setDir(libDir);
             task.addLibset(libSet);
         }
-               
+
         // add dependency libraries
-        for (Iterator i=getNarDependencies().iterator(); i.hasNext(); ) {
-            Artifact dependency = (Artifact)i.next();
-            File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+getAOL()+"/"+test.getLink());
+        for (Iterator i = getNarDependencies("test").iterator(); i.hasNext();) {
+            Artifact dependency = (Artifact) i.next();
+            File lib = new File(getNarFile(dependency).getParentFile(),
+                    "nar/lib/" + getAOL() + "/" + test.getLink());
             if (lib.exists()) {
                 LibrarySet libset = new LibrarySet();
                 libset.setProject(antProject);
-                libset.setLibs(new CUtil.StringArrayBuilder(dependency.getArtifactId()+"-"+dependency.getVersion()));
+                libset.setLibs(new CUtil.StringArrayBuilder(dependency
+                        .getArtifactId()
+                        + "-" + dependency.getVersion()));
                 libset.setDir(lib);
                 task.addLibset(libset);
             }
         }
 
         if (getOS().equals("MacOSX")) {
-            // add Framework for MacOS X              
+            // add Framework for MacOS X
             getJava().addMacOSXRuntime(task);
         } else {
             // Add JVM to linker
             // FIXME, use "this".
-            getJava().addRuntime(antProject, task, getDefaults(), getJavaHome(), getAOLKey()+"java.");
-        }        
+            getJava().addRuntime(antProject, task, getDefaults(),
+                    getJavaHome(), getAOLKey() + "java.");
+        }
 
         // execute
         try {
@@ -173,13 +192,9 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         } catch (BuildException e) {
             throw new MojoExecutionException("NAR: Test-Compile failed", e);
         }
-   }
-   
-    protected List getDependencies() {
-        return mavenProject.getTestArtifacts();
-    }   
-    
+    }
+
     protected File getTargetDirectory() {
         return new File(mavenProject.getBuild().getDirectory(), "test-nar");
-    }    
+    }
 }

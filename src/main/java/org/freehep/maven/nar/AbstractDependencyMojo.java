@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -17,18 +17,17 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 1a10fb9cda6f 2006/02/17 15:00:43 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
     /**
      * Returns those dependencies which are dependent on Nar files
      */
-    protected List/*<Artifact>*/ getNarDependencies() throws MojoExecutionException {
+    protected List/*<Artifact>*/ getNarDependencies(String scope) throws MojoExecutionException {
         List narDependencies = new ArrayList();                
-        for (Iterator i=getDependencies().iterator(); i.hasNext(); ) {
+        for (Iterator i=getDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
-            //System.err.println("*** "+dependency);
 
             if (getNarProperties(dependency) != null) narDependencies.add(dependency);
         }
@@ -38,25 +37,31 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     /**
      * Returns all NAR dependencies, including noarch and aol.
      */
-    protected List/*<Artifacts>*/ getAllNarDependencies() throws MojoExecutionException {
+    protected List/*<Artifacts>*/ getAllNarDependencies(String scope) throws MojoExecutionException {
         List allNarDependencies = new ArrayList();
-        for (Iterator i=getNarDependencies().iterator(); i.hasNext(); ) {
+        for (Iterator i=getNarDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
             Properties properties = getNarProperties(dependency);
             String[] nars = properties.getProperty("nars", "").split(",");
             for (int j=0; j<nars.length; j++) {
                 String[] nar = nars[j].split(":", 5);
-                if (nar.length >= 5) {
+                if (nar.length >= 4) {
                     try {
-                        String classifier = nar[3];
+                        String groupId = nar[0].trim();
+                        String artifactId = nar[1].trim();
+                        String type = nar[2].trim();
+                        String classifier = nar[3].trim();
                         if ("${aol}".equals(classifier)) {
                             try {
                                 classifier = getAOL();
+                                // translate for instance g++ to gcc...
+                                classifier = properties.getProperty(classifier, classifier);
                             } catch (MojoFailureException e) {
                                 throw new MojoExecutionException(e.getMessage(), e);
                             }
                         }
-                        allNarDependencies.add(new NarArtifact(nar[0], nar[1], nar[4], dependency.getScope(), nar[2], classifier, dependency.isOptional()));
+                        String version = nar.length >= 5 ? nar[4].trim() : dependency.getVersion();
+                        allNarDependencies.add(new NarArtifact(groupId, artifactId, version, dependency.getScope(), type, classifier, dependency.isOptional()));
                     } catch (InvalidVersionSpecificationException e) {
                         throw new MojoExecutionException("Error while reading nar file for dependency " + dependency, e );
                     }                             
@@ -74,7 +79,14 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         return new File(localRepository.getBasedir(), localRepository.pathOf(dependency).replaceAll("\\$\\{aol\\}", getAOL()));
     }
 
-    protected abstract List getDependencies();          
+    private List getDependencies(String scope) {
+        if (scope.equals("test")) {
+            return mavenProject.getTestArtifacts();
+        } else if (scope.equals("runtime")) {
+            return mavenProject.getRuntimeArtifacts();
+        }
+        return mavenProject.getCompileArtifacts();
+     }
     
     private Properties getNarProperties(Artifact dependency) throws MojoExecutionException {
         // FIXME reported to maven developer list, isSnapshot changes behaviour of getBaseVersion, called in pathOf.

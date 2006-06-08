@@ -18,7 +18,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 3ed11cf5502d 2006/02/17 15:05:40 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 
@@ -53,23 +53,19 @@ public class NarDownloadMojo extends AbstractDependencyMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-		List dependencies = getAllNarDependencies();
+		List dependencies = getAllNarDependencies("compile");
 		for (Iterator i = dependencies.iterator(); i.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
 
 			try {
 				artifactResolver.resolve(dependency, remoteArtifactRepositories, localRepository);
 			} catch (ArtifactNotFoundException e) {
-				// ignore, the jar has not been found
+                String message = "nar not found " + dependency.getId();
+                throw new MojoExecutionException(message, e);
 			} catch (ArtifactResolutionException e) {
 				String message = "nar cannot resolve " + dependency.getId();
 				throw new MojoExecutionException(message, e);
 			}
-			
 		}
-	}
-	
-	public List getDependencies() {
-		return mavenProject.getRuntimeArtifacts();
-	}
+	}	
 }

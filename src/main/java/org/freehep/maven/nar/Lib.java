@@ -19,7 +19,7 @@ import net.sf.antcontrib.cpptasks.types.LibrarySet;
  * Keeps info on a library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class Lib {
 
@@ -75,7 +75,7 @@ public class Lib {
             libSet.setDir(dir);
             linker.addLibset(libSet);        
         } else {
-            List dependencies = mojo.getNarDependencies();
+            List dependencies = mojo.getNarDependencies("compile");
             for (Iterator i=libs.iterator(); i.hasNext(); ) {
                 Lib lib = (Lib)i.next();
                 String[] ids = name.split(":",2);

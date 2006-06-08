@@ -1,10 +1,9 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -25,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -107,8 +106,10 @@ public class NarCompileMojo extends AbstractCompileMojo {
         getJava().addIncludePaths(mavenProject, task, this, type);
         
         // add dependency include paths
-        for (Iterator i=getNarDependencies().iterator(); i.hasNext(); ) {
+        for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {
+            // FIXME, handle multiple includes from one NAR
             File include = new File(getNarFile((Artifact)i.next()).getParentFile(), "nar/include");
+            System.err.println("*** Include "+include);
             if (include.exists()) {
                 task.createIncludePath().setPath(include.getPath());
             }
@@ -119,14 +120,20 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
         // add dependency libraries
         if (type.equals("shared") || type.equals("jni")) {
-            for (Iterator i=getNarDependencies().iterator(); i.hasNext(); ) {
+            for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {
                 Artifact dependency = (Artifact)i.next();
-                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+getAOL()+"/shared");
+                // FIXME, what about shared linking
+                // FIXME, getAOL() should be corrected.
+                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+"ppc-MacOSX-gcc"+"/static");
+                System.err.println("*** Lib "+lib);
                 if (lib.exists()) {
                     LibrarySet libset = new LibrarySet();
                     libset.setProject(antProject);
-                    libset.setLibs(new CUtil.StringArrayBuilder(dependency.getArtifactId()+"-"+dependency.getVersion()));
+                    // FIXME, pick up correct lib
+                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, SystemStubs, gfortran"));
+                            //dependency.getArtifactId()+"-"+dependency.getVersion()));
                     libset.setDir(lib);
+                    System.err.println("*** LIBSET: "+libset);
                     task.addLibset(libset);
                 }
             }
@@ -154,8 +161,4 @@ public class NarCompileMojo extends AbstractCompileMojo {
             }
         }          
     }
-
-    protected List getDependencies() {
-        return mavenProject.getRuntimeArtifacts();
-    }   
 }

@@ -1,4 +1,4 @@
-// Copyright 2005, FreeHEP.
+// Copyright 2005-2006, FreeHEP.
 package org.freehep.maven.nar;
  
 import org.apache.maven.artifact.Artifact;
@@ -11,7 +11,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
  * NarArtifact with its own type, classifier and artifactHandler.
  *
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarArtifact.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarArtifact.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class NarArtifact extends DefaultArtifact {
 

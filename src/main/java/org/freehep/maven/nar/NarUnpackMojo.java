@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -21,18 +21,18 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
             
     public void execute() throws MojoExecutionException, MojoFailureException {        
         
-        List dependencies = getAllNarDependencies();
+        List dependencies = getAllNarDependencies("compile");
         for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
             File file = getNarFile(dependency);
-            File narLocation = file.getParentFile();
-            File flagFile = new File(narLocation, "nar/"+FileUtils.basename(file.getPath(), "."+NAR_EXTENSION)+".flag");
+            File narLocation = new File(file.getParentFile(), "nar");
+            File flagFile = new File(narLocation, FileUtils.basename(file.getPath(), "."+NAR_EXTENSION)+".flag");
             
             boolean process = false;
             if (!narLocation.exists()) {
@@ -47,6 +47,7 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
             if (process) {
                 try {
                     unpackNar(file, narLocation);
+                    FileUtils.fileDelete(flagFile.getPath());
                     FileUtils.fileWrite(flagFile.getPath(), "");                 
                 } catch (IOException e) {
                     getLog().info("Cannot create flag file: "+flagFile.getPath());
@@ -54,11 +55,7 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
             }
         }
     }
-    
-    protected List getDependencies() {
-        return mavenProject.getRuntimeArtifacts();
-    }
-    
+        
     private void unpackNar(File file, File location) throws MojoExecutionException {
         try {
             UnArchiver unArchiver;
