@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 2f1b40cbf058 2006/06/09 14:22:02 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -130,7 +130,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                     LibrarySet libset = new LibrarySet();
                     libset.setProject(antProject);
                     // FIXME, pick up correct lib
-                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, SystemStubs, gfortran"));
+                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, gfortran, gfortranbegin"));
                             //dependency.getArtifactId()+"-"+dependency.getVersion()));
                     libset.setDir(lib);
                     System.err.println("*** LIBSET: "+libset);
