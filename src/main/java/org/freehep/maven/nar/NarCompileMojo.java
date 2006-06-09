@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 2f1b40cbf058 2006/06/09 14:22:02 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -58,7 +58,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
             outTypeEnum.setValue(type);
         }
         task.setOuttype(outTypeEnum);
-        
+
         // outDir
         File outDir = new File(getTargetDirectory(), "lib");
         outDir = new File(outDir, getAOL());
@@ -130,7 +130,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                     LibrarySet libset = new LibrarySet();
                     libset.setProject(antProject);
                     // FIXME, pick up correct lib
-                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, gfortran, gfortranbegin"));
+                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, dl, compat, g2c"));
                             //dependency.getArtifactId()+"-"+dependency.getVersion()));
                     libset.setDir(lib);
                     System.err.println("*** LIBSET: "+libset);
@@ -155,7 +155,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
         // rename output file on MacOSX
         if (library.getType().equals("jni") && getOS().equals("MacOSX")) {
             try {
-                FileUtils.rename(new File(outFile.getPath()+".bundle"), new File(outFile.getPath()+".jnilib"));
+                FileUtils.rename(new File(outFile.getParent(), "lib"+outFile.getName()+".so"), new File(outFile.getParent(), "lib"+outFile.getName()+".jnilib"));
             } catch (IOException e) {
                 throw new MojoExecutionException("NAR: could not rename output file", e);
             }

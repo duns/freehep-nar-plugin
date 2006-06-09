@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java d3c3541ba06c 2006/02/17 15:08:52 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
  */
 public abstract class Compiler {
 
@@ -175,7 +175,7 @@ public abstract class Compiler {
         // adjust default values
         if (name == null) name = defaults.getProperty(prefix+"compiler");
         if (name == null) {
-            throw new MojoFailureException("NAR: Please specify <Name> as part of <Cpp>, <C> or <Fortran>");
+            throw new MojoFailureException("NAR: Please specify <Name> as part of <Cpp>, <C> or <Fortran> for "+prefix);
         }
         
         Set finalIncludes = new HashSet();
@@ -185,7 +185,7 @@ public abstract class Compiler {
             if (includes.isEmpty()) {
                 String defaultIncludes = defaults.getProperty(prefix+"includes");
                 if (defaultIncludes == null) {
-                    throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran>");
+                    throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "+prefix);
                 }
                 String[] include = defaultIncludes.split(" ");
                 for (int i=0; i<include.length; i++) {
@@ -209,7 +209,7 @@ public abstract class Compiler {
             // include only the output.xxx files
             String defaultIncludes = defaults.getProperty(prefix+"includes");
             if (defaultIncludes == null) {
-                throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran>");
+                throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "+prefix);
             }
             // FIXME, includes is ignored here. 
             String[] include = defaultIncludes.split(" ");

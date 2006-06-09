@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Java.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
  */
 public class Java {
 
@@ -74,13 +74,12 @@ public class Java {
                 }
             } else {
                 String prefix = mojo.getAOLKey()+"java.";
-                String[] path = mojo.getDefaults().getProperty(prefix+"include").split(";");
-                if (path != null) {
+                String includes = mojo.getDefaults().getProperty(prefix+"include");
+                if (includes != null) {
+                    String[] path = includes.split(";");
                     for (int i=0; i<path.length; i++) {
                         task.createIncludePath().setPath(new File(mojo.getJavaHome(), path[i]).getPath());
                     }
-                } else {
-                    if (outType.equals("jni")) throw new MojoFailureException("NAR: Please specify <IncludePaths> as part of <Java>");
                 }
             }
         }
