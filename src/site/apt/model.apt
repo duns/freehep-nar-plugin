@@ -13,7 +13,7 @@ CompileMojo
   <libtool/>
 
   <linker>
-    <linkerName/>
+    <name/>
     <incremental/>
     <map/>
     <options>
