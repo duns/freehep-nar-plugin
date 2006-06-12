@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 058194920a5b 2006/06/12 07:05:03 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -52,11 +52,11 @@ public class NarCompileMojo extends AbstractCompileMojo {
         // outtype
         OutputTypeEnum outTypeEnum = new OutputTypeEnum();
         String type = library.getType();
-        if (type.equals("jni")) {
-            outTypeEnum.setValue("plugin");
-        } else {
+//        if (type.equals("jni")) {
+//            outTypeEnum.setValue("plugin");
+//        } else {
             outTypeEnum.setValue(type);
-        }
+//        }
         task.setOuttype(outTypeEnum);
 
         // outDir
@@ -130,7 +130,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                     LibrarySet libset = new LibrarySet();
                     libset.setProject(antProject);
                     // FIXME, pick up correct lib
-                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, dl, compat, g2c"));
+                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, dl, g2c"));
                             //dependency.getArtifactId()+"-"+dependency.getVersion()));
                     libset.setDir(lib);
                     System.err.println("*** LIBSET: "+libset);
@@ -153,12 +153,12 @@ public class NarCompileMojo extends AbstractCompileMojo {
         }
 
         // rename output file on MacOSX
-        if (library.getType().equals("jni") && getOS().equals("MacOSX")) {
-            try {
-                FileUtils.rename(new File(outFile.getParent(), "lib"+outFile.getName()+".so"), new File(outFile.getParent(), "lib"+outFile.getName()+".jnilib"));
-            } catch (IOException e) {
-                throw new MojoExecutionException("NAR: could not rename output file", e);
-            }
-        }          
+//        if (library.getType().equals("jni") && getOS().equals("MacOSX")) {
+//            try {
+//               FileUtils.rename(new File(outFile.getParent(), "lib"+outFile.getName()+".so"), new File(outFile.getParent(), "lib"+outFile.getName()+".jnilib"));
+//            } catch (IOException e) {
+//                throw new MojoExecutionException("NAR: could not rename output file", e);
+//            }
+//        }          
     }
 }
