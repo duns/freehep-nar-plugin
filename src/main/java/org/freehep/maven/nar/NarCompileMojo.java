@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 058194920a5b 2006/06/12 07:05:03 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java a6d83bea2713 2006/06/12 20:51:42 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -124,7 +124,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                 Artifact dependency = (Artifact)i.next();
                 // FIXME, what about shared linking
                 // FIXME, getAOL() should be corrected.
-                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+"ppc-MacOSX-gcc"+"/static");
+                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+"i386-Linux-gcc"+"/static");
                 System.err.println("*** Lib "+lib);
                 if (lib.exists()) {
                     LibrarySet libset = new LibrarySet();
