@@ -19,7 +19,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 73902c059881 2006/06/13 23:38:16 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -28,12 +28,13 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     /**
      * Returns dependencies which are dependent on NAR files (i.e. contain a nar.properties file)
      */
-    protected List/*<Artifact>*/ getNarDependencies(String scope) throws MojoExecutionException {
+    protected List/*<NarArtifact>*/ getNarDependencies(String scope) throws MojoExecutionException {
         List narDependencies = new ArrayList();                
         for (Iterator i=getDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
-
-            if (getNarProperties(dependency) != null) narDependencies.add(dependency);
+            
+            Properties narProperties = getNarProperties(dependency);
+            if (narProperties != null) narDependencies.add(new NarArtifact(dependency, narProperties));
         }
         return narDependencies;
     }
@@ -42,7 +43,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
      * Returns all NAR dependencies by type: noarch, static, dunamic, jni, plugin.
      * @throws MojoFailureException 
      */
-    protected Map/*<String, Artifact>*/ getAttachedNarDependencyMap(String scope) throws MojoExecutionException, MojoFailureException {
+    protected Map/*<String, List<AttachedNarArtifact>>*/ getAttachedNarDependencyMap(String scope) throws MojoExecutionException, MojoFailureException {
         Map attachedNarDependencies = new HashMap();
         for (Iterator i=getNarDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
@@ -55,24 +56,26 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     }
     
     /**
-     *  Returns a list of all attached nar dependencies for a specific bidning and "noarch".
+     *  Returns a list of all attached nar dependencies for a specific binding and "noarch", but not where "local" is specified
      * @param scope
      * @return
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    protected List/*<Artifact>*/ getAttachedNarDependencies(String scope) throws MojoExecutionException, MojoFailureException {
+    protected List/*<AttachedNarArtifact>*/ getAttachedNarDependencies(String scope) throws MojoExecutionException, MojoFailureException {
         List artifactList = new ArrayList();
         for (Iterator i=getNarDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
             Properties properties = getNarProperties(dependency);
             artifactList.addAll(getAttachedNarDependencies(dependency, "noarch"));
+            
+            // FIXME no handling of local
             artifactList.addAll(getAttachedNarDependencies(dependency, properties.getProperty("binding", "static")));            
         }
         return artifactList;
     }
     
-    protected List/*<Artifact>*/ getAttachedNarDependencies(Artifact dependency, String narType) throws MojoExecutionException, MojoFailureException {
+    protected List/*<AttachedNarArtifact>*/ getAttachedNarDependencies(Artifact dependency, String narType) throws MojoExecutionException, MojoFailureException {
         List artifactList = new ArrayList();
         Properties properties = getNarProperties(dependency);
         String[] nars = properties.getProperty(narType, "").split(",");

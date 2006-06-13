@@ -23,7 +23,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 73902c059881 2006/06/13 23:38:16 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -51,11 +51,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
         // outtype
         OutputTypeEnum outTypeEnum = new OutputTypeEnum();
         String type = library.getType();
-//        if (type.equals("jni")) {
-//            outTypeEnum.setValue("plugin");
-//        } else {
-            outTypeEnum.setValue(type);
-//        }
+        outTypeEnum.setValue(type);
         task.setOuttype(outTypeEnum);
 
         // outDir
@@ -120,17 +116,25 @@ public class NarCompileMojo extends AbstractCompileMojo {
         // add dependency libraries
         if (type.equals("shared") || type.equals("jni")) {
             for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {
-                Artifact dependency = (Artifact)i.next();
-                // FIXME, what about shared linking
-                // FIXME, getAOL() should be corrected.
-                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+"i386-Linux-gcc"+"/static");
+                NarArtifact dependency = (NarArtifact)i.next();
+                
+                // FIXME no handling of "local"
+                
+                // FIXME, no way to override this at this stage
+                String binding = dependency.getProperties().getProperty("binding", "static");
+                String aol = getAOL();
+                aol = dependency.getProperties().getProperty(aol, aol);
+                
+                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+aol+"/"+binding);
                 System.err.println("*** Lib "+lib);
                 if (lib.exists()) {
                     LibrarySet libset = new LibrarySet();
                     libset.setProject(antProject);
-                    // FIXME, pick up correct lib
-                    libset.setLibs(new CUtil.StringArrayBuilder("packlib, dl, g2c"));
-                            //dependency.getArtifactId()+"-"+dependency.getVersion()));
+                    
+                    // FIXME, no way to override
+                    String libs = dependency.getProperties().getProperty("libs", dependency.getArtifactId()+"-"+dependency.getVersion());
+                        
+                    libset.setLibs(new CUtil.StringArrayBuilder(libs));
                     libset.setDir(lib);
                     System.err.println("*** LIBSET: "+libset);
                     task.addLibset(libset);
