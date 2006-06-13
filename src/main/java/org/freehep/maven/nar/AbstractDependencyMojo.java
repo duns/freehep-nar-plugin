@@ -4,8 +4,10 @@ package org.freehep.maven.nar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -17,12 +19,14 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
+    private String[] narTypes = { "noarch", "static", "dynamic", "jni", "plugin" };
+    
     /**
-     * Returns those dependencies which are dependent on Nar files
+     * Returns dependencies which are dependent on NAR files (i.e. contain a nar.properties file)
      */
     protected List/*<Artifact>*/ getNarDependencies(String scope) throws MojoExecutionException {
         List narDependencies = new ArrayList();                
@@ -35,42 +39,65 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     }
         
     /**
-     * Returns all NAR dependencies, including noarch and aol.
+     * Returns all NAR dependencies by type: noarch, static, dunamic, jni, plugin.
+     * @throws MojoFailureException 
      */
-    protected List/*<Artifacts>*/ getAllNarDependencies(String scope) throws MojoExecutionException {
-        List allNarDependencies = new ArrayList();
+    protected Map/*<String, Artifact>*/ getAttachedNarDependencyMap(String scope) throws MojoExecutionException, MojoFailureException {
+        Map attachedNarDependencies = new HashMap();
+        for (Iterator i=getNarDependencies(scope).iterator(); i.hasNext(); ) {
+            Artifact dependency = (Artifact)i.next();
+            for (int j=0; j<narTypes.length; j++) {
+                List artifactList = getAttachedNarDependencies(dependency, narTypes[j]);
+                if (artifactList != null) attachedNarDependencies.put(narTypes[j], artifactList);
+            }
+        }
+        return attachedNarDependencies;
+    }
+    
+    /**
+     *  Returns a list of all attached nar dependencies for a specific bidning and "noarch".
+     * @param scope
+     * @return
+     * @throws MojoExecutionException
+     * @throws MojoFailureException
+     */
+    protected List/*<Artifact>*/ getAttachedNarDependencies(String scope) throws MojoExecutionException, MojoFailureException {
+        List artifactList = new ArrayList();
         for (Iterator i=getNarDependencies(scope).iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
             Properties properties = getNarProperties(dependency);
-            String[] nars = properties.getProperty("nars", "").split(",");
-            for (int j=0; j<nars.length; j++) {
-                String[] nar = nars[j].split(":", 5);
-                if (nar.length >= 4) {
-                    try {
-                        String groupId = nar[0].trim();
-                        String artifactId = nar[1].trim();
-                        String type = nar[2].trim();
-                        String classifier = nar[3].trim();
-                        if ("${aol}".equals(classifier)) {
-                            try {
-                                classifier = getAOL();
-                                // translate for instance g++ to gcc...
-                                classifier = properties.getProperty(classifier, classifier);
-                            } catch (MojoFailureException e) {
-                                throw new MojoExecutionException(e.getMessage(), e);
-                            }
-                        }
-                        String version = nar.length >= 5 ? nar[4].trim() : dependency.getVersion();
-                        allNarDependencies.add(new NarArtifact(groupId, artifactId, version, dependency.getScope(), type, classifier, dependency.isOptional()));
-                    } catch (InvalidVersionSpecificationException e) {
-                        throw new MojoExecutionException("Error while reading nar file for dependency " + dependency, e );
-                    }                             
-                } else {
-                    getLog().warn("nars property contains invalid field: '"+nars[j]+"'");
-                }
+            artifactList.addAll(getAttachedNarDependencies(dependency, "noarch"));
+            artifactList.addAll(getAttachedNarDependencies(dependency, properties.getProperty("binding", "static")));            
+        }
+        return artifactList;
+    }
+    
+    protected List/*<Artifact>*/ getAttachedNarDependencies(Artifact dependency, String narType) throws MojoExecutionException, MojoFailureException {
+        List artifactList = new ArrayList();
+        Properties properties = getNarProperties(dependency);
+        String[] nars = properties.getProperty(narType, "").split(",");
+        for (int j=0; j<nars.length; j++) {
+            String[] nar = nars[j].split(":", 5);
+            if (nar.length >= 4) {
+                try {
+                    String groupId = nar[0].trim();
+                    String artifactId = nar[1].trim();
+                    String type = nar[2].trim();
+                    String classifier = nar[3].trim();
+                    String aol = getAOL();
+//                  translate for instance g++ to gcc...
+                    aol = properties.getProperty(aol, aol);
+                    classifier = classifier.replaceAll("\\$\\{aol\\}", aol);
+                    String version = nar.length >= 5 ? nar[4].trim() : dependency.getVersion();
+                    artifactList.add(new AttachedNarArtifact(groupId, artifactId, version, dependency.getScope(), type, classifier, dependency.isOptional()));
+                } catch (InvalidVersionSpecificationException e) {
+                    throw new MojoExecutionException("Error while reading nar file for dependency " + dependency, e );
+                }                             
+            } else {
+                getLog().warn("nars property contains invalid field: '"+nars[j]+"'");
             }
         }
-        return allNarDependencies;
+        return artifactList;
     }
 
     protected File getNarFile(Artifact dependency) throws MojoFailureException {

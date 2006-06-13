@@ -20,7 +20,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 0ab10759d9b8 2006/02/17 15:16:12 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
  */
 public class NarPackageMojo extends AbstractNarMojo {
             
@@ -97,7 +97,7 @@ public class NarPackageMojo extends AbstractNarMojo {
     }
     
     private void addNarArtifact(String artifactType, String artifactClassifier, File artifactFile) {
-        Artifact artifact = new NarArtifact( mavenProject.getArtifact(), artifactType, artifactClassifier );
+        Artifact artifact = new AttachedNarArtifact( mavenProject.getArtifact(), artifactType, artifactClassifier );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );

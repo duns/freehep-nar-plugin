@@ -11,17 +11,17 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
  * NarArtifact with its own type, classifier and artifactHandler.
  *
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarArtifact.java fb2f54cb3103 2006/06/08 23:31:35 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java 83229295dbc0 2006/06/13 18:24:24 duns $
  */
-public class NarArtifact extends DefaultArtifact {
+public class AttachedNarArtifact extends DefaultArtifact {
 
-    public NarArtifact(String groupId, String artifactId, String version, String scope, 
+    public AttachedNarArtifact(String groupId, String artifactId, String version, String scope, 
                        String type, String classifier, boolean optional) throws InvalidVersionSpecificationException {
         super(groupId, artifactId, VersionRange.createFromVersionSpec(version), scope, 
               type, classifier, new Handler(classifier), optional);              
     }
 
-    public NarArtifact(Artifact parent, String type, String classifier) {
+    public AttachedNarArtifact(Artifact parent, String type, String classifier) {
         super(parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), 
               type, classifier, new Handler(classifier), parent.isOptional());
     }

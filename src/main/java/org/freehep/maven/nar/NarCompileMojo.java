@@ -16,7 +16,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @description Compile native source files.
@@ -24,7 +23,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java a6d83bea2713 2006/06/12 20:51:42 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         

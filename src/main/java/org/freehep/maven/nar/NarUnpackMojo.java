@@ -21,13 +21,13 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
             
     public void execute() throws MojoExecutionException, MojoFailureException {        
         
-        List dependencies = getAllNarDependencies("compile");
+        List dependencies = getAttachedNarDependencies("compile");
         for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
             File file = getNarFile(dependency);
