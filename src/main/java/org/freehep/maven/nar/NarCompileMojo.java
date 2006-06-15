@@ -10,6 +10,7 @@ import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.OutputTypeEnum;
 import net.sf.antcontrib.cpptasks.RuntimeType;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
+import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 73902c059881 2006/06/13 23:38:16 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java d3e5b1ffc9be 2006/06/15 22:00:33 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -121,23 +122,36 @@ public class NarCompileMojo extends AbstractCompileMojo {
                 // FIXME no handling of "local"
                 
                 // FIXME, no way to override this at this stage
-                String binding = dependency.getProperties().getProperty("binding", "static");
+                String binding = dependency.getNarInfo().getBinding(getAOL());
+                System.err.println("BINDING "+binding);
                 String aol = getAOL();
-                aol = dependency.getProperties().getProperty(aol, aol);
+                aol = dependency.getNarInfo().getAOL(getAOL());
+                System.err.println("LIB AOL "+aol);
                 
-                File lib = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+aol+"/"+binding);
-                System.err.println("*** Lib "+lib);
-                if (lib.exists()) {
-                    LibrarySet libset = new LibrarySet();
-                    libset.setProject(antProject);
+                File dir = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+aol+"/"+binding);
+                System.err.println("LIB DIR "+dir);
+                if (dir.exists()) {
+                    LibrarySet libSet = new LibrarySet();
+                    libSet.setProject(antProject);
                     
                     // FIXME, no way to override
-                    String libs = dependency.getProperties().getProperty("libs", dependency.getArtifactId()+"-"+dependency.getVersion());
-                        
-                    libset.setLibs(new CUtil.StringArrayBuilder(libs));
-                    libset.setDir(lib);
-                    System.err.println("*** LIBSET: "+libset);
-                    task.addLibset(libset);
+                    String libs = dependency.getNarInfo().getLibs(getAOL());
+                    System.err.println("LIBS = "+libs);    
+                    libSet.setLibs(new CUtil.StringArrayBuilder(libs));
+                    libSet.setDir(dir);
+                    task.addLibset(libSet);
+                } else {
+                	System.err.println("LIB DIR "+dir+" does NOT exist.");
+                }
+                
+                String sysLibs = dependency.getNarInfo().getSysLibs(getAOL());
+                if (sysLibs != null) {
+                    System.err.println("SYSLIBS = "+sysLibs);    
+                	SystemLibrarySet sysLibSet = new SystemLibrarySet();
+                	sysLibSet.setProject(antProject);
+
+                	sysLibSet.setLibs(new CUtil.StringArrayBuilder(sysLibs));
+                	task.addSyslibset(sysLibSet);
                 }
             }
         }
@@ -154,14 +168,5 @@ public class NarCompileMojo extends AbstractCompileMojo {
         } catch (BuildException e) {
             throw new MojoExecutionException("NAR: Compile failed", e);
         }
-
-        // rename output file on MacOSX
-//        if (library.getType().equals("jni") && getOS().equals("MacOSX")) {
-//            try {
-//               FileUtils.rename(new File(outFile.getParent(), "lib"+outFile.getName()+".so"), new File(outFile.getParent(), "lib"+outFile.getName()+".jnilib"));
-//            } catch (IOException e) {
-//                throw new MojoExecutionException("NAR: could not rename output file", e);
-//            }
-//        }          
     }
 }

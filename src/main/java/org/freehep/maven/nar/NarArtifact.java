@@ -1,28 +1,26 @@
 // Copyright 2006, FreeHEP.
 package org.freehep.maven.nar;
 
-import java.util.Properties;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 
 /**
  * 
  * @author duns
- * @version $Id: src/main/java/org/freehep/maven/nar/NarArtifact.java 73902c059881 2006/06/13 23:38:16 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarArtifact.java d3e5b1ffc9be 2006/06/15 22:00:33 duns $
  */
 public class NarArtifact extends DefaultArtifact {
 
-    private Properties narProperties;
+    private NarInfo narInfo;
 
-    public NarArtifact(Artifact dependency, Properties narProperties) {
+    public NarArtifact(Artifact dependency, NarInfo narInfo) {
         super(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersionRange(), 
               dependency.getScope(), dependency.getType(), dependency.getClassifier(), 
               dependency.getArtifactHandler(), dependency.isOptional());
-        this.narProperties = narProperties;
+        this.narInfo = narInfo;
     }
     
-    public Properties getProperties() {
-        return narProperties;
+    public NarInfo getNarInfo() {
+        return narInfo;
     }
 }
