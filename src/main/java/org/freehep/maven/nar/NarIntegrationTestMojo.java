@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.surefire.SurefireBooter;
 
 /**
@@ -48,7 +49,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 73902c059881 2006/06/13 23:38:16 duns $, 413987 maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 899583b73c05 2006/06/16 17:13:05 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -66,6 +67,14 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
         return false;
     }
 
+    // FREEHEP added to get names
+    /**
+     * @parameter expression="${project}"
+     * @readonly
+     * @required
+     */
+    protected MavenProject project;    
+    
     /**
      * Set this to 'true' to bypass unit tests entirely. Its use is NOT
      * RECOMMENDED, but quite convenient on occasion.
@@ -391,6 +400,9 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                 if (argLine == null) argLine = "";
                 if (testJNIModule()) {
                     argLine += " -Djava.library.path=target/nar/lib/"+getAOL()+"/jni";
+                    String jarFile = "target/"+project.getArtifactId()+"-"+project.getVersion()+".jar";
+                    getLog().debug("Adding to surefire test classpath: "+jarFile);
+                    surefireBooter.addClassPathUrl(jarFile);
                 }
                 
                 surefireBooter.setArgLine(argLine);
