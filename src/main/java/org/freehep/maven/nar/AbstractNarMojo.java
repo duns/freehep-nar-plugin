@@ -17,7 +17,7 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java b622bcaea4f3 2006/06/16 17:52:04 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo {
 
@@ -25,7 +25,7 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     protected final String NAR_NO_ARCH = "noarch";
     protected final String NAR_ROLE_HINT = "nar-library";
     protected final String NAR_TYPE = NAR_ROLE_HINT;
-    protected final String NAR_PROPERTIES = "nar.properties";
+//    protected final String NAR_PROPERTIES = "nar.properties";
        
     /**
      * The Architecture for the nar,
