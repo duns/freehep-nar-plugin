@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
  * Linker tag
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Linker.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Linker.java 0a36823a3ca9 2006/06/16 17:45:25 duns $
  */
 public class Linker {
 

@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 
@@ -6,7 +6,7 @@ package org.freehep.maven.nar;
  * Sets up a library to create
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Library.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Library.java 0a36823a3ca9 2006/06/16 17:45:25 duns $
  */
 public class Library {
 
@@ -19,8 +19,20 @@ public class Library {
      */
     protected String type = "shared";
     
+    /**
+     * Link with stdcpp if necessary
+     * Defaults to true.
+     * 
+     * @parameter expression=""
+     */
+    protected boolean linkCPP = true;
+    
     public String getType() {
         return type;
+    }
+    
+    public boolean linkCPP() {
+        return linkCPP;
     }
 }
 

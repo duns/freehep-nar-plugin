@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java d3e5b1ffc9be 2006/06/15 22:00:33 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 0a36823a3ca9 2006/06/16 17:45:25 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -54,6 +54,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
         String type = library.getType();
         outTypeEnum.setValue(type);
         task.setOuttype(outTypeEnum);
+        
+        // std c++
+        task.setLinkCPP(library.linkCPP());
 
         // outDir
         File outDir = new File(getTargetDirectory(), "lib");
