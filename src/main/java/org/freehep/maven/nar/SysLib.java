@@ -1,19 +1,18 @@
 // Copyright FreeHEP, 2005.
 package org.freehep.maven.nar;
 
-import org.apache.maven.plugin.MojoFailureException;
-
-import org.apache.tools.ant.Project;
-
 import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.types.LibraryTypeEnum;
 import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
+
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.tools.ant.Project;
 
 /**
  * Keeps info on a system library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/SysLib.java eec048018869 2005/11/18 06:31:36 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/SysLib.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public class SysLib {
 

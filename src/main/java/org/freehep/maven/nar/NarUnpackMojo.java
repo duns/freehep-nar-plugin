@@ -21,7 +21,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 83229295dbc0 2006/06/13 18:24:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
             
@@ -59,7 +59,7 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
     private void unpackNar(File file, File location) throws MojoExecutionException {
         try {
             UnArchiver unArchiver;
-            unArchiver = archiverManager.getUnArchiver(NAR_ROLE_HINT);
+            unArchiver = getArchiverManager().getUnArchiver(NAR_ROLE_HINT);
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);
             unArchiver.extract();

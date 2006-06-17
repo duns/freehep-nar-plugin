@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.surefire.SurefireBooter;
@@ -49,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 899583b73c05 2006/06/16 17:13:05 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java aaed00b12053 2006/06/17 00:35:37 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -65,16 +64,16 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                 return true;
         }
         return false;
-    }
-
+    }    
+    
     // FREEHEP added to get names
     /**
      * @parameter expression="${project}"
      * @readonly
      * @required
      */
-    protected MavenProject project;    
-    
+    private MavenProject project;    
+
     /**
      * Set this to 'true' to bypass unit tests entirely. Its use is NOT
      * RECOMMENDED, but quite convenient on occasion.
@@ -174,7 +173,8 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
      * @required
      * @readonly
      */
-    private ArtifactRepository localRepository;
+    // FREEHEP removed, already in superclass
+//    private ArtifactRepository localRepository;
 
     /**
      * List of System properties to pass to the JUnit tests.
@@ -385,7 +385,7 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
         boolean success;
         try {
 // FREEHEP
-            if (testJNIModule()) forkMode="pertest";
+            if (project.getPackaging().equals("nar") || (getNarDependencies("test").size() > 0)) forkMode="pertest";
             
             surefireBooter.setForkMode(forkMode);
 
@@ -398,12 +398,33 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
 
 // FREEHEP      
                 if (argLine == null) argLine = "";
+                
+                StringBuffer javaLibraryPath = new StringBuffer();
                 if (testJNIModule()) {
-                    argLine += " -Djava.library.path=target/nar/lib/"+getAOL()+"/jni";
+                    // Add libraries to java.library.path for testing
+                    String thisLib = "target/nar/lib/"+getAOL()+"/jni";
+                    if (new File(thisLib).exists()) {
+                        System.err.println("Adding to java.library.path: "+thisLib);
+                    }
+                    
+                    // add jar file to classpath, as one may want to read a properties file for artifactId and version
                     String jarFile = "target/"+project.getArtifactId()+"-"+project.getVersion()+".jar";
                     getLog().debug("Adding to surefire test classpath: "+jarFile);
                     surefireBooter.addClassPathUrl(jarFile);
                 }
+                
+                
+                List dependencies = getNarDependencies("test");
+                for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
+                    NarArtifact dependency = (NarArtifact)i.next();
+                    System.err.println("XXX "+getNarFile(dependency));
+                }
+                
+                // add final javalibrary path
+                if (javaLibraryPath.length() > 0) {
+                    argLine += " -Djava.library.path="+javaLibraryPath;
+                }
+// ENDFREEHEP
                 
                 surefireBooter.setArgLine(argLine);
 
@@ -438,7 +459,8 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
     protected void processSystemProperties() {
         System.setProperty("basedir", basedir.getAbsolutePath());
 
-        System.setProperty("localRepository", localRepository.getBasedir());
+        // FREEHEP, use access method
+        System.setProperty("localRepository", getLocalRepository().getBasedir());
 
         // Add all system properties configured by the user
         if (systemProperties != null) {

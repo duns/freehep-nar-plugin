@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 0a36823a3ca9 2006/06/16 17:45:25 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
         
@@ -38,7 +38,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                
         try {
             // FIXME, should the include paths be defined at a higher level ?
-            getCpp().copyIncludeFiles(mavenProject, new File(getTargetDirectory(), "include"));
+            getCpp().copyIncludeFiles(getMavenProject(), new File(getTargetDirectory(), "include"));
         } catch (IOException e) {
             throw new MojoExecutionException("NAR: could not copy include files", e);
         }
@@ -86,23 +86,23 @@ public class NarCompileMojo extends AbstractCompileMojo {
         
         // add C++ compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getCpp().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
 
         // add C compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getC().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
 
         // add Fortran compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getFortran().getCompiler(mavenProject, antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
 
         // add javah include path
-        File jniDirectory = getJavah().getJniDirectory(mavenProject);
+        File jniDirectory = getJavah().getJniDirectory(getMavenProject());
         if (jniDirectory.exists()) task.createIncludePath().setPath(jniDirectory.getPath());    
 
         // add java include paths 
         // FIXME, get rid of task
-        getJava().addIncludePaths(mavenProject, task, this, type);
+        getJava().addIncludePaths(getMavenProject(), task, this, type);
         
         // add dependency include paths
         for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {

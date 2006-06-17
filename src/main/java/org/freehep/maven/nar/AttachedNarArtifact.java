@@ -4,14 +4,14 @@ package org.freehep.maven.nar;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  * NarArtifact with its own type, classifier and artifactHandler.
  *
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java 83229295dbc0 2006/06/13 18:24:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public class AttachedNarArtifact extends DefaultArtifact {
 

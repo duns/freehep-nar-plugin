@@ -25,7 +25,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fb2f54cb3103 2006/06/08 23:31:35 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -80,24 +80,24 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // add C++ compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getCpp().getCompiler(mavenProject,
+        task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(),
                 antProject, getOS(), getDefaults(), getAOLKey(), type,
                 test.getName()));
 
         // add C compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getC().getCompiler(mavenProject, antProject,
+        task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject,
                 getOS(), getDefaults(), getAOLKey(), type, test.getName()));
 
         // add Fortran compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getFortran().getCompiler(mavenProject,
+        task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(),
                 antProject, getOS(), getDefaults(), getAOLKey(), type,
                 test.getName()));
 
         // add java include paths
         // FIXME, get rid of task
-        getJava().addIncludePaths(mavenProject, task, this, type);
+        getJava().addIncludePaths(getMavenProject(), task, this, type);
 
         // add dependency include paths
         for (Iterator i = getNarDependencies("test").iterator(); i.hasNext();) {
@@ -114,9 +114,9 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // FIXME hardcoded values
         String libName = getFinalName();
-        File includeDir = new File(mavenProject.getBuild().getDirectory(),
+        File includeDir = new File(getMavenProject().getBuild().getDirectory(),
                 "nar/include");
-        File libDir = new File(mavenProject.getBuild().getDirectory(),
+        File libDir = new File(getMavenProject().getBuild().getDirectory(),
                 "nar/lib/" + getAOL() + "/" + test.getLink());
 
         // copy shared library
@@ -195,6 +195,6 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
     }
 
     protected File getTargetDirectory() {
-        return new File(mavenProject.getBuild().getDirectory(), "test-nar");
+        return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
     }
 }

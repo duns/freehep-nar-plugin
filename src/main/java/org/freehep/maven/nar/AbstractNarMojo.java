@@ -17,7 +17,7 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java b622bcaea4f3 2006/06/16 17:52:04 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo {
 
@@ -25,7 +25,6 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     protected final String NAR_NO_ARCH = "noarch";
     protected final String NAR_ROLE_HINT = "nar-library";
     protected final String NAR_TYPE = NAR_ROLE_HINT;
-//    protected final String NAR_PROPERTIES = "nar.properties";
        
     /**
      * The Architecture for the nar,
@@ -172,22 +171,19 @@ public abstract class AbstractNarMojo extends AbstractMojo {
      */
     private List tests;
 
-
-
-
     /**
      * @parameter expression="${project}"
      * @readonly
      * @required
      */
-    protected MavenProject mavenProject;
+    private MavenProject mavenProject;
  
     /**
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
      */
-    protected ArtifactRepository localRepository;
+    private ArtifactRepository localRepository;
 
     /**
      * Maven ArtifactFactory.
@@ -196,7 +192,7 @@ public abstract class AbstractNarMojo extends AbstractMojo {
      * @required
      * @readonly
      */
-    protected ArtifactFactory artifactFactory;
+    private ArtifactFactory artifactFactory;
 
     /**
      * To look up Archiver/UnArchiver implementations
@@ -204,7 +200,7 @@ public abstract class AbstractNarMojo extends AbstractMojo {
      * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
      * @required
      */
-    protected ArchiverManager archiverManager;
+    private ArchiverManager archiverManager;
 
 
     private Properties defaults;
@@ -338,5 +334,21 @@ public abstract class AbstractNarMojo extends AbstractMojo {
    
     private String getLinkerName() throws MojoFailureException {
         return getLinker().getName(getDefaults(), getArchitecture()+"."+getOS()+".");        
+    }
+
+    protected ArchiverManager getArchiverManager() {
+        return archiverManager;
+    }
+
+    protected ArtifactFactory getArtifactFactory() {
+        return artifactFactory;
+    }
+
+    protected ArtifactRepository getLocalRepository() {
+        return localRepository;
+    }
+
+    protected MavenProject getMavenProject() {
+        return mavenProject;
     }
 }
