@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java aaed00b12053 2006/06/17 00:35:37 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 501cf4787202 2006/06/17 07:40:13 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -405,6 +405,7 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                     String thisLib = "target/nar/lib/"+getAOL()+"/jni";
                     if (new File(thisLib).exists()) {
                         System.err.println("Adding to java.library.path: "+thisLib);
+                        javaLibraryPath.append(thisLib);
                     }
                     
                     // add jar file to classpath, as one may want to read a properties file for artifactId and version
@@ -417,12 +418,18 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                 List dependencies = getNarDependencies("test");
                 for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
                     NarArtifact dependency = (NarArtifact)i.next();
-                    System.err.println("XXX "+getNarFile(dependency));
+                    NarInfo info = dependency.getNarInfo();
+                    if (!info.getBinding(getAOL()).equals("static")) {
+                        File depLib = new File(getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+info.getBinding(getAOL()));
+                        System.err.println("Adding to java.library.path: "+depLib.getPath());
+                        if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");
+                        javaLibraryPath.append(depLib.getPath());
+                    }
                 }
                 
                 // add final javalibrary path
                 if (javaLibraryPath.length() > 0) {
-                    argLine += " -Djava.library.path="+javaLibraryPath;
+                    argLine += " -Djava.library.path="+javaLibraryPath.toString();
                 }
 // ENDFREEHEP
                 

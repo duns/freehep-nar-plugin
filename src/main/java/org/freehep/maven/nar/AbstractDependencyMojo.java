@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 501cf4787202 2006/06/17 07:40:13 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -95,31 +95,33 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         NarInfo narInfo = getNarInfo(dependency);
         String[] nars = narInfo.getAttachedNars(getAOL(), narType);
         // FIXME Move this to info....
-        for (int j = 0; j < nars.length; j++) {
-            String[] nar = nars[j].split(":", 5);
-            if (nar.length >= 4) {
-                try {
-                    String groupId = nar[0].trim();
-                    String artifactId = nar[1].trim();
-                    String type = nar[2].trim();
-                    String classifier = nar[3].trim();
-                    // translate for instance g++ to gcc...
-                    String aol = narInfo.getAOL(getAOL());
-                    classifier = classifier.replace("${aol}", aol);
-                    String version = nar.length >= 5 ? nar[4].trim()
-                            : dependency.getVersion();
-                    artifactList.add(new AttachedNarArtifact(groupId,
-                            artifactId, version, dependency.getScope(), type,
-                            classifier, dependency.isOptional()));
-                } catch (InvalidVersionSpecificationException e) {
-                    throw new MojoExecutionException(
-                            "Error while reading nar file for dependency "
-                                    + dependency, e);
+        if (nars != null) {
+            for (int j = 0; j < nars.length; j++) {
+                String[] nar = nars[j].split(":", 5);
+                if (nar.length >= 4) {
+                    try {
+                        String groupId = nar[0].trim();
+                        String artifactId = nar[1].trim();
+                        String type = nar[2].trim();
+                        String classifier = nar[3].trim();
+                        // translate for instance g++ to gcc...
+                        String aol = narInfo.getAOL(getAOL());
+                        classifier = classifier.replace("${aol}", aol);
+                        String version = nar.length >= 5 ? nar[4].trim()
+                                : dependency.getVersion();
+                        artifactList.add(new AttachedNarArtifact(groupId,
+                                artifactId, version, dependency.getScope(), type,
+                                classifier, dependency.isOptional()));
+                    } catch (InvalidVersionSpecificationException e) {
+                        throw new MojoExecutionException(
+                                "Error while reading nar file for dependency "
+                                        + dependency, e);
+                    }
+                } else {
+                    getLog().warn(
+                            "nars property in "+dependency.getArtifactId()+" contains invalid field: '" + nars[j]
+                                    + "' for type: "+narType);
                 }
-            } else {
-                getLog().warn(
-                        "nars property contains invalid field: '" + nars[j]
-                                + "'");
             }
         }
         return artifactList;

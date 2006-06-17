@@ -13,7 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 501cf4787202 2006/06/17 07:40:13 duns $
  */
 public class NarInfo {
 
@@ -52,9 +52,14 @@ public class NarInfo {
 		return getProperty(aol, "libs.binding", "static");
 	}
 
+    public void setBinding(String aol, String value) {
+        setProperty(aol, "libs.binding", value);
+    }
+
 	// FIXME replace with list of AttachedNarArtifacts
 	public String[] getAttachedNars(String aol, String type) {
-		return getProperty(aol, "nar."+type, "").split(",");
+		String attachedNars = getProperty(aol, "nar."+type, null);
+        return attachedNars != null ? attachedNars.split(",") : null;
 	}
 
     public void addNar(String aol, String type, String nar) {

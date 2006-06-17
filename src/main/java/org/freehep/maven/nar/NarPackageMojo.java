@@ -17,11 +17,13 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 501cf4787202 2006/06/17 07:40:13 duns $
  */
 public class NarPackageMojo extends AbstractNarMojo {
             
     public void execute() throws MojoExecutionException, MojoFailureException {
+        // FIXME, multiple types should be possible
+        String type = "jni";
         NarInfo info = new NarInfo(getMavenProject().getGroupId(), getMavenProject().getArtifactId(), getMavenProject().getVersion());
 
         // General properties.nar file
@@ -36,28 +38,31 @@ public class NarPackageMojo extends AbstractNarMojo {
             // ignored
         }
 
+        File narDirectory = new File(getOutputDirectory(), "nar");
+        
         // noarch
-        String include = "nar/include";
-        if (new File(getOutputDirectory(), include).exists()) {   
+        String include = "include";
+        if (new File(narDirectory, include).exists()) {   
             File noarchFile = new File(getOutputDirectory(), getFinalName()+"-"+NAR_NO_ARCH+"."+NAR_EXTENSION);
-            nar(noarchFile, getOutputDirectory(), new String[] { include });
+            nar(noarchFile, narDirectory, new String[] { include });
             addNarArtifact(NAR_TYPE, NAR_NO_ARCH, noarchFile);
             info.setNar(null, "noarch", getMavenProject().getGroupId()+":"+getMavenProject().getArtifactId()+":"+NAR_TYPE+":"+NAR_NO_ARCH);
         }
         
         // aol
-        String bin = "nar/bin";
-        String lib = "nar/lib";
-        if (new File(getOutputDirectory(), bin).exists() || new File(getOutputDirectory(), lib).exists()) {
+        String bin = "bin";
+        String lib = "lib";
+        if (new File(narDirectory, bin).exists() || new File(narDirectory, lib).exists()) {
             // aol
-            File archFile = new File(getOutputDirectory(), getFinalName()+"-"+getAOL()+"."+NAR_EXTENSION);
-            nar(archFile, getOutputDirectory(), new String[] { bin, lib });
-            addNarArtifact(NAR_TYPE, getAOL(), archFile);  
-            // FIXME, multiple types should be possible
-            String type = "jni";
+            File archFile = new File(getOutputDirectory(), getFinalName()+"-"+getAOL()+"-"+type+"."+NAR_EXTENSION);
+            nar(archFile, narDirectory, new String[] { bin, lib });
+            addNarArtifact(NAR_TYPE, getAOL()+"-"+type, archFile);  
             info.setNar(null, type, getMavenProject().getGroupId()+":"+getMavenProject().getArtifactId()+":"+NAR_TYPE+":"+"${aol}-"+type);
         } 
-                
+        
+        // FIXME hardcoded
+        info.setBinding(null, type);
+        
         try {
             info.writeToFile(propertiesFile);              
         } catch (IOException ioe) {
