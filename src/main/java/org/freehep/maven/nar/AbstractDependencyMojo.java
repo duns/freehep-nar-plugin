@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 501cf4787202 2006/06/17 07:40:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 9c718bfa8735 2006/06/19 22:53:09 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -77,6 +77,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         List artifactList = new ArrayList();
         for (Iterator i = getNarDependencies(scope).iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
+            System.err.println("Dep "+dependency);
             NarInfo narInfo = getNarInfo(dependency);
             artifactList
                     .addAll(getAttachedNarDependencies(dependency, "noarch"));

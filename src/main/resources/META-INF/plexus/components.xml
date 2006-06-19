@@ -17,8 +17,8 @@
                                   org.freehep:freehep-nar-plugin:nar-testCompile</test-compile>
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test,
                           org.freehep:freehep-nar-plugin:nar-test</test>
-                    <package>org.apache.maven.plugins:maven-jar-plugin:jar,
-                    		 org.freehep:freehep-nar-plugin:nar-package</package>
+                    <package>org.freehep:freehep-nar-plugin:nar-package,
+                             org.apache.maven.plugins:maven-jar-plugin:jar</package>
                     <integration-test>org.freehep:freehep-nar-plugin:nar-integration-test</integration-test>
                     <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                     <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>

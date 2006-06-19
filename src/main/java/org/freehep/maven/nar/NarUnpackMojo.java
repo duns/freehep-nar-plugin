@@ -21,15 +21,18 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 9c718bfa8735 2006/06/19 22:53:09 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
             
     public void execute() throws MojoExecutionException, MojoFailureException {        
         
+        // FIXME should this be runtime ?
         List dependencies = getAttachedNarDependencies("compile");
+        System.err.println("Found "+dependencies.size()+ " attached Nars");
         for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
             Artifact dependency = (Artifact)i.next();
+            System.err.println("Unpack "+dependency);
             File file = getNarFile(dependency);
             File narLocation = new File(file.getParentFile(), "nar");
             File flagFile = new File(narLocation, FileUtils.basename(file.getPath(), "."+NAR_EXTENSION)+".flag");
