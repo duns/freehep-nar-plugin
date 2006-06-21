@@ -13,7 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 501cf4787202 2006/06/17 07:40:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java f306842a5f50 2006/06/21 20:44:59 duns $
  */
 public class NarInfo {
 
@@ -89,6 +89,7 @@ public class NarInfo {
     }
     
 	private String getProperty(String aol, String key, String defaultValue) {
+        if (key == null) return defaultValue;
 		String value = info.getProperty(key, defaultValue);
 		return aol == null ? value : info.getProperty(aol+"."+key, value);
 	}

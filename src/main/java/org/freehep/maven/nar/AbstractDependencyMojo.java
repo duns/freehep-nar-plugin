@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 9c718bfa8735 2006/06/19 22:53:09 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java f306842a5f50 2006/06/21 20:44:59 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -54,7 +54,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         for (Iterator i = getNarDependencies(scope).iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
             for (int j = 0; j < narTypes.length; j++) {
-                List artifactList = getAttachedNarDependencies(dependency,
+                List artifactList = getAttachedNarDependencies(dependency, getAOL(),
                         narTypes[j]);
                 if (artifactList != null)
                     attachedNarDependencies.put(narTypes[j], artifactList);
@@ -63,6 +63,11 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         return attachedNarDependencies;
     }
 
+    protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
+            String scope) throws MojoExecutionException, MojoFailureException {
+        return getAttachedNarDependencies(scope, getAOL());
+    }
+    
     /**
      * Returns a list of all attached nar dependencies for a specific binding
      * and "noarch", but not where "local" is specified
@@ -73,28 +78,28 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
      * @throws MojoFailureException
      */
     protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-            String scope) throws MojoExecutionException, MojoFailureException {
+            String scope, String aol) throws MojoExecutionException, MojoFailureException {
         List artifactList = new ArrayList();
         for (Iterator i = getNarDependencies(scope).iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
             System.err.println("Dep "+dependency);
             NarInfo narInfo = getNarInfo(dependency);
             artifactList
-                    .addAll(getAttachedNarDependencies(dependency, "noarch"));
+                    .addAll(getAttachedNarDependencies(dependency, null, "noarch"));
 
             // FIXME no handling of local
-            artifactList.addAll(getAttachedNarDependencies(dependency, narInfo
-                    .getBinding(getAOL())));
+            artifactList.addAll(getAttachedNarDependencies(dependency, aol, narInfo
+                    .getBinding(aol)));
         }
         return artifactList;
     }
 
     protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-            Artifact dependency, String narType) throws MojoExecutionException,
+            Artifact dependency, String aol, String narType) throws MojoExecutionException,
             MojoFailureException {
         List artifactList = new ArrayList();
         NarInfo narInfo = getNarInfo(dependency);
-        String[] nars = narInfo.getAttachedNars(getAOL(), narType);
+        String[] nars = narInfo.getAttachedNars(aol, narType);
         // FIXME Move this to info....
         if (nars != null) {
             for (int j = 0; j < nars.length; j++) {
@@ -106,8 +111,10 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
                         String type = nar[2].trim();
                         String classifier = nar[3].trim();
                         // translate for instance g++ to gcc...
-                        String aol = narInfo.getAOL(getAOL());
-                        classifier = classifier.replace("${aol}", aol);
+                        aol = narInfo.getAOL(aol);
+                        if (aol != null) {
+                            classifier = NarUtil.replace("${aol}", aol, classifier);
+                        }
                         String version = nar.length >= 5 ? nar[4].trim()
                                 : dependency.getVersion();
                         artifactList.add(new AttachedNarArtifact(groupId,
@@ -133,8 +140,8 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
         // of getBaseVersion, called in pathOf.
         if (dependency.isSnapshot())
             ;
-        return new File(getLocalRepository().getBasedir(), getLocalRepository().pathOf(
-                dependency).replace("${aol}", getAOL()));
+        return new File(getLocalRepository().getBasedir(), NarUtil.replace("${aol}", getAOL(), getLocalRepository().pathOf(
+                dependency)));
     }
 
     private List getDependencies(String scope) {

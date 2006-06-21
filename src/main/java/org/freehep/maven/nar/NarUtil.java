@@ -1,12 +1,15 @@
 // Copyright 2005, FreeHEP.
 package org.freehep.maven.nar;
  
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java f306842a5f50 2006/06/21 20:44:59 duns $
  */
 public class NarUtil {
     
@@ -49,4 +52,16 @@ public class NarUtil {
             return null;
         }
     }
+    
+    /**
+     * Replaces target with replacement in string. For jdk 1.4 compatiblity.
+     * @param target
+     * @param replacement
+     * @param string
+     * @return
+     */
+    public static String replace(CharSequence target, CharSequence replacement, String string) {
+        return Pattern.compile(target.toString(), Pattern.LITERAL).matcher(
+            string).replaceAll(Matcher.quoteReplacement(replacement.toString()));
+    }       
 }
