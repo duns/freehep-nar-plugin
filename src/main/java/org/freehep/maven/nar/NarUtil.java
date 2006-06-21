@@ -8,7 +8,7 @@ import org.apache.bcel.classfile.JavaClass;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java fc2acdd9b26c 2006/06/21 21:16:20 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 5e680f13e167 2006/06/21 21:17:37 duns $
  */
 public class NarUtil {
     
@@ -70,7 +70,7 @@ public class NarUtil {
         if (slashEIndex == -1)
             return "\\Q" + s + "\\E";
 
-        StringBuilder sb = new StringBuilder(s.length() * 2);
+        StringBuffer sb = new StringBuffer(s.length() * 2);
         sb.append("\\Q");
         slashEIndex = 0;
         int current = 0;
