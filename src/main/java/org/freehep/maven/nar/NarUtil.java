@@ -8,7 +8,7 @@ import org.apache.bcel.classfile.JavaClass;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 7545de7c8f4f 2006/06/21 20:57:08 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java fc2acdd9b26c 2006/06/21 21:16:20 duns $
  */
 public class NarUtil {
     
@@ -60,10 +60,31 @@ public class NarUtil {
      * @return
      */
     public static String replace(CharSequence target, CharSequence replacement, String string) {
-        return Pattern.compile(target.toString(), /* Pattern.LITERAL jdk 1.4 */ 0x10).matcher(
+        return Pattern.compile(quote(target.toString())/*, Pattern.LITERAL jdk 1.4 */).matcher(
             string).replaceAll(/* Matcher. jdk 1.4 */ quoteReplacement(replacement.toString()));
     }       
 
+    /* for jdk 1.4 */
+    private static String quote(String s) {
+        int slashEIndex = s.indexOf("\\E");
+        if (slashEIndex == -1)
+            return "\\Q" + s + "\\E";
+
+        StringBuilder sb = new StringBuilder(s.length() * 2);
+        sb.append("\\Q");
+        slashEIndex = 0;
+        int current = 0;
+        while ((slashEIndex = s.indexOf("\\E", current)) != -1) {
+            sb.append(s.substring(current, slashEIndex));
+            current = slashEIndex + 2;
+            sb.append("\\E\\\\E\\Q");
+        }
+        sb.append(s.substring(current, s.length()));
+        sb.append("\\E");
+        return sb.toString();
+    }
+
+    /* for jdk 1.4 */
     private static String quoteReplacement(String s) {
         if ((s.indexOf('\\') == -1) && (s.indexOf('$') == -1))
             return s;
