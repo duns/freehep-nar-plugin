@@ -1,7 +1,6 @@
 // Copyright 2005, FreeHEP.
 package org.freehep.maven.nar;
  
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.bcel.classfile.ClassParser;
@@ -9,7 +8,7 @@ import org.apache.bcel.classfile.JavaClass;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java f306842a5f50 2006/06/21 20:44:59 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 7545de7c8f4f 2006/06/21 20:57:08 duns $
  */
 public class NarUtil {
     
@@ -61,7 +60,24 @@ public class NarUtil {
      * @return
      */
     public static String replace(CharSequence target, CharSequence replacement, String string) {
-        return Pattern.compile(target.toString(), Pattern.LITERAL).matcher(
-            string).replaceAll(Matcher.quoteReplacement(replacement.toString()));
+        return Pattern.compile(target.toString(), /* Pattern.LITERAL jdk 1.4 */ 0x10).matcher(
+            string).replaceAll(/* Matcher. jdk 1.4 */ quoteReplacement(replacement.toString()));
     }       
+
+    private static String quoteReplacement(String s) {
+        if ((s.indexOf('\\') == -1) && (s.indexOf('$') == -1))
+            return s;
+        StringBuffer sb = new StringBuffer();
+        for (int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                sb.append('\\'); sb.append('\\');
+            } else if (c == '$') {
+                sb.append('\\'); sb.append('$');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
 }
