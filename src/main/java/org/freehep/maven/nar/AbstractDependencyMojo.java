@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java f306842a5f50 2006/06/21 20:44:59 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 11653eea15a5 2006/06/22 00:03:37 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -65,41 +65,43 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
     protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
             String scope) throws MojoExecutionException, MojoFailureException {
-        return getAttachedNarDependencies(scope, getAOL());
+        return getAttachedNarDependencies(scope, null, null);
     }
     
     /**
      * Returns a list of all attached nar dependencies for a specific binding
      * and "noarch", but not where "local" is specified
      * 
-     * @param scope
+     * @param scope compile, test, runtime, ....
+     * @param classifier either a valid aol, noarch or null. In case of null both the default getAOL() and noarch dependencies
+     * are returned.
+     * @param type noarch, static, shared, jni, or null. In case of null the default binding found in narInfo is used.
      * @return
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
     protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-            String scope, String aol) throws MojoExecutionException, MojoFailureException {
+            String scope, String aol, String type) throws MojoExecutionException, MojoFailureException {
         List artifactList = new ArrayList();
         for (Iterator i = getNarDependencies(scope).iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
-            System.err.println("Dep "+dependency);
             NarInfo narInfo = getNarInfo(dependency);
-            artifactList
-                    .addAll(getAttachedNarDependencies(dependency, null, "noarch"));
-
+            if (aol == null) {
+                artifactList.addAll(getAttachedNarDependencies(dependency, null, "noarch"));
+            }
             // FIXME no handling of local
-            artifactList.addAll(getAttachedNarDependencies(dependency, aol, narInfo
-                    .getBinding(aol)));
+            artifactList.addAll(getAttachedNarDependencies(dependency, aol == null ? getAOL() : aol, type == null ? narInfo
+                    .getBinding(aol) : type));
         }
         return artifactList;
     }
 
-    protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-            Artifact dependency, String aol, String narType) throws MojoExecutionException,
+    private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
+            Artifact dependency, String aol, String type) throws MojoExecutionException,
             MojoFailureException {
         List artifactList = new ArrayList();
         NarInfo narInfo = getNarInfo(dependency);
-        String[] nars = narInfo.getAttachedNars(aol, narType);
+        String[] nars = narInfo.getAttachedNars(aol, type);
         // FIXME Move this to info....
         if (nars != null) {
             for (int j = 0; j < nars.length; j++) {
@@ -108,7 +110,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
                     try {
                         String groupId = nar[0].trim();
                         String artifactId = nar[1].trim();
-                        String type = nar[2].trim();
+                        String ext = nar[2].trim();
                         String classifier = nar[3].trim();
                         // translate for instance g++ to gcc...
                         aol = narInfo.getAOL(aol);
@@ -118,7 +120,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
                         String version = nar.length >= 5 ? nar[4].trim()
                                 : dependency.getVersion();
                         artifactList.add(new AttachedNarArtifact(groupId,
-                                artifactId, version, dependency.getScope(), type,
+                                artifactId, version, dependency.getScope(), ext,
                                 classifier, dependency.isOptional()));
                     } catch (InvalidVersionSpecificationException e) {
                         throw new MojoExecutionException(
@@ -128,7 +130,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
                 } else {
                     getLog().warn(
                             "nars property in "+dependency.getArtifactId()+" contains invalid field: '" + nars[j]
-                                    + "' for type: "+narType);
+                                    + "' for type: "+type);
                 }
             }
         }

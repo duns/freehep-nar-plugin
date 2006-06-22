@@ -21,45 +21,73 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 9c718bfa8735 2006/06/19 22:53:09 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 11653eea15a5 2006/06/22 00:03:37 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
-            
-    public void execute() throws MojoExecutionException, MojoFailureException {        
-        
-        // FIXME should this be runtime ?
-        List dependencies = getAttachedNarDependencies("compile");
-        System.err.println("Found "+dependencies.size()+ " attached Nars");
-        for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
-            Artifact dependency = (Artifact)i.next();
-            System.err.println("Unpack "+dependency);
-            File file = getNarFile(dependency);
-            File narLocation = new File(file.getParentFile(), "nar");
-            File flagFile = new File(narLocation, FileUtils.basename(file.getPath(), "."+NAR_EXTENSION)+".flag");
-            
-            boolean process = false;
-            if (!narLocation.exists()) {
-                narLocation.mkdirs();
-                process = true;
-            } else if (!flagFile.exists()) {
-                process = true;
-            } else if (file.lastModified() > flagFile.lastModified()) {
-                process = true;
-            }
 
-            if (process) {
-                try {
-                    unpackNar(file, narLocation);
-                    FileUtils.fileDelete(flagFile.getPath());
-                    FileUtils.fileWrite(flagFile.getPath(), "");                 
-                } catch (IOException e) {
-                    getLog().info("Cannot create flag file: "+flagFile.getPath());
+    /**
+     * List of classifiers which you want unpack. Example ppc-MacOSX-g++,
+     * x86-Windows-msvc, i386-Linux-g++.
+     * 
+     * @parameter expression=""
+     */
+    private List classifiers;
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (classifiers == null) {
+            unpackAttachedNars(null);
+        } else {
+            for (Iterator j = classifiers.iterator(); j.hasNext();) {
+                unpackAttachedNars((String) j.next());
+            }
+        }
+    }
+
+    void unpackAttachedNars(String classifier) throws MojoExecutionException,
+            MojoFailureException {
+        // FIXME should this be runtime ?
+        // FIXME, hardcoded
+        String[] types = { "jni", "shared" };
+
+        for (int t = 0; t < types.length; t++) {
+            List dependencies = getAttachedNarDependencies("compile",
+                    classifier, types[t]);
+            for (Iterator i = dependencies.iterator(); i.hasNext();) {
+                Artifact dependency = (Artifact) i.next();
+                System.err.println("Unpack " + dependency);
+                File file = getNarFile(dependency);
+                File narLocation = new File(file.getParentFile(), "nar");
+                File flagFile = new File(narLocation, FileUtils.basename(file
+                        .getPath(), "." + NAR_EXTENSION)
+                        + ".flag");
+
+                boolean process = false;
+                if (!narLocation.exists()) {
+                    narLocation.mkdirs();
+                    process = true;
+                } else if (!flagFile.exists()) {
+                    process = true;
+                } else if (file.lastModified() > flagFile.lastModified()) {
+                    process = true;
+                }
+
+                if (process) {
+                    try {
+                        unpackNar(file, narLocation);
+                        FileUtils.fileDelete(flagFile.getPath());
+                        FileUtils.fileWrite(flagFile.getPath(), "");
+                    } catch (IOException e) {
+                        getLog().info(
+                                "Cannot create flag file: "
+                                        + flagFile.getPath());
+                    }
                 }
             }
         }
     }
-        
-    private void unpackNar(File file, File location) throws MojoExecutionException {
+
+    private void unpackNar(File file, File location)
+            throws MojoExecutionException {
         try {
             UnArchiver unArchiver;
             unArchiver = getArchiverManager().getUnArchiver(NAR_ROLE_HINT);
@@ -67,12 +95,15 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
             unArchiver.setDestDirectory(location);
             unArchiver.extract();
         } catch (IOException e) {
-            throw new MojoExecutionException("Error unpacking file: "+file+" to: "+location, e);
+            throw new MojoExecutionException("Error unpacking file: " + file
+                    + " to: " + location, e);
         } catch (NoSuchArchiverException e) {
-            throw new MojoExecutionException("Error unpacking file: "+file+" to: "+location, e);
+            throw new MojoExecutionException("Error unpacking file: " + file
+                    + " to: " + location, e);
         } catch (ArchiverException e) {
-            throw new MojoExecutionException("Error unpacking file: "+file+" to: "+location, e);
-        } 
+            throw new MojoExecutionException("Error unpacking file: " + file
+                    + " to: " + location, e);
+        }
     }
-    
+
 }

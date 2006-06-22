@@ -1,15 +1,15 @@
 // Copyright FreeHEP, 2006.
 package org.freehep.maven.nar;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @description Assemble libraries of NAR files.
@@ -18,55 +18,52 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java f306842a5f50 2006/06/21 20:44:59 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 11653eea15a5 2006/06/22 00:03:37 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
-	/**
-	 * Artifact resolver, needed to download source jars for inclusion in
-	 * classpath.
-	 * 
-	 * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
-	 * @required
-	 * @readonly
-	 */
-	private ArtifactResolver artifactResolver;
-
-	/**
-	 * Remote repositories which will be searched for source attachments.
-	 * 
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @required
-	 * @readonly
-	 */
-	private List remoteArtifactRepositories;
-
     /**
-     * List of classifiers which you want to assemble. Example ppc-MacOSX-g++, x86-Windows-msvc, i386-Linux-g++.
+     * List of classifiers which you want to assemble. Example ppc-MacOSX-g++,
+     * x86-Windows-msvc, i386-Linux-g++.
      * 
-     *  @parameter expression=""
-     *  @required
+     * @parameter expression=""
+     * @required
      */
     private List classifiers;
-    
-	public void execute() throws MojoExecutionException, MojoFailureException {
-        for (Iterator j = classifiers.iterator(); j.hasNext(); ) {
-            String classifier = (String)j.next();
-            System.err.println("For "+classifier);
-            List dependencies = getAttachedNarDependencies("compile", classifier);
-            for (Iterator i = dependencies.iterator(); i.hasNext();) {
-                Artifact dependency = (Artifact) i.next();
-//			try {
-                    System.err.println("Assemble from "+dependency);
-//				artifactResolver.resolve(dependency, remoteArtifactRepositories, getLocalRepository());	
-/*			} catch (ArtifactNotFoundException e) {
-                String message = "nar not found " + dependency.getId();
-                throw new MojoExecutionException(message, e);
-			} catch (ArtifactResolutionException e) {
-				String message = "nar cannot resolve " + dependency.getId();
-				throw new MojoExecutionException(message, e);
-			}
-*/		    }
+
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        for (Iterator j = classifiers.iterator(); j.hasNext();) {
+            String classifier = (String) j.next();
+            System.err.println("For " + classifier);
+
+            // FIXME, hardcoded
+            String[] types = { "jni", "shared" };
+
+            for (int t = 0; t < types.length; t++) {
+                List dependencies = getAttachedNarDependencies("compile",
+                        classifier, types[t]);
+                for (Iterator i = dependencies.iterator(); i.hasNext();) {
+                    Artifact dependency = (Artifact) i.next();
+                    System.err.println("Assemble from " + dependency);
+
+                    // FIXME reported to maven developer list, isSnapshot changes behaviour
+                    // of getBaseVersion, called in pathOf.
+                    if (dependency.isSnapshot())
+                        ;
+
+                    File src = new File(getLocalRepository().pathOf(dependency));
+                    src = new File(getLocalRepository().getBasedir(), src.getParent());
+                    src = new File(src, "nar/lib/" + classifier + "/" + types[t]+"/"+"lib" + dependency.getArtifactId() + "-"
+                            + dependency.getVersion() + ".jnilib");
+                    File dst = new File("target/nar/lib/" + classifier + "/"
+                            + types[t]);
+                    try {
+                        FileUtils.copyFileToDirectory(src, dst);
+                    } catch (IOException ioe) {
+                        throw new MojoExecutionException("Failed to copy "+src+" to "+dst, ioe);
+                    }
+                }
+            }
         }
-	}	
+    }
 }
