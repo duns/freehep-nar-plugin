@@ -18,7 +18,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 11653eea15a5 2006/06/22 00:03:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 166927d6dae1 2006/06/22 18:11:11 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -46,21 +46,35 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
                     Artifact dependency = (Artifact) i.next();
                     System.err.println("Assemble from " + dependency);
 
-                    // FIXME reported to maven developer list, isSnapshot changes behaviour
+                    String prefix = classifier.replace("-", ".") + ".";
+
+                    // FIXME reported to maven developer list, isSnapshot
+                    // changes behaviour
                     // of getBaseVersion, called in pathOf.
                     if (dependency.isSnapshot())
                         ;
-
                     File src = new File(getLocalRepository().pathOf(dependency));
-                    src = new File(getLocalRepository().getBasedir(), src.getParent());
-                    src = new File(src, "nar/lib/" + classifier + "/" + types[t]+"/"+"lib" + dependency.getArtifactId() + "-"
-                            + dependency.getVersion() + ".jnilib");
+                    src = new File(getLocalRepository().getBasedir(), src
+                            .getParent());
+                    src = new File(src, "nar/lib/"
+                            + classifier
+                            + "/"
+                            + types[t]
+                            + "/"
+                            + getDefaults().getProperty(prefix + "lib.prefix")
+                            + dependency.getArtifactId()
+                            + "-"
+                            + dependency.getVersion()
+                            + "."
+                            + getDefaults().getProperty(
+                                    prefix + types[t] + ".extension"));
                     File dst = new File("target/nar/lib/" + classifier + "/"
                             + types[t]);
                     try {
                         FileUtils.copyFileToDirectory(src, dst);
                     } catch (IOException ioe) {
-                        throw new MojoExecutionException("Failed to copy "+src+" to "+dst, ioe);
+                        throw new MojoExecutionException("Failed to copy "
+                                + src + " to " + dst, ioe);
                     }
                 }
             }
