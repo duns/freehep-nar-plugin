@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 11653eea15a5 2006/06/22 00:03:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 82940229c3a9 2006/06/23 18:20:03 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -88,10 +88,15 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
             NarInfo narInfo = getNarInfo(dependency);
             if (aol == null) {
                 artifactList.addAll(getAttachedNarDependencies(dependency, null, "noarch"));
+                aol = getAOL();
             }
+
+            // use preferred binding, unless non existing.
+            String binding = narInfo.getBinding(aol);
+            binding = binding != null ? binding : type != null ? type :  "static"; 
+
             // FIXME no handling of local
-            artifactList.addAll(getAttachedNarDependencies(dependency, aol == null ? getAOL() : aol, type == null ? narInfo
-                    .getBinding(aol) : type));
+            artifactList.addAll(getAttachedNarDependencies(dependency, aol, binding));
         }
         return artifactList;
     }
@@ -99,12 +104,14 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
             Artifact dependency, String aol, String type) throws MojoExecutionException,
             MojoFailureException {
+        System.err.println("***** "+aol+" "+type);
         List artifactList = new ArrayList();
         NarInfo narInfo = getNarInfo(dependency);
         String[] nars = narInfo.getAttachedNars(aol, type);
         // FIXME Move this to info....
         if (nars != null) {
             for (int j = 0; j < nars.length; j++) {
+                System.err.println("==== "+nars[j]);
                 String[] nar = nars[j].split(":", 5);
                 if (nar.length >= 4) {
                     try {
