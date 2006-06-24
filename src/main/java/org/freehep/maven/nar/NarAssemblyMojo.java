@@ -18,7 +18,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 166927d6dae1 2006/06/22 18:11:11 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java fb5891dae908 2006/06/24 00:32:01 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -73,8 +73,9 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
                     try {
                         FileUtils.copyFileToDirectory(src, dst);
                     } catch (IOException ioe) {
-                        throw new MojoExecutionException("Failed to copy "
-                                + src + " to " + dst, ioe);
+                        System.err.println("WARNING (ignored): Failed to copy "
+                                + src + " to " + dst);
+//                        System.err.println(ioe);
                     }
                 }
             }
