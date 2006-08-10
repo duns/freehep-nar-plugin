@@ -13,7 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 82940229c3a9 2006/06/23 18:20:03 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java b3550fd01911 2006/08/10 23:06:37 duns $
  */
 public class NarInfo {
 
