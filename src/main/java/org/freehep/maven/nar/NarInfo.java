@@ -13,7 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java b3550fd01911 2006/08/10 23:06:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 8a7e57a69298 2006/08/21 22:03:24 duns $
  */
 public class NarInfo {
 
@@ -46,6 +46,7 @@ public class NarInfo {
     
     public void read(InputStream is) throws IOException {
         info.load(is);
+//		info.list(System.out);
     }
 
     /**
@@ -96,7 +97,9 @@ public class NarInfo {
 	private String getProperty(String aol, String key, String defaultValue) {
         if (key == null) return defaultValue;
 		String value = info.getProperty(key, defaultValue);
-		return aol == null ? value : info.getProperty(aol+"."+key, value);
+		value = aol == null ? value : info.getProperty(aol+"."+key, value);
+//		System.err.println("getProperty("+aol+", "+key+", "+defaultValue+") = " + value);
+		return value;
 	}
     
     private void setProperty(String aol, String key, String value) {

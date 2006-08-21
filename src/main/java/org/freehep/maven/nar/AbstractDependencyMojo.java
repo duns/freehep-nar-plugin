@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 82940229c3a9 2006/06/23 18:20:03 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java 8a7e57a69298 2006/08/21 22:03:24 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -82,13 +82,18 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
      */
     protected List/* <AttachedNarArtifact> */getAttachedNarDependencies(
             String scope, String aol, String type) throws MojoExecutionException, MojoFailureException {
+    	boolean noarch = false;
+    	if (aol == null) {
+    		noarch = true;
+    		aol = getAOL();
+    	}
+    	
         List artifactList = new ArrayList();
         for (Iterator i = getNarDependencies(scope).iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
             NarInfo narInfo = getNarInfo(dependency);
-            if (aol == null) {
+            if (noarch) {
                 artifactList.addAll(getAttachedNarDependencies(dependency, null, "noarch"));
-                aol = getAOL();
             }
 
             // use preferred binding, unless non existing.
@@ -104,7 +109,7 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
             Artifact dependency, String aol, String type) throws MojoExecutionException,
             MojoFailureException {
-        System.err.println("***** "+aol+" "+type);
+        System.err.println("***** "+dependency+" "+aol+" "+type);
         List artifactList = new ArrayList();
         NarInfo narInfo = getNarInfo(dependency);
         String[] nars = narInfo.getAttachedNars(aol, type);
