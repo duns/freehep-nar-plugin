@@ -18,67 +18,70 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java b3550fd01911 2006/08/10 23:06:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
-    /**
-     * List of classifiers which you want to assemble. Example ppc-MacOSX-g++,
-     * x86-Windows-msvc, i386-Linux-g++.
-     * 
-     * @parameter expression=""
-     * @required
-     */
-    private List classifiers;
+	/**
+	 * List of classifiers which you want to assemble. Example ppc-MacOSX-g++,
+	 * x86-Windows-msvc, i386-Linux-g++.
+	 * 
+	 * @parameter expression=""
+	 * @required
+	 */
+	private List classifiers;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        for (Iterator j = classifiers.iterator(); j.hasNext();) {
-            String classifier = (String) j.next();
-            System.err.println("For " + classifier);
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		for (Iterator j = classifiers.iterator(); j.hasNext();) {
+			String classifier = (String) j.next();
+			System.err.println("For " + classifier);
 
-            // FIXME, hardcoded
-            String[] types = { "jni", "shared" };
+			// FIXME, hardcoded
+			String[] types = { "jni", "shared" };
 
-            for (int t = 0; t < types.length; t++) {
-                List dependencies = getAttachedNarDependencies("compile",
-                        classifier, types[t]);
-                for (Iterator i = dependencies.iterator(); i.hasNext();) {
-                    Artifact dependency = (Artifact) i.next();
-                    System.err.println("Assemble from " + dependency);
+			for (int t = 0; t < types.length; t++) {
+				List narArtifacts = getNarManager().getNarDependencies(
+						"compile");
+				List dependencies = getNarManager().getAttachedNarDependencies(
+						narArtifacts, classifier, types[t]);
+				for (Iterator i = dependencies.iterator(); i.hasNext();) {
+					Artifact dependency = (Artifact) i.next();
+					System.err.println("Assemble from " + dependency);
 
-                    String prefix = classifier.replace("-", ".") + ".";
+					String prefix = classifier.replace("-", ".") + ".";
 
-                    // FIXME reported to maven developer list, isSnapshot
-                    // changes behaviour
-                    // of getBaseVersion, called in pathOf.
-                    if (dependency.isSnapshot())
-                        ;
-                    File src = new File(getLocalRepository().pathOf(dependency));
-                    src = new File(getLocalRepository().getBasedir(), src
-                            .getParent());
-                    src = new File(src, "nar/lib/"
-                            + classifier
-                            + "/"
-                            + types[t]
-                            + "/"
-                            + getDefaults().getProperty(prefix + "lib.prefix")
-                            + dependency.getArtifactId()
-                            + "-"
-                            + dependency.getVersion()
-                            + "."
-                            + getDefaults().getProperty(
-                                    prefix + types[t] + ".extension"));
-                    File dst = new File("target/nar/lib/" + classifier + "/"
-                            + types[t]);
-                    try {
-                        FileUtils.copyFileToDirectory(src, dst);
-                    } catch (IOException ioe) {
-                        System.err.println("WARNING (ignored): Failed to copy "
-                                + src + " to " + dst);
-//                        System.err.println(ioe);
-                    }
-                }
-            }
-        }
-    }
+					// FIXME reported to maven developer list, isSnapshot
+					// changes behaviour
+					// of getBaseVersion, called in pathOf.
+					if (dependency.isSnapshot())
+						;
+					File src = new File(getLocalRepository().pathOf(dependency));
+					src = new File(getLocalRepository().getBasedir(), src
+							.getParent());
+					src = new File(src, "nar/lib/"
+							+ classifier
+							+ "/"
+							+ types[t]
+							+ "/"
+							+ NarUtil.getDefaults().getProperty(
+									prefix + "lib.prefix")
+							+ dependency.getArtifactId()
+							+ "-"
+							+ dependency.getVersion()
+							+ "."
+							+ NarUtil.getDefaults().getProperty(
+									prefix + types[t] + ".extension"));
+					File dst = new File("target/nar/lib/" + classifier + "/"
+							+ types[t]);
+					try {
+						FileUtils.copyFileToDirectory(src, dst);
+					} catch (IOException ioe) {
+						System.err.println("WARNING (ignored): Failed to copy "
+								+ src + " to " + dst);
+						// System.err.println(ioe);
+					}
+				}
+			}
+		}
+	}
 }

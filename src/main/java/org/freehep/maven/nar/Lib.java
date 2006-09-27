@@ -19,7 +19,7 @@ import org.apache.tools.ant.Project;
  * Keeps info on a library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class Lib {
 
@@ -75,7 +75,7 @@ public class Lib {
             libSet.setDir(dir);
             linker.addLibset(libSet);        
         } else {
-            List dependencies = mojo.getNarDependencies("compile");
+            List dependencies = mojo.getNarManager().getNarDependencies("compile");
             for (Iterator i=libs.iterator(); i.hasNext(); ) {
                 Lib lib = (Lib)i.next();
                 String[] ids = name.split(":",2);
@@ -85,7 +85,7 @@ public class Lib {
                 for (Iterator j=dependencies.iterator(); j.hasNext(); ) {
                     Artifact dependency = (Artifact)j.next();
                     if (dependency.getGroupId().equals(ids[0]) && dependency.getArtifactId().equals(ids[1])) {
-                        File narDir = new File(mojo.getNarFile(dependency).getParentFile(), "nar/lib/"+mojo.getAOL()+"/"+lib.type);
+                        File narDir = new File(mojo.getNarManager().getNarFile(dependency).getParentFile(), "nar/lib/"+mojo.getAOL()+"/"+lib.type);
                         String narName = dependency.getArtifactId()+"-"+lib.name+"-"+dependency.getVersion();
                         lib.addLibSet(mojo, linker, antProject, narName, narDir);
                     }

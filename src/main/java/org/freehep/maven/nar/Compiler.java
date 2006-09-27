@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public abstract class Compiler {
 
@@ -167,13 +167,13 @@ public abstract class Compiler {
     }
 
     public CompilerDef getCompiler(MavenProject mavenProject, Project antProject, 
-                                   String os, Properties defaults, String aol, 
+                                   String os, String aol, 
                                    String type, String output) throws MojoFailureException {
                                     
         String prefix = aol+getName()+".";                                
                                     
         // adjust default values
-        if (name == null) name = defaults.getProperty(prefix+"compiler");
+        if (name == null) name = NarUtil.getDefaults().getProperty(prefix+"compiler");
         if (name == null) {
             throw new MojoFailureException("NAR: Please specify <Name> as part of <Cpp>, <C> or <Fortran> for "+prefix);
         }
@@ -183,7 +183,7 @@ public abstract class Compiler {
         if (!type.equals("test")) {
             // add all includes and excludes
             if (includes.isEmpty()) {
-                String defaultIncludes = defaults.getProperty(prefix+"includes");
+                String defaultIncludes = NarUtil.getDefaults().getProperty(prefix+"includes");
                 if (defaultIncludes == null) {
                     throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "+prefix);
                 }
@@ -195,7 +195,7 @@ public abstract class Compiler {
                 finalIncludes.addAll(includes);
             }
             if (excludes.isEmpty()) {
-                String defaultExcludes = defaults.getProperty(prefix+"excludes");
+                String defaultExcludes = NarUtil.getDefaults().getProperty(prefix+"excludes");
                 if (defaultExcludes != null) {
                     String[] exclude = defaultExcludes.split(" ");
                     for (int i=0; i<exclude.length; i++) {
@@ -207,7 +207,7 @@ public abstract class Compiler {
             }
         } else {
             // include only the output.xxx files
-            String defaultIncludes = defaults.getProperty(prefix+"includes");
+            String defaultIncludes = NarUtil.getDefaults().getProperty(prefix+"includes");
             if (defaultIncludes == null) {
                 throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "+prefix);
             }
@@ -251,7 +251,7 @@ public abstract class Compiler {
                 compiler.addConfiguredCompilerArg(arg);
            }
         } else {
-            String[] option = defaults.getProperty(prefix+"options").split(" ");
+            String[] option = NarUtil.getDefaults().getProperty(prefix+"options").split(" ");
             if (option != null) {
                 for (int i=0; i<option.length; i++) {
                     CompilerArgument arg = new CompilerArgument();
@@ -270,7 +270,7 @@ public abstract class Compiler {
                 defineSet.addDefine(define);
             }
         } else {
-            String defaultDefines = defaults.getProperty(prefix+"defines");
+            String defaultDefines = NarUtil.getDefaults().getProperty(prefix+"defines");
             if (defaultDefines != null) {
                 defineSet.setDefine(new CUtil.StringArrayBuilder(defaultDefines));           
             }
@@ -286,7 +286,7 @@ public abstract class Compiler {
                 defineSet.addUndefine(undefine);
             }
         } else {
-            String defaultUndefines = defaults.getProperty(prefix+"undefines");
+            String defaultUndefines = NarUtil.getDefaults().getProperty(prefix+"undefines");
             if (defaultUndefines != null) {
                 defineSet.setUndefine(new CUtil.StringArrayBuilder(defaultUndefines));           
             }

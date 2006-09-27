@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
  * Linker tag
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Linker.java 0a36823a3ca9 2006/06/16 17:45:25 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Linker.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class Linker {
 
@@ -83,6 +83,19 @@ public class Linker {
      */
     private List/*<SysLib>*/ sysLibs; 
 
+    public Linker() {
+    	// default constructor for use as TAG
+    }
+    
+    /**
+     * For use with specific named linker.
+     * 
+     * @param name
+     */
+    public Linker(String name) {
+    	this.name = name;
+    }
+    
     public String getName(Properties defaults, String prefix) throws MojoFailureException {
         if (name == null) {
             name = defaults.getProperty(prefix+"linker");
@@ -93,7 +106,7 @@ public class Linker {
         return name;
     }
 
-    public LinkerDef getLinker(AbstractDependencyMojo mojo, Project antProject, String os, Properties defaults, 
+    public LinkerDef getLinker(AbstractDependencyMojo mojo, Project antProject, String os, 
                                String prefix, String type) 
                 throws MojoFailureException, MojoExecutionException {
         if (name == null) {
@@ -127,7 +140,7 @@ public class Linker {
                 linker.addConfiguredLinkerArg(arg);
             }
         } else {
-            String options = defaults.getProperty(prefix+"options");
+            String options = NarUtil.getDefaults().getProperty(prefix+"options");
             if (options != null) {
                 String[] option = options.split(" ");
                 for (int i=0; i<option.length; i++) {
@@ -145,7 +158,7 @@ public class Linker {
                 lib.addLibSet(mojo, linker, antProject);
             }
         } else {
-            String libsList = defaults.getProperty(prefix+"libs");
+            String libsList = NarUtil.getDefaults().getProperty(prefix+"libs");
             if (libsList != null) {
                 String[] lib = libsList.split(", ");
                 for (int i=0; i<lib.length; i++) {
@@ -174,7 +187,7 @@ public class Linker {
                 linker.addSyslibset(sysLib.getSysLibSet(antProject));
             }
         } else {
-            String sysLibsList = defaults.getProperty(prefix+"sysLibs");
+            String sysLibsList = NarUtil.getDefaults().getProperty(prefix+"sysLibs");
             if (sysLibsList != null) {
                 String[] sysLib = sysLibsList.split(", ");
                 for (int i=0; i<sysLib.length; i++) {

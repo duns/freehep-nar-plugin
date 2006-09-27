@@ -35,7 +35,7 @@ import org.apache.maven.surefire.SurefireBooter;
 /**
  * Run integration tests using Surefire.
  * 
- * This plugin was copied from mnavens surefire plugin to accomodate a few
+ * This plugin was copied from mavens surefire plugin to accomodate a few
  * things for the NAR plugin: 1. To test a jar file with its native module we
  * can only run after tha package phase, so we use the integration-test phase.
  * 2. We need to set java.library.path to a AOL (architecture-os-linker)
@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 501cf4787202 2006/06/17 07:40:13 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -385,7 +385,7 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
         boolean success;
         try {
 // FREEHEP
-            if (project.getPackaging().equals("nar") || (getNarDependencies("test").size() > 0)) forkMode="pertest";
+            if (project.getPackaging().equals("nar") || (getNarManager().getNarDependencies("test").size() > 0)) forkMode="pertest";
             
             surefireBooter.setForkMode(forkMode);
 
@@ -415,12 +415,12 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                 }
                 
                 
-                List dependencies = getNarDependencies("test");
+                List dependencies = getNarManager().getNarDependencies("test");
                 for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
                     NarArtifact dependency = (NarArtifact)i.next();
                     NarInfo info = dependency.getNarInfo();
                     if (!info.getBinding(getAOL()).equals("static")) {
-                        File depLib = new File(getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+info.getBinding(getAOL()));
+                        File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+info.getBinding(getAOL()));
                         System.err.println("Adding to java.library.path: "+depLib.getPath());
                         if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");
                         javaLibraryPath.append(depLib.getPath());

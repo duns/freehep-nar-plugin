@@ -24,12 +24,12 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
-        
-    public void execute() throws MojoExecutionException, MojoFailureException {                        
-        // make sure destination is there
+        	
+    public void execute() throws MojoExecutionException, MojoFailureException {                            	
+    	// make sure destination is there
         getTargetDirectory().mkdirs();
                                                             
         for (Iterator i=getLibraries().iterator(); i.hasNext(); ) {
@@ -86,15 +86,15 @@ public class NarCompileMojo extends AbstractCompileMojo {
         
         // add C++ compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(), antProject, getOS(), getAOLKey(), type, getOutput()));
 
         // add C compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject, getOS(), getAOLKey(), type, getOutput()));
 
         // add Fortran compiler
         // FIXME use this as param
-        task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(), antProject, getOS(), getDefaults(), getAOLKey(), type, getOutput()));
+        task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(), antProject, getOS(), getAOLKey(), type, getOutput()));
 
         // add javah include path
         File jniDirectory = getJavah().getJniDirectory(getMavenProject());
@@ -105,9 +105,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
         getJava().addIncludePaths(getMavenProject(), task, this, type);
         
         // add dependency include paths
-        for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {
+        for (Iterator i=getNarManager().getNarDependencies("compile").iterator(); i.hasNext(); ) {
             // FIXME, handle multiple includes from one NAR
-            File include = new File(getNarFile((Artifact)i.next()).getParentFile(), "nar/include");
+            File include = new File(getNarManager().getNarFile((Artifact)i.next()).getParentFile(), "nar/include");
             System.err.println("*** Include "+include);
             if (include.exists()) {
                 task.createIncludePath().setPath(include.getPath());
@@ -115,11 +115,11 @@ public class NarCompileMojo extends AbstractCompileMojo {
         }
                 
         // add linker
-        task.addConfiguredLinker(getLinker().getLinker(this, antProject, getOS(), getDefaults(), getAOLKey()+"linker.", type));
+        task.addConfiguredLinker(getLinker().getLinker(this, antProject, getOS(), getAOLKey()+"linker.", type));
 
         // add dependency libraries
         if (type.equals("shared") || type.equals("jni")) {
-            for (Iterator i=getNarDependencies("compile").iterator(); i.hasNext(); ) {
+            for (Iterator i=getNarManager().getNarDependencies("compile").iterator(); i.hasNext(); ) {
                 NarArtifact dependency = (NarArtifact)i.next();
                 
                 // FIXME no handling of "local"
@@ -131,7 +131,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
                 aol = dependency.getNarInfo().getAOL(getAOL());
                 System.err.println("LIB AOL "+aol);
                 
-                File dir = new File(getNarFile(dependency).getParentFile(), "nar/lib/"+aol+"/"+binding);
+                File dir = new File(getNarManager().getNarFile(dependency).getParentFile(), "nar/lib/"+aol+"/"+binding);
                 System.err.println("LIB DIR "+dir);
                 if (dir.exists()) {
                     LibrarySet libSet = new LibrarySet();
@@ -162,7 +162,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
         // Add JVM to linker
         if (!getOS().equals("MacOSX")) {
             // FIXME, use "this".
-            getJava().addRuntime(antProject, task, getDefaults(), getJavaHome(), getAOLKey()+"java.");
+            getJava().addRuntime(antProject, task, getJavaHome(), getAOLKey()+"java.");
         }        
         
         // execute

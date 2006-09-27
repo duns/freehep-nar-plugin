@@ -17,14 +17,14 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 501cf4787202 2006/06/17 07:40:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo {
 
-    protected final String NAR_EXTENSION = "nar";
-    protected final String NAR_NO_ARCH = "noarch";
-    protected final String NAR_ROLE_HINT = "nar-library";
-    protected final String NAR_TYPE = "nar";
+    public final static String NAR_EXTENSION = "nar";
+    public final static String NAR_NO_ARCH = "noarch";
+    public final static String NAR_ROLE_HINT = "nar-library";
+    public final static String NAR_TYPE = "nar";
        
     /**
      * The Architecture for the nar,
@@ -201,61 +201,32 @@ public abstract class AbstractNarMojo extends AbstractMojo {
      * @required
      */
     private ArchiverManager archiverManager;
-
-
-    private Properties defaults;
-    private String aolKey;
-    
-    public Properties getDefaults() throws MojoFailureException {
-        // read properties file with defaults
-        if (defaults == null) {
-            defaults = PropertyUtils.loadProperties(AbstractNarMojo.class.getResourceAsStream("aol.properties"));
-        }
-        if (defaults == null) throw new MojoFailureException("NAR: Could not load default properties file: 'aol.properties'.");
-
-        return defaults;
-    }
     
     protected String getArchitecture() {
+    	architecture = NarUtil.getArchitecture(architecture);
         return architecture;
     }
     
     protected String getOS() {
-        // adjust OS if not given
-        if (os == null) {
-            os = System.getProperty("os.name");
-            if (os.startsWith("Windows")) os = "Windows";
-            if (os.equals("Mac OS X")) os = "MacOSX";
-        }
+    	os = NarUtil.getOS(os);    	
         return os;
     }
     
-    protected File getJavaHome() {
-        // adjust JavaHome
-        if (javaHome == null) {
-            javaHome = new File(System.getProperty("java.home"));
-            if (!getOS().equals("MacOSX")) {
-                javaHome = new File(javaHome, "..");
-            }
-            getLog().info("JavaHome '"+javaHome+"'");
-        }
-        return javaHome;       
-    }
-    
     protected String getAOL() throws MojoFailureException {
-        // adjust aol
-        if (aol == null) {
-            aol = getArchitecture()+"-"+getOS()+"-"+getLinkerName();       
-            getLog().info("NAR target '"+aol+"'");
-        }
+    	aol = NarUtil.getAOL(architecture, os, linker, aol);    	
+        getLog().info("NAR target '"+aol+"'");
         return aol;
     }
     
     protected Linker getLinker() {
-        if (linker == null) {
-            linker = new Linker();
-        }
+    	linker = NarUtil.getLinker(linker);
         return linker;
+    }
+
+    protected File getJavaHome() {
+    	javaHome = NarUtil.getJavaHome(javaHome, os);    	
+        getLog().info("JavaHome '"+javaHome+"'");
+    	return javaHome;       
     }
     
     protected File getOutputDirectory() {
@@ -267,11 +238,7 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     }
 
     protected String getAOLKey() throws MojoFailureException {
-        if (aolKey == null) {
-            // construct AOL key prefix
-            aolKey = getArchitecture()+"."+getOS()+"."+getLinkerName()+".";    
-        }
-        return aolKey;
+    	return NarUtil.getAOLKey(architecture, os, linker);    	
     }
     
     protected File getTargetDirectory() {
@@ -332,10 +299,6 @@ public abstract class AbstractNarMojo extends AbstractMojo {
         return java;
     }
    
-    private String getLinkerName() throws MojoFailureException {
-        return getLinker().getName(getDefaults(), getArchitecture()+"."+getOS()+".");        
-    }
-
     protected ArchiverManager getArchiverManager() {
         return archiverManager;
     }

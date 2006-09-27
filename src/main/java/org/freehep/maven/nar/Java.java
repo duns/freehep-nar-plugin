@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 67e3a6ab8d65 2006/06/09 23:37:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class Java {
 
@@ -74,7 +74,7 @@ public class Java {
                 }
             } else {
                 String prefix = mojo.getAOLKey()+"java.";
-                String includes = mojo.getDefaults().getProperty(prefix+"include");
+                String includes = NarUtil.getDefaults().getProperty(prefix+"include");
                 if (includes != null) {
                     String[] path = includes.split(";");
                     for (int i=0; i<path.length; i++) {
@@ -85,10 +85,10 @@ public class Java {
         }
     }
     
-    public void addRuntime(Project antProject, CCTask task, Properties defaults, File javaHome, String prefix) throws MojoFailureException {
+    public void addRuntime(Project antProject, CCTask task, File javaHome, String prefix) throws MojoFailureException {
         if (link) {
             if (runtimeDirectory == null) {
-                runtimeDirectory = defaults.getProperty(prefix+"runtimeDirectory");
+                runtimeDirectory = NarUtil.getDefaults().getProperty(prefix+"runtimeDirectory");
                 if (runtimeDirectory == null) {
                     throw new MojoFailureException("NAR: Please specify a <RuntimeDirectory> as part of <Java>");
                 }

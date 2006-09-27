@@ -25,7 +25,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -81,18 +81,18 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         // add C++ compiler
         // FIXME use this as param
         task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(),
-                antProject, getOS(), getDefaults(), getAOLKey(), type,
+                antProject, getOS(), getAOLKey(), type,
                 test.getName()));
 
         // add C compiler
         // FIXME use this as param
         task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject,
-                getOS(), getDefaults(), getAOLKey(), type, test.getName()));
+                getOS(), getAOLKey(), type, test.getName()));
 
         // add Fortran compiler
         // FIXME use this as param
         task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(),
-                antProject, getOS(), getDefaults(), getAOLKey(), type,
+                antProject, getOS(), getAOLKey(), type,
                 test.getName()));
 
         // add java include paths
@@ -100,8 +100,8 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         getJava().addIncludePaths(getMavenProject(), task, this, type);
 
         // add dependency include paths
-        for (Iterator i = getNarDependencies("test").iterator(); i.hasNext();) {
-            File include = new File(getNarFile((Artifact) i.next())
+        for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i.hasNext();) {
+            File include = new File(getNarManager().getNarFile((Artifact) i.next())
                     .getParentFile(), "nar/include");
             if (include.exists()) {
                 task.createIncludePath().setPath(include.getPath());
@@ -110,7 +110,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // add linker
         task.addConfiguredLinker(getLinker().getLinker(this, antProject,
-                getOS(), getDefaults(), getAOLKey() + "linker.", type));
+                getOS(), getAOLKey() + "linker.", type));
 
         // FIXME hardcoded values
         String libName = getFinalName();
@@ -123,9 +123,9 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         if (test.getLink().equals("shared")) {
             try {
                 // defaults are Unix
-                String libPrefix = getDefaults().getProperty(
+                String libPrefix = NarUtil.getDefaults().getProperty(
                         getAOLKey() + "lib.prefix", "lib");
-                String libExt = getDefaults().getProperty(
+                String libExt = NarUtil.getDefaults().getProperty(
                         getAOLKey() + "shared.extension", "so");
                 File copyDir = new File(getTargetDirectory(), (getOS().equals(
                         "Windows") ? "bin" : "lib")
@@ -161,9 +161,9 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         }
 
         // add dependency libraries
-        for (Iterator i = getNarDependencies("test").iterator(); i.hasNext();) {
+        for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i.hasNext();) {
             Artifact dependency = (Artifact) i.next();
-            File lib = new File(getNarFile(dependency).getParentFile(),
+            File lib = new File(getNarManager().getNarFile(dependency).getParentFile(),
                     "nar/lib/" + getAOL() + "/" + test.getLink());
             if (lib.exists()) {
                 LibrarySet libset = new LibrarySet();
@@ -182,7 +182,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         } else {
             // Add JVM to linker
             // FIXME, use "this".
-            getJava().addRuntime(antProject, task, getDefaults(),
+            getJava().addRuntime(antProject, task,
                     getJavaHome(), getAOLKey() + "java.");
         }
 
