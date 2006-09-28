@@ -7,12 +7,18 @@ import java.util.regex.Pattern;
 
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.PropertyUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 52af5aa4d82d 2006/09/28 21:45:13 duns $
  */
 public class NarUtil {
 
@@ -92,6 +98,39 @@ public class NarUtil {
 		return javaHome;
 	}
 
+	public static void makeExecutable(File file, final Log log) throws MojoExecutionException {
+		if (!file.exists()) return;
+		
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			for (int i=0; i<files.length; i++) {
+				makeExecutable(files[i], log);
+			}
+		} if (file.isFile() && file.canRead() && file.canWrite() && !file.isHidden()) {
+			// chmod +x file
+	        Commandline commandLine = new Commandline();
+	        commandLine.setExecutable("chmod");
+	        commandLine.createArgument().setValue("+x");
+	        commandLine.createArgument().setFile(file);
+	        
+			StreamConsumer consumer = new StreamConsumer() {
+	            public void consumeLine ( String line ) {
+	                log.info( line );
+	            }
+	        };
+			
+			log.info(commandLine.toString());
+			try {
+				int result = CommandLineUtils.executeCommandLine(commandLine, consumer, consumer);
+				if (result != 0) {
+					throw new  MojoExecutionException("Result of " + commandLine + " execution is: \'" + result + "\'." );
+				}
+			} catch (CommandLineException e) {
+				throw new MojoExecutionException("Failed to execute "+commandLine, e);
+			}
+		}
+	}
+	
 	/**
 	 * Returns the Bcel Class corresponding to the given class filename
 	 * 

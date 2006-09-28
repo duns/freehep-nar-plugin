@@ -259,7 +259,7 @@ public class NarManager {
 		}
 	}
 
-	public void unpackAttachedNars(List/*<NarArtifacts>*/ narArtifacts, ArchiverManager manager, String classifier)
+	public void unpackAttachedNars(List/*<NarArtifacts>*/ narArtifacts, ArchiverManager manager, String classifier, String os)
 			throws MojoExecutionException, MojoFailureException {
 		// FIXME should this be runtime ?
 		// FIXME, hardcoded
@@ -290,6 +290,9 @@ public class NarManager {
 				if (process) {
 					try {
 						unpackNar(manager, file, narLocation);
+						if (!NarUtil.getOS(os).equals("Windows")) {
+							NarUtil.makeExecutable(new File(narLocation, "bin"), log);
+						}
 						FileUtils.fileDelete(flagFile.getPath());
 						FileUtils.fileWrite(flagFile.getPath(), "");
 					} catch (IOException e) {
@@ -308,7 +311,7 @@ public class NarManager {
 			unArchiver = manager.getUnArchiver(AbstractNarMojo.NAR_ROLE_HINT);
 			unArchiver.setSourceFile(file);
 			unArchiver.setDestDirectory(location);
-			unArchiver.extract();
+			unArchiver.extract();			
 		} catch (IOException e) {
 			throw new MojoExecutionException("Error unpacking file: " + file
 					+ " to: " + location, e);

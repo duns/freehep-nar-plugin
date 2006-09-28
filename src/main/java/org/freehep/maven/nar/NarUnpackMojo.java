@@ -21,7 +21,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 52af5aa4d82d 2006/09/28 21:45:13 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
 
@@ -36,10 +36,10 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 		List narArtifacts = getNarManager().getNarDependencies("compile");
         if (classifiers == null) {
-            getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), null);
+            getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), null, getOS());
         } else {
             for (Iterator j = classifiers.iterator(); j.hasNext();) {
-            	getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), (String) j.next());
+            	getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), (String) j.next(), getOS());
             }
         }
     }
