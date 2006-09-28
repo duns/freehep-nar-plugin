@@ -17,11 +17,13 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 501cf4787202 2006/06/17 07:40:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
  */
 public class NarPackageMojo extends AbstractNarMojo {
             
     public void execute() throws MojoExecutionException, MojoFailureException {
+    	if (shouldSkip()) return;
+    	
         // FIXME, multiple types should be possible
         String type = "jni";
         NarInfo info = new NarInfo(getMavenProject().getGroupId(), getMavenProject().getArtifactId(), getMavenProject().getVersion());

@@ -17,7 +17,7 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo {
 
@@ -26,6 +26,13 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     public final static String NAR_ROLE_HINT = "nar-library";
     public final static String NAR_TYPE = "nar";
        
+    /**
+     * Skip running of NAR plugins (any) altogether
+     * 
+     * @parameter expression="${nar.skip}" default-value="false"
+     */
+    private boolean skip;
+    
     /**
      * The Architecture for the nar,
      * Some choices are: "x86", "i386", "amd64", "ppc", "sparc", ...
@@ -201,6 +208,10 @@ public abstract class AbstractNarMojo extends AbstractMojo {
      * @required
      */
     private ArchiverManager archiverManager;
+    
+    protected boolean shouldSkip() {
+    	return skip;
+    }
     
     protected String getArchitecture() {
     	architecture = NarUtil.getArchitecture(architecture);

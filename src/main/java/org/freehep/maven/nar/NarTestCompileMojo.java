@@ -25,11 +25,13 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+    	if (shouldSkip()) return;
+    	
         // make sure destination is there
         getTargetDirectory().mkdirs();
 

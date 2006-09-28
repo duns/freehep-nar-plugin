@@ -10,10 +10,11 @@ import org.apache.maven.plugin.MojoFailureException;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestMojo.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
  */
 public class NarTestMojo extends AbstractNarMojo {
             
-    public void execute() throws MojoExecutionException, MojoFailureException {        
+    public void execute() throws MojoExecutionException, MojoFailureException { 
+    	if (shouldSkip()) return;
     }    
 }

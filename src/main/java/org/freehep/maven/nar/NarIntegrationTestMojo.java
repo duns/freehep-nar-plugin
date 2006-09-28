@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 417210bb60fa 2006/09/27 23:02:41 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -263,6 +263,8 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
     private boolean childDelegation;
 
     public void execute() throws MojoExecutionException {
+    	if (shouldSkip()) return;
+    	
         if (skip) {
             getLog().info("Tests are skipped.");
 
