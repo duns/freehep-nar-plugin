@@ -1,0 +1,17 @@
+	---
+FreeHEP NAR Plugin
+	---
+	---
+Mark Donszelmann
+	---
+	
+Usage
+
+	Add the following fragment to your pom file to execute the nar plugin.
+
++--
+<project>
+  ...
+  ...
+</project>
++--

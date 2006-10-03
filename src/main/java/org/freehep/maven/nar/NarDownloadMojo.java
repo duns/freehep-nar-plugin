@@ -9,13 +9,14 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * @description Download NAR files.
+ * Downloads any dependent NAR files. This includes the noarch and aol type NAR files.
+ *
  * @goal nar-download
  * @phase generate-sources
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 

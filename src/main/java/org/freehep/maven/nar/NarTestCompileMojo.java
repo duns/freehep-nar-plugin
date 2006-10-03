@@ -20,12 +20,13 @@ import org.apache.tools.ant.Project;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * @description Test Compile native source files.
+ * Compiles native test source files.
+ *
  * @goal nar-testCompile
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
