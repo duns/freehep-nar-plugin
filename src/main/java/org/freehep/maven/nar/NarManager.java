@@ -40,7 +40,8 @@ public class NarManager {
 			"plugin" };
 
 	public NarManager(Log log, ArtifactRepository repository,
-			MavenProject project, String architecture, String os, Linker linker) throws MojoFailureException {
+			MavenProject project, String architecture, String os, Linker linker)
+			throws MojoFailureException {
 		this.log = log;
 		this.repository = repository;
 		this.project = project;
@@ -87,7 +88,8 @@ public class NarManager {
 	}
 
 	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-			List/*<NarArtifacts>*/ narArtifacts) throws MojoExecutionException, MojoFailureException {
+			List/* <NarArtifacts> */narArtifacts) throws MojoExecutionException,
+			MojoFailureException {
 		return getAttachedNarDependencies(narArtifacts, null, null);
 	}
 
@@ -108,7 +110,7 @@ public class NarManager {
 	 * @throws MojoFailureException
 	 */
 	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-			List/*<NarArtifacts>*/ narArtifacts, String aol, String type)
+			List/* <NarArtifacts> */narArtifacts, String aol, String type)
 			throws MojoExecutionException, MojoFailureException {
 		boolean noarch = false;
 		if (aol == null) {
@@ -126,9 +128,8 @@ public class NarManager {
 			}
 
 			// use preferred binding, unless non existing.
-			String binding = narInfo.getBinding(aol);
-			binding = binding != null ? binding : type != null ? type
-					: "static";
+			String binding = narInfo.getBinding(aol, type != null ? type
+					: "static");
 
 			// FIXME no handling of local
 			artifactList.addAll(getAttachedNarDependencies(dependency, aol,
@@ -230,9 +231,10 @@ public class NarManager {
 		return project.getCompileArtifacts();
 	}
 
-	public void downloadAttachedNars(List/*<NarArtifacts>*/ narArtifacts, List remoteRepositories,
-			ArtifactResolver resolver, String classifier)
-			throws MojoExecutionException, MojoFailureException {
+	public void downloadAttachedNars(List/* <NarArtifacts> */narArtifacts,
+			List remoteRepositories, ArtifactResolver resolver,
+			String classifier) throws MojoExecutionException,
+			MojoFailureException {
 		// FIXME this may not be the right way to do this.... -U ignored and
 		// also SNAPSHOT not used
 
@@ -259,11 +261,12 @@ public class NarManager {
 		}
 	}
 
-	public void unpackAttachedNars(List/*<NarArtifacts>*/ narArtifacts, ArchiverManager manager, String classifier, String os)
+	public void unpackAttachedNars(List/* <NarArtifacts> */narArtifacts,
+			ArchiverManager manager, String classifier, String os)
 			throws MojoExecutionException, MojoFailureException {
 		// FIXME should this be runtime ?
 		// FIXME, hardcoded
-		String[] types = { "jni", "shared", "static"};
+		String[] types = { "jni", "shared", "static" };
 
 		for (int t = 0; t < types.length; t++) {
 			List dependencies = getAttachedNarDependencies(narArtifacts,
@@ -291,7 +294,8 @@ public class NarManager {
 					try {
 						unpackNar(manager, file, narLocation);
 						if (!NarUtil.getOS(os).equals("Windows")) {
-							NarUtil.makeExecutable(new File(narLocation, "bin"), log);
+							NarUtil.makeExecutable(
+									new File(narLocation, "bin"), log);
 						}
 						FileUtils.fileDelete(flagFile.getPath());
 						FileUtils.fileWrite(flagFile.getPath(), "");
@@ -311,7 +315,7 @@ public class NarManager {
 			unArchiver = manager.getUnArchiver(AbstractNarMojo.NAR_ROLE_HINT);
 			unArchiver.setSourceFile(file);
 			unArchiver.setDestDirectory(location);
-			unArchiver.extract();			
+			unArchiver.extract();
 		} catch (IOException e) {
 			throw new MojoExecutionException("Error unpacking file: " + file
 					+ " to: " + location, e);

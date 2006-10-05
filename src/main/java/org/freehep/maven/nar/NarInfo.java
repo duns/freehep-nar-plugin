@@ -13,7 +13,7 @@ import java.util.jar.JarFile;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 8a7e57a69298 2006/08/21 22:03:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarInfo.java 1711d4d3f75e 2006/10/05 17:45:06 duns $
  */
 public class NarInfo {
 
@@ -50,12 +50,12 @@ public class NarInfo {
     }
 
     /**
-     * No binding means user binding.
+     * No binding means default binding.
      * @param aol
      * @return
      */
-	public String getBinding(String aol) {
-		return getProperty(aol, "libs.binding", null);
+	public String getBinding(String aol, String defaultBinding) {
+		return getProperty(aol, "libs.binding", defaultBinding);
 	}
 
     public void setBinding(String aol, String value) {

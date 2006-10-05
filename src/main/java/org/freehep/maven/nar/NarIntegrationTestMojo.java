@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 1711d4d3f75e 2006/10/05 17:45:06 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -421,8 +421,9 @@ public class NarIntegrationTestMojo extends AbstractDependencyMojo {
                 for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
                     NarArtifact dependency = (NarArtifact)i.next();
                     NarInfo info = dependency.getNarInfo();
-                    if (!info.getBinding(getAOL()).equals("static")) {
-                        File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+info.getBinding(getAOL()));
+                    String binding = info.getBinding(getAOL(), "static");
+                    if (!binding.equals("static")) {
+                        File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
                         System.err.println("Adding to java.library.path: "+depLib.getPath());
                         if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");
                         javaLibraryPath.append(depLib.getPath());
