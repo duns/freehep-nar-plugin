@@ -1,0 +1,193 @@
+	---
+FreeHEP NAR Plugin
+	---
+	---
+Mark Donszelmann
+	---
+	
+Introduction
+
+	This plugin for Maven 2 allows you to compile native code (c++, c and fortran) on
+a number of different architectures (Linux, Windows, MacOSX, Solaris, ...) and with
+a number of different compilers/linkers (g++, Microsoft Visual C++, CC, ...)
+The output produced is wrapped up in Native ARchive files (.nar) some of which
+are machine independent, while others are machine-and-compiler specific.
+These nar files can be deployed to a standard maven (web) server. 
+
+	Other maven projects may specify
+dependencies on these nar files. Nar files get downloaded, unpacked and 
+installed in the local maven repository, just like jar files are (apart from the
+unpacking).
+    
+	The NAR plugin executes the following goals, in the order below, to create and deploy nar files. 
+The goals are part of the
+nar packaging/lifecycle, which inserts the nar goals into the standard lifecyle. Using nar packaging
+allows you to build a jar file as well as nar files. The list below shows the sequence of goals 
+(including the default jar lifecycle):
+
+    [[1]] {{{#init}nar:init}}
+    
+    [[2]] {{{#info}nar:info (optional)}}
+    
+    [[3]] {{{#unpack}nar:unpack}}
+    
+    [[4]] {{{#jni}nar:jni}}
+    
+    [[5]] {{{#compile}nar:compile}}
+    
+    [[6]] {{{#compile-tests}nar:compile-tests}}
+    
+    [[7]] {{{#nar}nar:nar (default)}}
+    
+    [[8]] {{{#install}nar:install (optional)}}
+    
+    [[9]] {{{#deploy}nar:deploy (optional)}}
+
+	[]
+            
+* {init}
+
+	The NAR Plugin starts off by setting and deducing all kinds of property values for usage
+in the goals below. Some properties can only be set in a general way, but most properties
+can be set in 4 ways, "general", "architecture specific", "architecture-os specific", 
+"architecture-os-linker specific". The lookup of such a property will start off by the
+mosts specific property and end at the general one (normally the default value).
+For more information on general and specific properties, see {{{properties.html}
+the properties}}.
+                
+                
+	After reading the general properties, this goal tries to deduce the "Operating System"
+and the "Architecture" of the machine. Both can be overridden by setting <<<freehep.nar.os.name>>>
+and <<<freehep.nar.os.arch>>>.
+                
+                
+	The name of the linker is looked up in a architecture-os specific way, but can be overridden
+by setting <<<[arch.[os.]]freehep.nar.linker.name>>>. Now that the linker name is known
+all other properties are looked up with a prefix of <<<[arch.[os.[linker.]]]>>> trying the longest 
+prefix first.
+                
+                
+	All properties have defaults set for specific architecture-os-linker combinations, so most
+of the time these can be left untouched. You can, however, override any of these properties 
+if you need to.
+                            
+* {info}
+                
+	This optional goal shows all the properties as they are deduced in the init goal. The name
+of the property and its value are shown, including in what way this property is defined 
+(e.g. "general", "architecture", "architecture-os" or "architecture-os-linker").
+                
+* {unpack}
+                
+	Your NAR artifact(s) may be dependent on other nar artifacts. The standard maven dependency 
+declaration in the POM is used to describe such dependencies, see {{{nar-dependencies.html}
+nar-dependencies}}. By the time this goal is running maven will have already downloaded 
+the property files of all the nars it depends on. This property file contains information on what other
+machine dependent and machine independent nar files to download.
+
+
+	This goal will download any further necessary nar files into the local repository. Since a nar
+file is of no use to any native compilation process it is unpacked into
+a subdirectory of the local repository. A flag is set not to download and unpack this nar file again, 
+except if it is a SNAPSHOT artifact. The actual nar file is deleted to preserve diskspace.
+                
+* {jni}
+                
+	This goal will run the javah tool on any class file in the <<<maven.build.dest>>> directory
+which has native methods in it. The actual class files are inpected (rather than their sources).
+The javah tool is picked up from the java installation and is run with a classpath of <<<
+maven.build.dest>>> and the setting of <<<freehep.nar.classpath>>>. A special flag is set
+to make sure the compile and compile-tests goals will include the necessary header file directories 
+of both the generated header files and the java virtual machine header files.
+
+
+	This goal has no effect if there are no java sources, or if none of the java classes contain a native
+method.
+                
+* {compile}
+                
+	This goal will compile the native source code (c, c++ or fortran) and archive it into a static library
+or link it into a dynamic library, depending on the setting of <<<freehep.nar.outtype>>>. 
+To handle the variety of compilers and linkers, the NAR plugin uses the cpptasks from the ant-contrib
+project, with some minor improvements and additions of compilers, see {{{cpptasks.html}cpptasks}}.
+Most of the settings for cpptasks, such as compiler, linker, options and include dirs are available
+through the NAR plugin.
+
+
+	The compiler will automatically select the correct compiler (c, c++ or fortran) based on the type of
+sources, as specified in the patterns in <<<freehep.nar.c.src.includes>>>, 
+<<<freehep.nar.c++.src.includes>>> and <<<freehep.nar.fortran.src.includes>>>.
+
+
+	Include paths are added from:
+
+    * the java installation if java native code is present, see the jni goal, or if you set 
+    <<<freehep.nar.compile.withjava>>>.
+    
+    * the generated java header files from javah if java native code is present, see the jni goal.
+    
+    * the header files of any of the nar type dependencies, in the local repository or locally installed.
+    
+    * any directories set in <<<freehep.nar.compile.includepath>>>.
+    
+    * any system directories set in <<<freehep.nar.compile.sysincludepath>>>.
+
+	[]
+
+	The static or dynamic library is linked against:
+
+    * the list of libraries set in <<<freehep.nar.libs>>>.
+    
+    * the libraries of any of the nar type dependencies, in the local repository or locally installed.
+    
+    * the java virtual machine if java native code is present, see the jni goal, or if you set
+    <<<freehep.nar.link.withjava>>>.
+
+	[]
+
+	All include files from <<<freehep.nar.compile.includepath>>> are copied to be included
+in the non machine specific nar file.
+
+	If you set <<<freehep.nar.includefilesonly>>> to true the compilation step will be 
+skipped. This flag can be used if you want to distribute a library that only contains pure
+abstract classes in include files.
+                
+
+* {compile-tests}
+                
+	This goal compiles a lists of tests from <<<freehep.nar.tests>>>. The source for the tests
+can be in any of the supported languages. The include paths and libraries to compile and link with
+are the same as under the compile goal, except that the include dir and library of the artifact
+produced by the compile goal is also added.
+
+
+	If you set <<<freehep.nar.includefilesonly>>> to true the compile-tests goal will be 
+skipped.
+                
+* {nar}                
+   
+	This goal creates the artifact nar file(s). The following nar files are created by default:
+
+    * <Artifact>-nar-<version>.nar, a property file describing the behaviour of the 
+    library and other nar files available. For a description see {{{nar-dependencies.html}
+    nar-dependencies}}.
+    
+    * <Artifact>-nar-<version>.noarch.nar, a compressed jar file containing non machine
+    specific parts of the distribution, such as the include directories.
+    
+    * <Artifact>-nar-<version>.<aol>.nar, a compressed jar file containing machine
+    specific parts of the distribution, such as the libraries. This file is specific to a particular
+    Architecture-OS-Linker (aol) combination and is not generated if <<<freehep.nar.includefilesonly>>>
+    is set.
+    
+    []
+                
+* {install}                
+
+	This goal installs the produced artifacts in your local repository. The unpacking is done in the 
+unpack goal of a dependent artifact upon first usage.
+                
+
+* {deploy}
+                
+	This goal deploys the produced artifacts on a maven (web) server.	
