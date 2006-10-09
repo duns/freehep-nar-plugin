@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 493f9143c229 2006/09/29 23:09:26 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java a5bf42299ed4 2006/10/09 18:27:22 duns $
  */
 public abstract class Compiler {
 
@@ -111,22 +111,38 @@ public abstract class Compiler {
 
     /**
      * Defines
-     * Defaults to Architecture-OS-Linker specific values.
-     * FIXME table missing
      *
      * @parameter expression=""
      */
     private List defines;
 
     /**
-     * Undefines
-     * Defaults to Architecture-OS-Linker specific values.
+     * Clears default defines
+     * to Architecture-OS-Linker specific values.
      * FIXME table missing
+	 *
+     * @parameter expression="" default-value="false"
+     * @required
+	 */
+    private boolean clearDefaultDefines;
+    
+    /**
+     * Undefines
      *
      * @parameter expression=""
      */
     private List undefines;
 
+    /**
+     * Clears default undefines
+     * to Architecture-OS-Linker specific values.
+     * FIXME table missing
+	 *
+     * @parameter expression="" default-value="false"
+     * @required
+	 */
+    private boolean clearDefaultUndefines;
+    
     /**
      * Include Paths.
      * Defaults to "${sourceDirectory}/include"
@@ -262,36 +278,48 @@ public abstract class Compiler {
         }
 
         // add defines
-        DefineSet defineSet = new DefineSet();
         if (defines != null) {
+            DefineSet defineSet = new DefineSet();
             for (Iterator i=defines.iterator(); i.hasNext(); ) {
                 DefineArgument define = new DefineArgument();
-                define.setValue((String)i.next());
+                String[] pair = ((String)i.next()).split("=",2);
+                define.setName(pair[0]);
+                define.setValue(pair.length > 1 ? pair[1] : null);
                 defineSet.addDefine(define);
             }
-        } else {
+            compiler.addConfiguredDefineset(defineSet);            
+        } 
+        
+        if (!clearDefaultDefines) {
+            DefineSet defineSet = new DefineSet();
             String defaultDefines = NarUtil.getDefaults().getProperty(prefix+"defines");
             if (defaultDefines != null) {
                 defineSet.setDefine(new CUtil.StringArrayBuilder(defaultDefines));           
             }
+            compiler.addConfiguredDefineset(defineSet);            
         }
-        compiler.addConfiguredDefineset(defineSet);            
         
         // add undefines
-        DefineSet undefineSet = new DefineSet();
-        if (undefines != null) {
-            for (Iterator i=undefines.iterator(); i.hasNext(); ) {
+         if (undefines != null) {
+             DefineSet undefineSet = new DefineSet();
+             for (Iterator i=undefines.iterator(); i.hasNext(); ) {
                 DefineArgument undefine = new DefineArgument();
-                undefine.setValue((String)i.next());
-                defineSet.addUndefine(undefine);
+                String[] pair = ((String)i.next()).split("=",2);
+                undefine.setName(pair[0]);
+                undefine.setValue(pair.length > 1 ? pair[1] : null);
+                undefineSet.addUndefine(undefine);
             }
-        } else {
+            compiler.addConfiguredDefineset(undefineSet);            
+        }
+         
+        if (!clearDefaultUndefines) {
+            DefineSet undefineSet = new DefineSet();
             String defaultUndefines = NarUtil.getDefaults().getProperty(prefix+"undefines");
             if (defaultUndefines != null) {
-                defineSet.setUndefine(new CUtil.StringArrayBuilder(defaultUndefines));           
+                undefineSet.setUndefine(new CUtil.StringArrayBuilder(defaultUndefines));           
             }
+            compiler.addConfiguredDefineset(undefineSet);            
         }
-        compiler.addConfiguredDefineset(undefineSet);            
         
         // add include path
         for (Iterator i=getIncludePaths(mavenProject, type).iterator(); i.hasNext(); ) {

@@ -51,9 +51,11 @@ CompileMojo
     <defines>
       <define/>
     </defines>
+    <clearDefaultDefines/>
     <undefines>
       <undefine/>
     </undefines>
+    <clearDefaultUndefines/>
     <includePaths>
       <includePath/>
     </includePaths>
