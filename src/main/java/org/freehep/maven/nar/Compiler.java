@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java a5bf42299ed4 2006/10/09 18:27:22 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
  */
 public abstract class Compiler {
 
@@ -351,7 +351,6 @@ public abstract class Compiler {
         	otherFileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
         	otherFileSet.setDir(new File((String)i.next()));
         	compiler.addFileset(otherFileSet);
-        	System.err.println("* "+otherFileSet.getDir(antProject) + " "+otherFileSet);
         }
         return compiler;
     }
@@ -381,7 +380,6 @@ public abstract class Compiler {
        
         for (Iterator i=files.iterator(); i.hasNext(); ) {
             File file = (File)i.next();
-            System.err.println(file);
             String dest = file.getAbsolutePath();
             dest = dest.substring(sourcePath.length() + 1);
             File destination = new File(destinationDirectory, dest);

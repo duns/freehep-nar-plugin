@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -44,7 +44,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
     private void createTest(Project antProject, Test test)
             throws MojoExecutionException, MojoFailureException {
         String type = "test";
-        System.err.println("TESTING " + test.getName());
+//        System.err.println("TESTING " + test.getName());
 
         // configure task
         CCTask task = new CCTask();
@@ -63,7 +63,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // outFile
         File outFile = new File(outDir, test.getName());
-        getLog().info("NAR - output: '" + outFile + "'");
+        if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
         task.setOutfile(outFile);
 
         // object directory

@@ -4,7 +4,6 @@ package org.freehep.maven.nar;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -12,26 +11,27 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.util.PropertyUtils;
 
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 63e59ef830f9 2006/09/28 23:19:52 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
  */
-public abstract class AbstractNarMojo extends AbstractMojo {
-
-    public final static String NAR_EXTENSION = "nar";
-    public final static String NAR_NO_ARCH = "noarch";
-    public final static String NAR_ROLE_HINT = "nar-library";
-    public final static String NAR_TYPE = "nar";
-       
+public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
+    
     /**
      * Skip running of NAR plugins (any) altogether
      * 
      * @parameter expression="${nar.skip}" default-value="false"
      */
     private boolean skip;
+    
+    /**
+     * Level of logging messages, 0 is minimum.
+     * 
+     * @parameter expression="${nar.logLevel}" default-value="0"
+     */
+    private int logLevel;
     
     /**
      * The Architecture for the nar,
@@ -213,6 +213,10 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     	return skip;
     }
     
+    protected int getLogLevel() {
+    	return logLevel;
+    }
+    
     protected String getArchitecture() {
     	architecture = NarUtil.getArchitecture(architecture);
         return architecture;
@@ -225,7 +229,6 @@ public abstract class AbstractNarMojo extends AbstractMojo {
     
     protected String getAOL() throws MojoFailureException {
     	aol = NarUtil.getAOL(architecture, os, linker, aol);    	
-        getLog().info("NAR target '"+aol+"'");
         return aol;
     }
     
@@ -236,7 +239,6 @@ public abstract class AbstractNarMojo extends AbstractMojo {
 
     protected File getJavaHome() {
     	javaHome = NarUtil.getJavaHome(javaHome, os);    	
-        getLog().info("JavaHome '"+javaHome+"'");
     	return javaHome;       
     }
     

@@ -25,13 +25,13 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 1711d4d3f75e 2006/10/05 17:45:06 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip()) {
-			getLog().info("NAR Plugin running is SKIPPED.");
+			getLog().warn("NAR Plugin running is SKIPPED.");
 			return;
 		}
 
@@ -75,7 +75,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 		// outFile
 		File outFile = new File(outDir, getOutput());
-		getLog().info("NAR - output: '" + outFile + "'");
+		if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
 		task.setOutfile(outFile);
 
 		// object directory
@@ -128,7 +128,6 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				File include = new File(getNarManager().getNarFile(
 						narDependency).getParentFile(), "nar/include");
 				if (include.exists()) {
-					System.err.println("*** Include " + include);
 					task.createIncludePath().setPath(include.getPath());
 				}
 			}
@@ -149,34 +148,34 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				// FIXME, no way to override this at this stage
 				String binding = dependency.getNarInfo().getBinding(getAOL(),
 						"static");
-				System.err.println("BINDING " + binding);
+//				System.err.println("BINDING " + binding);
 				String aol = getAOL();
 				aol = dependency.getNarInfo().getAOL(getAOL());
-				System.err.println("LIB AOL " + aol);
+//				System.err.println("LIB AOL " + aol);
 
 				if (!binding.equals("jni")) {
 					File dir = new File(getNarManager().getNarFile(dependency)
 							.getParentFile(), "nar/lib/" + aol + "/" + binding);
-					System.err.println("LIB DIR " + dir);
+//					System.err.println("LIB DIR " + dir);
 					if (dir.exists()) {
 						LibrarySet libSet = new LibrarySet();
 						libSet.setProject(antProject);
 
 						// FIXME, no way to override
 						String libs = dependency.getNarInfo().getLibs(getAOL());
-						System.err.println("LIBS = " + libs);
+//						System.err.println("LIBS = " + libs);
 						libSet.setLibs(new CUtil.StringArrayBuilder(libs));
 						libSet.setDir(dir);
 						task.addLibset(libSet);
 					} else {
-						System.err.println("LIB DIR " + dir
-								+ " does NOT exist.");
+//						System.err.println("LIB DIR " + dir
+//								+ " does NOT exist.");
 					}
 
 					String sysLibs = dependency.getNarInfo().getSysLibs(
 							getAOL());
 					if (sysLibs != null) {
-						System.err.println("SYSLIBS = " + sysLibs);
+//						System.err.println("SYSLIBS = " + sysLibs);
 						SystemLibrarySet sysLibSet = new SystemLibrarySet();
 						sysLibSet.setProject(antProject);
 

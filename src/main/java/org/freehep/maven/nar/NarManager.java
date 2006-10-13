@@ -29,6 +29,8 @@ import org.codehaus.plexus.util.FileUtils;
 public class NarManager {
 
 	private Log log;
+	
+	private int logLevel;
 
 	private MavenProject project;
 
@@ -39,10 +41,11 @@ public class NarManager {
 	private String[] narTypes = { "noarch", "static", "dynamic", "jni",
 			"plugin" };
 
-	public NarManager(Log log, ArtifactRepository repository,
+	public NarManager(Log log, int logLevel, ArtifactRepository repository,
 			MavenProject project, String architecture, String os, Linker linker)
 			throws MojoFailureException {
 		this.log = log;
+		this.logLevel = logLevel;
 		this.repository = repository;
 		this.project = project;
 		this.defaultAOL = NarUtil.getAOL(architecture, os, linker, null);
@@ -141,14 +144,14 @@ public class NarManager {
 	private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
 			Artifact dependency, String aol, String type)
 			throws MojoExecutionException, MojoFailureException {
-		System.err.println("***** " + dependency + " " + aol + " " + type);
+//		System.err.println("***** " + dependency + " " + aol + " " + type);
 		List artifactList = new ArrayList();
 		NarInfo narInfo = getNarInfo(dependency);
 		String[] nars = narInfo.getAttachedNars(aol, type);
 		// FIXME Move this to info....
 		if (nars != null) {
 			for (int j = 0; j < nars.length; j++) {
-				System.err.println("==== " + nars[j]);
+//				System.err.println("==== " + nars[j]);
 				String[] nar = nars[j].split(":", 5);
 				if (nar.length >= 4) {
 					try {
@@ -247,7 +250,7 @@ public class NarManager {
 			for (Iterator i = dependencies.iterator(); i.hasNext();) {
 				Artifact dependency = (Artifact) i.next();
 				try {
-					System.err.println("Resolving " + dependency);
+//					System.err.println("Resolving " + dependency);
 					resolver
 							.resolve(dependency, remoteRepositories, repository);
 				} catch (ArtifactNotFoundException e) {
@@ -273,7 +276,7 @@ public class NarManager {
 					classifier, types[t]);
 			for (Iterator i = dependencies.iterator(); i.hasNext();) {
 				Artifact dependency = (Artifact) i.next();
-				System.err.println("Unpack " + dependency);
+//				System.err.println("Unpack " + dependency);
 				File file = getNarFile(dependency);
 				File narLocation = new File(file.getParentFile(), "nar");
 				File flagFile = new File(narLocation, FileUtils.basename(file
@@ -300,7 +303,7 @@ public class NarManager {
 						FileUtils.fileDelete(flagFile.getPath());
 						FileUtils.fileWrite(flagFile.getPath(), "");
 					} catch (IOException e) {
-						log.info("Cannot create flag file: "
+						log.warn("Cannot create flag file: "
 								+ flagFile.getPath());
 					}
 				}
