@@ -10,7 +10,8 @@
   <packaging>maven-plugin</packaging>
   <name>FreeHEP Maven Native Archive Plugin</name>
   <version>2.0-alpha-2-SNAPSHOT</version>
-  <description>Native Archive Plug-in to compile and link c++, c and fortran (for Maven 2).</description>
+  <description>Native Archive Plug-in to compile and link c++, c and fortran (for Maven 2),
+  see Introduction</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>

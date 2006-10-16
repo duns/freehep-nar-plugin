@@ -5,5 +5,24 @@ FreeHEP NAR Plugin
 Mark Donszelmann
 	---
 	
-Frequently Asked Questions
+NAR Philosophy
 
+	In the NAR plugin we follow Maven's main principles, outlined below:
+	
+	* Convention over configuration
+	
+		* Standard directory layout for Native projects
+		
+		* A single Native project producses a single output
+		
+		* Standard naming conventions
+		
+		[]
+
+	* Declarative execution
+
+	* Reuse of build logic
+
+	* Coherent organization of dependencies
+
+	
