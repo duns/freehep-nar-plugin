@@ -9,20 +9,18 @@ NAR Philosophy
 
 	In the NAR plugin we follow Maven's main principles, outlined below:
 	
-	* Convention over configuration
+* Convention over configuration
 	
-		* Standard directory layout for Native projects
+** Standard directory layout for Native projects
 		
-		* A single Native project producses a single output
+** A single Native project producses a single output
 		
-		* Standard naming conventions
+** Standard naming conventions
 		
-		[]
+* Declarative execution
 
-	* Declarative execution
+* Reuse of build logic
 
-	* Reuse of build logic
-
-	* Coherent organization of dependencies
+* Coherent organization of dependencies
 
 	

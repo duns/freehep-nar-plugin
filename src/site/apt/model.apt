@@ -1,5 +1,15 @@
-CompileMojo
+	---
+FreeHEP NAR Plugin
+	---
+	---
+Mark Donszelmann
+	---
 
+NAR Configuration
+
+	The following shows the possible tags in the NAR configuration section:
+
++--
 <configuration>
   <arch/>
   <os/>
@@ -82,6 +92,6 @@ CompileMojo
     <runtime/>
   </java>
   
-  // added for TestCompileMojo
   <link/>
 </configuration>
++--

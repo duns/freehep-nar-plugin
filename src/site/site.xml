@@ -26,6 +26,7 @@
       <item name="Goals" href="plugin-info.html"/>
       <item name="Usage" href="usage.html"/>
       <item name="Lifecycle" href="lifecycle.html"/>
+      <item name="Configuration" href="configuration.html"/>
       <item name="NAR Dependencies" href="narDependencies.html"/>
       <item name="Bug Reports" href="http://bugs.freehep.org/browse/NARPLUGIN"/>
       <item name="APIDocs" href="apidocs/index.html"/>
