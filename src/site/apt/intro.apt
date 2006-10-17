@@ -48,46 +48,48 @@ allows you to build a jar file as well as nar files. The list below shows the se
     [[10]] {{{#deploy}deploy (standard maven goal)}}
 
 	[]
-            
-* {nar-download}
+	
+* Initialization
 
 	The NAR Plugin starts off by setting and deducing all kinds of property values for usage
 in the goals below. Some properties can only be set in a general way, but most properties
 can be set in 4 ways, "general", "architecture specific", "architecture-os specific", 
 "architecture-os-linker specific". The lookup of such a property will start off by the
-mosts specific property and end at the general one (normally the default value).
+most specific property and end at the general one (normally the default value).
 For more information on general and specific properties, see {{{properties.html}
 the properties}}.
                 
                 
-	After reading the general properties, this goal tries to deduce the "Operating System"
-and the "Architecture" of the machine. Both can be overridden by setting <<<freehep.nar.os.name>>>
-and <<<freehep.nar.os.arch>>>.
+	After reading the general properties, the NAR Plugin to deduce the "Operating System"
+and the "Architecture" of the machine. Both can be overridden by setting <<<os>>>
+and <<<arch>>> in the configuration.
                 
                 
 	The name of the linker is looked up in a architecture-os specific way, but can be overridden
-by setting <<<[arch.[os.]]freehep.nar.linker.name>>>. Now that the linker name is known
+by setting <<<linker name>>>. Now that the linker name is known
 all other properties are looked up with a prefix of <<<[arch.[os.[linker.]]]>>> trying the longest 
 prefix first.
                 
                 
-	All properties have defaults set for specific architecture-os-linker combinations, so most
+	All values have defaults set for specific architecture-os-linker combinations, so most
 of the time these can be left untouched. You can, however, override any of these properties 
 if you need to.
-                                            
-* {nar-unpack}
-                
+
+            
+* {nar-download}
+
 	Your NAR artifact(s) may be dependent on other nar artifacts. The standard maven dependency 
 declaration in the POM is used to describe such dependencies, see {{{nar-dependencies.html}
 nar-dependencies}}. By the time this goal is running maven will have already downloaded 
-the property files of all the nars it depends on. This property file contains information on what other
-machine dependent and machine independent nar files to download.
+all dependent jar files some of which may include a nar.properties file. 
+This property file contains information on what other machine dependent and machine independent nar files to download.
+This goal will download any further necessary nar files into the local repository.
+                                            
+* {nar-unpack}
 
-
-	This goal will download any further necessary nar files into the local repository. Since a nar
-file is of no use to any native compilation process it is unpacked into
-a subdirectory of the local repository. A flag is set not to download and unpack this nar file again, 
-except if it is a SNAPSHOT artifact. The actual nar file is deleted to preserve diskspace.
+	Since a nar file is of no use to any native compilation process the nar-unpack goal unpacks the nar into
+the "nar" subdirectory of the local repository. A flag is set not to download and unpack this nar file again, 
+except if it is a SNAPSHOT artifact. <<< TBD The actual nar file is deleted to preserve diskspace.>>>
                 
 * {nar-javah}
                 

@@ -95,3 +95,130 @@ NAR Configuration
   <link/>
 </configuration>
 +--
+
+* configuration
+
+** arch
+
+** os
+
+** javaHome
+
+** aol
+
+** targetDirectory
+
+** output
+
+** type
+
+** failOnError
+
+** runtime
+
+** libtool
+
+
+* linker
+
+** name
+
+** incremental
+
+** map
+
+** options
+
+*** option
+
+** libs
+  
+*** lib
+    
+**** name
+    
+**** type
+    
+**** directory
+  
+** sysLibs
+  
+*** sysLib
+    
+**** name
+    
+**** type
+ 
+
+* cpp
+
+** name
+    
+** sourceDirectory
+    
+** includes
+
+*** include
+
+** excludes
+      
+*** exclude
+    
+** debug
+    
+** exceptions
+    
+** rtti
+    
+** optimize
+   
+** multiThreaded
+   
+** defines
+     
+*** define
+
+** clearDefaultDefines
+    
+** undefines
+     
+*** undefine
+
+** clearDefaultUndefines
+    
+** includePaths
+
+*** includePath
+    
+** systemIncludePaths
+     
+*** systemIncludePath
+    
+** options
+      
+*** option
+
+
+* c
+
+	Same definitions as for \<cpp\>
+
+
+* fortran
+
+	Same definitions as for \<cpp\>
+
+
+* java
+
+** include
+
+** includePaths
+
+*** includePath
+
+** link
+
+** runtimeDirectory
+
+** runtime
