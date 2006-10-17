@@ -11,41 +11,45 @@ Introduction
 a number of different architectures (Linux, Windows, MacOSX, Solaris, ...) and with
 a number of different compilers/linkers (g++, Microsoft Visual C++, CC, ...)
 The output produced is wrapped up in Native ARchive files (.nar) some of which
-are machine independent, while others are machine-and-compiler specific.
-These nar files can be deployed to a standard maven (web) server. 
+are machine independent (-noarch), while others are machine specific and thus depend
+on a combination of machine architecture(A), operating-system(O) and linker(L) identified
+as AOL.
+These nar files can be installed in the local maven repository and deployed to a 
+standard maven (web) server, using the standard maven-install-plugin and maven-deploy-plugin.
 
-	Other maven projects may specify
-dependencies on these nar files. Nar files get downloaded, unpacked and 
+	Other maven projects may specify dependencies on these nar files using the standard
+maven dependency declaration. Nar files get downloaded, unpacked and 
 installed in the local maven repository, just like jar files are (apart from the
 unpacking).
     
 	The NAR plugin executes the following goals, in the order below, to create and deploy nar files. 
 The goals are part of the
-nar packaging/lifecycle, which inserts the nar goals into the standard lifecyle. Using nar packaging
-allows you to build a jar file as well as nar files. The list below shows the sequence of goals 
-(including the default jar lifecycle):
+<<nar>> packaging/{{{lifecycle.html}lifecycle}}, which inserts the nar goals into the standard lifecyle. Using nar packaging
+allows you to build a jar file as well as nar files. The list below shows the sequence of the NAR goals:
 
-    [[1]] {{{#init}nar:init}}
+    [[1]] {{{#nar-download}nar-download}}
     
-    [[2]] {{{#info}nar:info (optional)}}
+    [[2]] {{{#nar-unpack}nar-unpack}}
     
-    [[3]] {{{#unpack}nar:unpack}}
+    [[3]] {{{#nar-javah}nar-javah}}
     
-    [[4]] {{{#jni}nar:jni}}
+    [[4]] {{{#nar-compile}nar:compile}}
     
-    [[5]] {{{#compile}nar:compile}}
+    [[5]] {{{#nar-testCompile}nar-testCompile}}
     
-    [[6]] {{{#compile-tests}nar:compile-tests}}
+    [[6]] {{{#nar-test}nar-test}}
     
-    [[7]] {{{#nar}nar:nar (default)}}
+    [[7]] {{{#nar-package}nar-package}}
     
-    [[8]] {{{#install}nar:install (optional)}}
+    [[8]] {{{#nar-integration-test}nar-integration-test}}
     
-    [[9]] {{{#deploy}nar:deploy (optional)}}
+    [[9]] {{{#install}install (standard maven goal)}}
+    
+    [[10]] {{{#deploy}deploy (standard maven goal)}}
 
 	[]
             
-* {init}
+* {nar-download}
 
 	The NAR Plugin starts off by setting and deducing all kinds of property values for usage
 in the goals below. Some properties can only be set in a general way, but most properties
@@ -70,14 +74,8 @@ prefix first.
 	All properties have defaults set for specific architecture-os-linker combinations, so most
 of the time these can be left untouched. You can, however, override any of these properties 
 if you need to.
-                            
-* {info}
-                
-	This optional goal shows all the properties as they are deduced in the init goal. The name
-of the property and its value are shown, including in what way this property is defined 
-(e.g. "general", "architecture", "architecture-os" or "architecture-os-linker").
-                
-* {unpack}
+                                            
+* {nar-unpack}
                 
 	Your NAR artifact(s) may be dependent on other nar artifacts. The standard maven dependency 
 declaration in the POM is used to describe such dependencies, see {{{nar-dependencies.html}
@@ -91,7 +89,7 @@ file is of no use to any native compilation process it is unpacked into
 a subdirectory of the local repository. A flag is set not to download and unpack this nar file again, 
 except if it is a SNAPSHOT artifact. The actual nar file is deleted to preserve diskspace.
                 
-* {jni}
+* {nar-javah}
                 
 	This goal will run the javah tool on any class file in the <<<maven.build.dest>>> directory
 which has native methods in it. The actual class files are inpected (rather than their sources).
@@ -104,7 +102,7 @@ of both the generated header files and the java virtual machine header files.
 	This goal has no effect if there are no java sources, or if none of the java classes contain a native
 method.
                 
-* {compile}
+* {nar-compile}
                 
 	This goal will compile the native source code (c, c++ or fortran) and archive it into a static library
 or link it into a dynamic library, depending on the setting of <<<freehep.nar.outtype>>>. 
@@ -153,7 +151,7 @@ skipped. This flag can be used if you want to distribute a library that only con
 abstract classes in include files.
                 
 
-* {compile-tests}
+* {nar-testCompile}
                 
 	This goal compiles a lists of tests from <<<freehep.nar.tests>>>. The source for the tests
 can be in any of the supported languages. The include paths and libraries to compile and link with
@@ -163,8 +161,11 @@ produced by the compile goal is also added.
 
 	If you set <<<freehep.nar.includefilesonly>>> to true the compile-tests goal will be 
 skipped.
+
+* {nar-test}
+           
                 
-* {nar}                
+* {nar-package}                
    
 	This goal creates the artifact nar file(s). The following nar files are created by default:
 
@@ -181,12 +182,15 @@ skipped.
     is set.
     
     []
+
+* {nar-integration-test}
+                
                 
 * {install}                
 
 	This goal installs the produced artifacts in your local repository. The unpacking is done in the 
 unpack goal of a dependent artifact upon first usage.
-                
+
 
 * {deploy}
                 

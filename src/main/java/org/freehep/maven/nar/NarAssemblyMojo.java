@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -33,8 +33,6 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 	private List classifiers;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (shouldSkip()) return;
-		
 		for (Iterator j = classifiers.iterator(); j.hasNext();) {
 			String classifier = (String) j.next();
 			System.err.println("For " + classifier);

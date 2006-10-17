@@ -11,6 +11,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -23,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
 
@@ -35,15 +36,23 @@ public class NarUnpackMojo extends AbstractDependencyMojo {
      */
     private List classifiers;
 
+    /**
+     * To look up Archiver/UnArchiver implementations
+     *
+     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
+     * @required
+     */
+    private ArchiverManager archiverManager;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
     	if (shouldSkip()) return;
     	
 		List narArtifacts = getNarManager().getNarDependencies("compile");
         if (classifiers == null) {
-            getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), null, getOS());
+            getNarManager().unpackAttachedNars(narArtifacts, archiverManager, null, getOS());
         } else {
             for (Iterator j = classifiers.iterator(); j.hasNext();) {
-            	getNarManager().unpackAttachedNars(narArtifacts, getArchiverManager(), (String) j.next(), getOS());
+            	getNarManager().unpackAttachedNars(narArtifacts, archiverManager, (String) j.next(), getOS());
             }
         }
     }

@@ -7,3 +7,6 @@ Mark Donszelmann
 	
 Frequently Asked Questions
 
+	[Why does the nar-package goal run before the (general) jar goal]
+The nar-package goal generates the nar.properties file which needs to 
+be included in the general jar artifact.

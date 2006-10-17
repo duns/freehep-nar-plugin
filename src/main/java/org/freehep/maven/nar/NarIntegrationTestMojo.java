@@ -48,13 +48,13 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 1711d4d3f75e 2006/10/05 17:45:06 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
  */
 // FREEHEP, changed class name, inheritence, goal and phase
-public class NarIntegrationTestMojo extends AbstractDependencyMojo {
+public class NarIntegrationTestMojo extends AbstractCompileMojo {
 
     // FREEHEP added test for JNI module
     private boolean testJNIModule() {
