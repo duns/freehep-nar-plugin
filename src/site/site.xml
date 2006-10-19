@@ -31,6 +31,7 @@
       <item name="Bug Reports" href="http://bugs.freehep.org/browse/NARPLUGIN"/>
       <item name="APIDocs" href="apidocs/index.html"/>
       <item name="FAQ" href="faq.html"/>
+      <item name="AOL Properties" href="aol.html"/>
     </menu>
    
     <menu name="Examples">

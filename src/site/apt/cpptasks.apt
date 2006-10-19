@@ -1,0 +1,56 @@
+	---
+FreeHEP NAR Plugin
+	---
+	---
+Mark Donszelmann
+	---
+	
+CppTasks
+
+	To handle the variety of architectures, compilers and linkers, the NAR Plugin uses 
+the <a href="http://ant-contrib.sourceforge.net/cc.html">cpptasks</a> library available 
+from <a href="http://ant-contrib.sourceforge.net/">ant-contrib</a>.
+This library allows to specify compilers and linkers from ant (and thus from maven)
+and unifies most common options for those compilers and linkers.
+
+	The NAR Plugin uses cpptasks 1.0 beta 3 from 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=36177">sourceforge</a>
+with some minor extensions:
+	
++--
+*** Changes marked with FREEHEP.
+cpptasks-20051015-patched-1.2-SNAPSHOT
+- added -shared-libgcc/-static-libgcc for linking gcc and c++. 
+- added -dynamic as a valid option to GccLinker
+
+cpptasks-20051015-patched-1.1
+- [CCTask] added method to link with CPP
+- [compiler.LinkType] added method to link with CPP
+- [gcc.GppLinker] link with or without CPP
+- [gcc.AbstractLdLinker] added jni
+- [OutputTypeEnum] added jni
+- [compiler.LinkType] add jni as type
+- [gcc.GccLinker] add jni as type and special linker for MacOS X to output jnilib files.
+- [gcc.GppLinker] add jni as type and special linker for MacOS X to output jnilib files.
+- [gcc.GccCCompiler] added gfortran compiler
+- [CompilerEnum] added gfortran compiler
+cpptasks-20051015-patched-1.0
+- [DevStudioCompatibleCCompiler] changed /GX into /EHsc (for VC8, and backward compatible with VC7 and VC6).
+- [CommandLineLinker] use absolute paths for filenames if they are shorter than relative paths to overcome windows file length limit.
+- [gcc.AbstractLdLinker] no -Bstatic for Darwin.
+- [CCTask] added log statement to identify linker and compiler.
+- [intel.IntelLinux32CLinker, intel.IntelLinux64CLinker, intel.IntelLinux32Compiler, intel.IntelLinux64Compiler] 
+  added with names icpc and ecpc.
+- [LinkerEnum, CompilerEnum] added above linkers and compilers.
+- [intel.IntelLinux32CCompiler, intel.IntelLinux64CCompiler] links to IntelLinux32CLinker and IntelLinux64CLinker.
+- [intel.IntelLinux32Linker, intel.IntelLinux64Linker] changed linker name from icc to icpc and ecc to ecpc for version 8.1 of icc.
+- [sun.ForteCCompiler] Added (suncc)
+- [sun.ForteF77Compiler] Added (sunf77)
+- [CompilerEnum] Added the above (suncc, sunf77).
+- [compaq.CompaqVisualFortranCompiler] removed addition of quotes.
+- [gcc.GccCompatibleCCompiler, gcc.GccCCompiler] moved and modified -fno-rtti code 
+- [gcc.GccCompatibleCCompiler] added missing code for -fno-exceptions
+- [gcc.GppLinker, compiler.LinkType] Set "callAddLibrarySets" flag, submitted as bug 1109917 in cpptasks of ant-contrib.
+- [compiler.CommandLineLinker] Check "callAddLibrarySets" flag.
+
++--	

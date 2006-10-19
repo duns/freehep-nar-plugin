@@ -29,6 +29,9 @@ NAR Configuration
     <options>
       <option/>
     </options>
+    <definitions>
+      <definition>
+    </definitions>
     <libs>
       <lib>
         <name/>
@@ -76,12 +79,15 @@ NAR Configuration
       <option/>
     </options>
   </cpp>
+
   <c>
     ... same as for <cpp>
   </c>
+
   <fortran>
     ... same as for <cpp>
   </fortran>
+  
   <java>
     <include/>
     <includePaths>
@@ -91,6 +97,24 @@ NAR Configuration
     <runtimeDirectory/>
     <runtime/>
   </java>
+
+  <javah>
+    <name/>
+    <bootClassPaths>
+      <bootClassPath/>
+    </bootClassPaths>
+    <classPaths>
+      <classPath/>
+    </classPaths>
+    <jniDirectory/>
+    <classDirectory/>
+    <includes>
+      <include>
+    </includes>
+    <excludes>
+      <exclude>
+    </excludes>
+  </javah>
   
   <link/>
 </configuration>
@@ -121,83 +145,128 @@ NAR Configuration
 
 * linker
 
+	Section to specify parameters for the linker.
+
 ** name
+
+	The Linker. Some choices are: "msvc", "g++", "CC", "icpc", ...
+    Default is AOL specific.
 
 ** incremental
 
+	Enables incremental linking. Default is false.
+
 ** map
+
+	Enables the production of a map file. Default is false.
 
 ** options
 
-*** option
+	Options for the linker.
+    Defaults to AOL specific values.
+
+** definitions
+
+   	(Windows only, Shared libs only) list of definition files.
+    Defaults to none.
 
 ** libs
-  
-*** lib
+
+	Adds libraries to the linker. For each lib you have to specify:
     
-**** name
+	[name] Name of the library, or a dependency groupId:artifactId if this library contains sublibraries
     
-**** type
+	[type] Type of linking for this library. Default is shared.
     
-**** directory
+	[directory] Location for this library.
+	
+	[]
   
 ** sysLibs
+
+	Adds system libraries to the linker. For each syslib you have to specify:
+	
+	[name] Name of the system library
+	
+	[type] Type of linking for this system library. Default is shared.
   
-*** sysLib
-    
-**** name
-    
-**** type
- 
+  	[]
+  	 
 
 * cpp
 
+	Section to specify parameters for the c++ compiler.
+
 ** name
+
+	The name of the compiler. Some choices are: "msvc", "g++", "gcc", "CC", "cc", "icc", "icpc", ...
+    Default is AOL specific.
     
 ** sourceDirectory
     
+    Source directory for native files
+    
 ** includes
 
-*** include
+	Include patterns for sources.
 
 ** excludes
       
-*** exclude
+	Exclude patterns for sources. 
     
 ** debug
     
+    Compile with debug information. Default is false.
+    
 ** exceptions
+
+	Enables generation of exception handling code. Default is true.
     
 ** rtti
+
+	Enables run-time type information. Default is true.
     
 ** optimize
+
+	Sets optimization.
+  	Possible choices are: "none", "size", "minimal", "speed", "full", "aggressive", "extreme", "unsafe".
+  	Default is none.
    
 ** multiThreaded
    
+    Enables or disables generation of multithreaded code.
+    Default value: false, except on Windows.
+   
 ** defines
-     
-*** define
+
+	List of defines.
 
 ** clearDefaultDefines
     
+    Clear the defines specified in AOL properties.
+    
 ** undefines
-     
-*** undefine
 
+	List of undefines.
+     
 ** clearDefaultUndefines
     
+	Clear undefines specified in AOL properties.
+
 ** includePaths
 
-*** includePath
+	Include Paths.
+    Defaults to "${sourceDirectory}/include"
     
 ** systemIncludePaths
-     
-*** systemIncludePath
+
+	System Include Paths, which are added at the end of all include paths
     
 ** options
-      
-*** option
 
+	Options for the C++ compiler
+    Defaults to AOL specific values.
+      
 
 * c
 
@@ -222,3 +291,38 @@ NAR Configuration
 ** runtimeDirectory
 
 ** runtime
+
+
+* javah
+
+	Section to specify parameters for javah
+
+** name
+
+	Javah command to run.
+
+** bootClassPaths
+
+	List of boot class paths. By default none.
+
+** classPaths
+
+	List of classpaths. By default the classDirectory directory is included and all dependent classes.
+
+** jniDirectory
+
+	The target directory into which to generate the output.
+
+** classDirectory
+
+	The class directory to scan for class files with native interfaces.
+
+** includes
+
+	The set of files/patterns to include. Defaults to "**/*.class"
+
+** excludes
+
+	A list of exclusion filters. Defaults to none.
+	
+

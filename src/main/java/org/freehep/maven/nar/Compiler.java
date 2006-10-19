@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java d82d5a6fbeb1 2006/10/19 00:09:24 duns $
  */
 public abstract class Compiler {
 
@@ -335,7 +335,7 @@ public abstract class Compiler {
             }            
         }
         
-        // Add deafult fileset
+        // Add default fileset
         ConditionalFileSet fileSet = new ConditionalFileSet();
         fileSet.setProject(antProject);
         fileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));

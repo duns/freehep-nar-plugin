@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Javah.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Javah.java d82d5a6fbeb1 2006/10/19 00:09:24 duns $
  */
 public class Javah {
 
@@ -49,7 +49,7 @@ public class Javah {
     private List/*<File>*/ bootClassPaths = new ArrayList();
            
     /**
-     * Add class paths. By default the target/classes directory is included and all dependent classes.
+     * Add class paths. By default the classDirectory directory is included and all dependent classes.
      *
      * @parameter
      */
