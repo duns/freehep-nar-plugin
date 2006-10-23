@@ -7,7 +7,7 @@ Mark Donszelmann
 	
 Introduction
 
-	NOTE: bold print is NOT implemented yet.
+	NOTE: <<bold>> print is <<NOT implemented yet>>.
 
 	This plugin for Maven 2 allows you to compile native code (c++, c and fortran) on
 a number of different architectures (Linux, Windows, MacOSX, Solaris, ...) and with
@@ -106,6 +106,10 @@ project, with some minor improvements and additions of compilers, see {{{cpptask
 Most of the settings for cpptasks, such as compiler, linker, options and include dirs are available
 through the NAR plugin, see {{{configuration.html}configuration}}.
 
+	The NAR plugin searches the directory structure under COMPILER.sourceDirectory, which defaults to
+src/main. The standard way to separate your sources for different languages would be src/main/c, src/main/c++
+and src/main/fortran, but any file under src/main is searched for.
+
 	The compiler will automatically select the correct compiler (c, c++ or fortran) based on the type of
 sources, as specified in the patterns in <<<AOL.c.includes>>>, 
 <<<AOL.nar.src.includes>>> and <<<AOL.fortran.includes>>>, where AOL is a dotted qualifier of the architecture,
@@ -153,43 +157,59 @@ abstract classes in include files.>>
                 
 
 * {nar-testCompile}
+
+	This goal will compile the native test source code (c, c++ or fortran) and create executables from it.
+To handle the variety of compilers and linkers, the NAR plugin uses the cpptasks from the ant-contrib
+project, with some minor improvements and additions of compilers, see {{{cpptasks.html}cpptasks}}.
+Most of the settings for cpptasks, such as compiler, linker, options and include dirs are available
+through the NAR plugin, see {{{configuration.html}configuration}}.
+
+	The NAR plugin searches the directory structure under COMPILER.sourceDirectory, which defaults to
+src/test. The standard way to separate your sources for different languages would be src/test/c, src/test/c++
+and src/test/fortran, but any file under src/test is searched for.
+
+	The compiler will automatically select the correct compiler (c, c++ or fortran) based on the type of
+sources, as specified in the patterns in <<<AOL.c.includes>>>, 
+<<<AOL.nar.src.includes>>> and <<<AOL.fortran.includes>>>, where AOL is a dotted qualifier of the architecture,
+os and linker (x86.Windows.msvc for example).
                 
-	This goal compiles a lists of tests from <<<freehep.nar.tests>>>. The source for the tests
-can be in any of the supported languages. The include paths and libraries to compile and link with
-are the same as under the compile goal, except that the include dir and library of the artifact
-produced by the compile goal is also added.
+	<<TBD If you set freehep.nar.includefilesonly to true the compile-tests goal will be 
+skipped.>>
 
-
-	If you set <<<freehep.nar.includefilesonly>>> to true the compile-tests goal will be 
-skipped.
-
-A special flag is set
-to make sure the compile and compile-tests goals will include the necessary header file directories 
-of both the generated header files and the java virtual machine header files.
 
 * {nar-test}
            
+	<<TBD>>
                 
 * {nar-package}                
    
-	This goal creates the artifact nar file(s). The following nar files are created by default:
+	This goal creates the artifact jar/nar file(s). The jar file is created by the standard package goal.
+The following jar and nar files are created:
 
-    * <Artifact>-nar-<version>.nar, a property file describing the behaviour of the 
+    * \<Artifact\>-\<version\>.jar, containing a property file describing the behaviour of the 
     library and other nar files available. For a description see {{{nar-dependencies.html}
     nar-dependencies}}.
     
-    * <Artifact>-nar-<version>.noarch.nar, a compressed jar file containing non machine
+    * \<Artifact\>-\<version\>-noarch.nar, a compressed jar file containing non machine
     specific parts of the distribution, such as the include directories.
     
-    * <Artifact>-nar-<version>.<aol>.nar, a compressed jar file containing machine
+    * \<Artifact\>-\<version\>-\<aol\>.nar, a compressed jar file containing machine
     specific parts of the distribution, such as the libraries. This file is specific to a particular
-    Architecture-OS-Linker (aol) combination and is not generated if <<<freehep.nar.includefilesonly>>>
-    is set.
+    Architecture-OS-Linker (AOL) combination <<TBD and is not generated if freehep.nar.includefilesonly
+    is set>>.
     
     []
 
 * {nar-integration-test}
-                
+               
+    This goal runs tests against the packaged jar and nar files. Currently this is useful only to
+test a jni library. The jni library is added to the java.library.path and the tests are forked to
+pick up this path.
+
+	To use this goal you need to put the test sources in the regular test directories but disable 
+the running of the tests by the maven-surefire-plugin.
+               
+	<<TBD integration tests for other modules than jni>>
                 
 * {install}                
 
@@ -199,4 +219,5 @@ unpack goal of a dependent artifact upon first usage.
 
 * {deploy}
                 
-	This goal deploys the produced artifacts on a maven (web) server.	
+	This goal deploys the produced artifacts on a maven (web) server. The jar and nar files only consists
+in their full form on the server and are never unpacked on the server.	
