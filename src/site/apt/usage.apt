@@ -25,7 +25,7 @@ and link native code.
         <version>nar-version-number</version>
         <extensions>true</extensions>
       </plugin>
-    </pligins>
+    </plugins>
   </build>
 </project>
 +--
