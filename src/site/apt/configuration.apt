@@ -124,24 +124,52 @@ NAR Configuration
 
 ** arch
 
+	The Architecture for which we produce the native library. Examples are
+i386, x86, ppc, ppc64, etc... Default is the system property os.arch.
+
 ** os
+
+	The Operating System  for which we produce the native library. Examples
+are Windows, Linux, MacOSX, SunOS, ... Default is derived from os.name, without spaces and
+in the case of Windows generalized.
 
 ** javaHome
 
+	The location of the Java installation. Default is derived from the system
+property java.home, corrected for MacOSX.
+
 ** aol
+
+	The Architecture-OS-Linker qualifier. Default is composed from the arch,
+os and linker.name value.
 
 ** targetDirectory
 
+	Directory for all NAR related output.
+Defaults to "${project.build.directory}/nar" for "compile" goal
+Defaults to "${project.build.directory}/test-nar" for "compile-test" goal
+
 ** output
 
+	Name of the output. Default is ${project.artifactId}-${project.version}.
+	
 ** type
+
+	NOT USED?
 
 ** failOnError
 
+	Fail on compilation/linking error. Default is true.
+
 ** runtime
+
+	Sets the type of runtime library, possible values "dynamic", "static".
+Default is dynamic.
 
 ** libtool
 
+	Set use of libtool. If set to true, the "libtool " will be prepended to 
+the command line for compatible compilers/linkers. Default is false.
 
 * linker
 
@@ -150,7 +178,7 @@ NAR Configuration
 ** name
 
 	The Linker. Some choices are: "msvc", "g++", "CC", "icpc", ...
-    Default is AOL specific.
+    Default is Architecture OS specific.
 
 ** incremental
 
@@ -280,18 +308,29 @@ NAR Configuration
 
 * java
 
+	Section to specify parameters for java
+
 ** include
+
+	Add Java includes to includepath. Default is false.
 
 ** includePaths
 
-*** includePath
+	List of Java Include Paths, relative to javaHome.
+    Defaults to: "javaHome/include" and "javaHome/include/os-specific".
 
 ** link
 
+	Add Java Runtime to linker. Default is false.
+
 ** runtimeDirectory
+
+	Relative path from javaHome to the java runtime to link with.
+    Defaults to AOL specific value.
 
 ** runtime
 
+	Name of the runtime. Default is jvm.
 
 * javah
 

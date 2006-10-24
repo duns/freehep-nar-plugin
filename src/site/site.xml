@@ -33,12 +33,12 @@
       <item name="FAQ" href="faq.html"/>
       <item name="AOL Properties" href="aol.html"/>
     </menu>
-   
+<!--   
     <menu name="Examples">
       <item name="Static Library" href=".html"/>
       <item name="Executable" href=".html"/>
     </menu>
-
+-->
     ${reports}
     
   </body>
