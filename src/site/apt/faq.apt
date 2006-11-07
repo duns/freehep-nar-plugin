@@ -10,3 +10,11 @@ Frequently Asked Questions
 	[Why does the nar-package goal run before the (general) jar goal]
 The nar-package goal generates the nar.properties file which needs to 
 be included in the general jar artifact.
+
+	[Why does the nar plugin produce both a jar artifact and an 
+	attached -noarch.nar artifact. Could these two not be combined?]
+The jar artifact contains only java classes and gets added to the classpath.
+It needs no further processing. The -noarch.nar artifact contains include
+files and needs to be unpacked to be useful for the native compilers. 
+It does not need to be added to the classpath. Combining the two artifacts
+would complicate matters.

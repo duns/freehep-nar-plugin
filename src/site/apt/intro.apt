@@ -35,7 +35,7 @@ allows you to build a jar file as well as nar files. The list below shows the se
     
     [[3]] {{{#nar-javah}nar-javah}}
     
-    [[4]] {{{#nar-compile}nar:compile}}
+    [[4]] {{{#nar-compile}nar-compile}}
     
     [[5]] {{{#nar-testCompile}nar-testCompile}}
     
@@ -110,14 +110,14 @@ through the NAR plugin, see {{{configuration.html}configuration}}.
 src/main. The standard way to separate your sources for different languages would be src/main/c, src/main/c++
 and src/main/fortran, but any file under src/main is searched for.
 
-	The compiler will automatically select the correct compiler (c, c++ or fortran) based on the type of
-sources, as specified in the patterns in <<<AOL.c.includes>>>, 
-<<<AOL.nar.src.includes>>> and <<<AOL.fortran.includes>>>, where AOL is a dotted qualifier of the architecture,
+	The nar plugin will automatically select the correct compiler (c, c++ or fortran) based on the type of
+source, as specified in the patterns in <<<AOL.c.includes>>>, 
+<<<AOL.cpp.includes>>> and <<<AOL.fortran.includes>>>, where AOL is a dotted qualifier of the architecture,
 os and linker (x86.Windows.msvc for example).
 
 	Include paths are added in this order from:
 
-    * any directories set in <<<COMPILER.includePaths>>>, where COMPILER is cpp, c or fortran.
+    * any directories set in <<<COMPILER.includePaths>>>, where COMPILER is c, cpp or fortran.
 
     * the <<<javah.jniDirectory>>>.
 
@@ -133,7 +133,7 @@ os and linker (x86.Windows.msvc for example).
     
     * the header files of any of the nar type dependencies, unless it is a jni library.
     
-    * any system directories set in <<<COMPILER.sysincludepath>>>, where COMPILER is cpp, c or fortran.
+    * any system directories set in <<<COMPILER.sysincludepath>>>, where COMPILER is c, cpp or fortran.
 
 	[]
 
@@ -209,7 +209,7 @@ pick up this path.
 	To use this goal you need to put the test sources in the regular test directories but disable 
 the running of the tests by the maven-surefire-plugin.
                
-	<<TBD integration tests for other modules than jni>>
+	<<TBD integration tests for other types of libraries than jni>>
                 
 * {install}                
 

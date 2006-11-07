@@ -10,14 +10,14 @@ NAR Library
 	Other plugins may need to use some of the functionality of the NAR Plugin,
 such as downloading and unpacking. The NAR Plugin therefore groups most of
 its functionality into the NAR Manager and allows other plugins and the NAR
-Plugin itself to call on thge NAR Manager.
+Plugin itself to call on the NAR Manager.
 
 	The {{{http://java.freehep.org/freehep-swig-plugin}SWIG Plugin}} which needs
 the swig native executable uses the NAR Manager to download, unpack and call 
 the executable.
 
 	To use the NAR Manager, see the {{{apidocs/index.html}API Docs}}, add the
-following to your pom file:
+following to your POM file:
 
 +--
 <project>

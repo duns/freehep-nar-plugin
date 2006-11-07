@@ -15,7 +15,7 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java dfbee333a1d4 2006/11/07 17:21:00 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
     
@@ -54,7 +54,7 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
     private String os;
 
     /**
-     * Architector-OS-Linker name.
+     * Architecture-OS-Linker name.
      * Defaults to: arch-os-linker.
      *
      * @parameter expression=""
@@ -82,8 +82,8 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
 
     /**
      * Target directory for Nar file construction
-     * Defaults to "${project.build.directory}/nar" for "compile" goal
-     * Defaults to "${project.build.directory}/test-nar" for "compile-test" goal
+     * Defaults to "${project.build.directory}/nar" for "nar-compile" goal
+     * Defaults to "${project.build.directory}/test-nar" for "nar-testCompile" goal
      *
      * @parameter expression=""
      */

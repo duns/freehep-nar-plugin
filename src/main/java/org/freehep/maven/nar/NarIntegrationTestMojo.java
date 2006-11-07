@@ -35,20 +35,20 @@ import org.apache.maven.surefire.SurefireBooter;
 /**
  * Run integration tests using Surefire.
  * 
- * This plugin was copied from mavens surefire plugin to accomodate a few
+ * This goal was copied from Maven's surefire plugin to accomodate a few
  * things for the NAR plugin: 1. To test a jar file with its native module we
- * can only run after tha package phase, so we use the integration-test phase.
- * 2. We need to set java.library.path to a AOL (architecture-os-linker)
+ * can only run after the package phase, so we use the integration-test phase.
+ * 2. We need to set java.library.path to an AOL (architecture-os-linker)
  * specific value, but AOL is only known in the NAR plugin and thus cannot be
  * set from the pom. 3. To have the java.library.path definition picked up by
  * java we need the "pertest" forkmode.
  * 
- * To use this plugin you need to put the test sources in the regular test
+ * To use this goal you need to put the test sources in the regular test
  * directories but disable the running of the tests by the
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java dfbee333a1d4 2006/11/07 17:21:00 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test

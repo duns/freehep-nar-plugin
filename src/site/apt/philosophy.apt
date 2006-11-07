@@ -97,7 +97,7 @@ primary outputs:
          the artifactId, groupId and version, and <<not>> the architecture,
          os and linker it was build with. The latter is a derived value 
          of the executable or library one is building at this time. Not 
-         specifying architecture, os and linker also means that the pom 
+         specifying architecture, os and linker also means that the POM 
          is generic. Since nar files are by default (except for the -noarch
          nar) architecture-os-linker specific they need to be secondary 
          artifacts.
@@ -119,10 +119,10 @@ example: shared, static or jni.
 
 	[]
 
-	Since the java compiler has a junified interface there is no need
+	Since the java compiler has a unified interface there is no need
 for any naming conventions here. Native compilers and linkers on different
 platforms tend to have radically different interfaces (command line options)
-so these where unified, allowing the user to switch on exception handling
+so these were unified, allowing the user to switch on exception handling
 and debugging with the same tag in the configuration no matter which 
 platform the NAR Plugin is running on. An example is below:
 
@@ -159,7 +159,7 @@ NAR artifacts.
 	All logic in Maven is setup in a declarative fashion using the Project
 Object Model (POM). The NAR Plugin can be configured inside this model.
 Moreover the "nar" lifecycle can be used to automatically integrate
-all the NAR Plugin goals wit the goals of the default "jar" lifecycle.
+all the NAR Plugin goals with the goals of the default "jar" lifecycle.
 
 ** NAR's project object model (POM)
 
@@ -194,11 +194,11 @@ shared library, which depends on a native math library (nmath).
 +--
 
 	This POM will allow you to compile, link and test the java and native code 
-in the project. The crucial part of the pom is the inclusion of the nar
+in the project. The crucial part of the POM is the inclusion of the NAR
 plugin as an extension and the declaration of the "nar" packaging. The two will
 call the NAR Plugin goals as specified in the lifecycle.
 
-  	For tis pom the NAR Plugin will download and unpack the noarch and aol parts of the
+  	For this POM the NAR Plugin will download and unpack the noarch and aol parts of the
 org.freehep nmath library version 4.5.1, for the platform you are running on.
 
 	Maven's Super POM is used for most of the default behaviour
@@ -209,7 +209,7 @@ and the NAR Plugin's {{{aol.html}AOL Properties}} are used for native defaults.
 
 	Maven's default build lifecycle, "jar", allows one to execute plugin goals
 as part of it, but this necessitates declaration of separate goals in each 
-pom. To simplify the building of native artifacts we chose to define a "nar"
+POM. To simplify the building of native artifacts we chose to define a "nar"
 lifecycle which calls all the goals the "jar" lifecycle has, interleaved with
 the goals of the NAR Plugin.
 
@@ -217,7 +217,7 @@ the goals of the NAR Plugin.
 * {Coherent organization of dependencies}
 
 	Maven uses a local repository to resolve its dependencies. If not found 
-one ore more repote repositories are consulted to find a dependency. If found
+one or more remote repositories are consulted to find a dependency. If found
 the dependency is downloaded to the local repository and used from there by
 any of the plugins.
 
@@ -225,7 +225,7 @@ any of the plugins.
 Note that the dependency declared in the example above is a standard "jar"
 dependency. It becomes a NAR depenency only because it contains the nar.properties
 file and the NAR Plugin is configured for this project. When a user executes
-install or deploy on a nar project the jar file with its attached nar artifacts
+install or deploy on a NAR project the jar file with its attached nar artifacts
 will be installed in the local repository or deployed in the remote repository.
 
 	A remote repository for the native math library would probably look
@@ -254,19 +254,20 @@ remoterepo/
                                    ...
 +--
 
-	When a nar dependency is encountered the jar file is already downloaded into
+	When a NAR dependency is encountered the jar file is already downloaded into
 the local repository by maven itself. The nar-download goal will download any
-attached nar artifacts into the local repository and store them alongside the
-jar file and the pom. Note that for these jar and nar files there is just one
-pom, since it is just one artifact. If the nar files are already in the local
+attached NAR artifacts into the local repository and store them alongside the
+jar file and the POM. Note that for these jar and nar files there is just one
+POM, since it is just one artifact. If the nar files are already in the local
 repository, due to someone calling nar-install on them, no extra download occurs.
 
-	Now that the pom, jar and nar files are all in the local repository, the 
+	Now that the POM, jar and nar files are all in the local repository, the 
 nar-unpack goal unpacks the nar files. This is necessary because none of the 
 native compiler/linker tools understands nar files, so an unpacked directory 
 structure should be created. Unpacking only happens in the local repository. 
 A remote repository <<never>> contains an unpacked nar file. If unpacking was
-already done, then no action is taken by the nar-unpack goal.
+already done, then no action is taken by the nar-unpack goal, unless the 
+artifact is a SNAPSHOT.
 
 	The local repository for the native math library may look similar to this
 if we were running on a MacOS X PowerPC system (Note the unpacked nar directory
@@ -305,6 +306,6 @@ repository/
 
 	The usage of local repository by the NAR Plugin works seamlessly with the 
 usage of it by other Maven plugins. The SWIG Plugin for instance downloads
-the native swig executable (wrapped in a nar artifact), installs and unpacks
+the native swig executable (wrapped in a NAR artifact), installs and unpacks
 it in the local repository and then uses the executable in the bin directory
 location.

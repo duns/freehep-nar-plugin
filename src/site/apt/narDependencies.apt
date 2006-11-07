@@ -9,7 +9,7 @@ NAR Dependencies
 
 	Dependencies on other NARs are handled by the standard maven dependency mechanism.
 The type for NAR files is <<<nar>>>, however to ease the inclusion of Java code and
-llokup of properties any nar file is always published as an attached artifact
+lookup of properties any nar file is always published as an attached artifact
 to  a jar artifact. A nar dependency therefore becomes a jar dependency and is
 declared in the following way:
 
