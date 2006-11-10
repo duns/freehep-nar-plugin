@@ -40,6 +40,10 @@
       <item name="Executable" href=".html"/>
     </menu>
 -->
+    <menu name="Other Information">
+      <item name="Maven and other languages" href="http://docs.codehaus.org/display/MAVEN/Support+for+other+languages"/>
+    </menu>
+
     ${reports}
     
   </body>
