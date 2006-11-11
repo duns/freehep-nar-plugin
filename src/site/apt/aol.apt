@@ -55,8 +55,8 @@ x86.Windows.g++.cpp.includes=**/*.cc **/*.cpp **/*.cxx
 x86.Windows.g++.cpp.excludes=
 
 x86.Windows.g++.c.compiler=gcc
-x86.Windows.g++.cpp.defines=Windows
-x86.Windows.g++.cpp.options=-Wall
+x86.Windows.g++.c.defines=Windows
+x86.Windows.g++.c.options=-Wall
 x86.Windows.g++.c.includes=**/*.c
 x86.Windows.g++.c.excludes=
 
