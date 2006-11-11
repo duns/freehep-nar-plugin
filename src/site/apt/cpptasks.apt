@@ -8,13 +8,13 @@ Mark Donszelmann
 CppTasks
 
 	To handle the variety of architectures, compilers and linkers, the NAR Plugin uses 
-the <a href="http://ant-contrib.sourceforge.net/cc.html">cpptasks</a> library available 
-from <a href="http://ant-contrib.sourceforge.net/">ant-contrib</a>.
+the {{{http://ant-contrib.sourceforge.net/cc.html}cpptasks}} library available 
+from {{{http://ant-contrib.sourceforge.net/}ant-contrib}}.
 This library allows to specify compilers and linkers from ant (and thus from maven)
 and unifies most common options for those compilers and linkers.
 
 	The NAR Plugin uses cpptasks 1.0 beta 3 from 
-<a href="http://sourceforge.net/project/showfiles.php?group_id=36177">sourceforge</a>
+{{{http://sourceforge.net/project/showfiles.php?group_id=36177}sourceforge}}
 with some minor extensions:
 	
 +--
@@ -52,5 +52,11 @@ cpptasks-20051015-patched-1.0
 - [gcc.GccCompatibleCCompiler] added missing code for -fno-exceptions
 - [gcc.GppLinker, compiler.LinkType] Set "callAddLibrarySets" flag, submitted as bug 1109917 in cpptasks of ant-contrib.
 - [compiler.CommandLineLinker] Check "callAddLibrarySets" flag.
-
 +--	
+
+	You can find the latest of our mods in our svn repository:
+
++--
+svn co svn://svn.freehep.org/svn/misc/trunk/cpptasks
++--
+
