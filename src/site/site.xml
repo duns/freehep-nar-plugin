@@ -23,17 +23,26 @@
     <menu name="Overview">
       <item name="Introduction" href="intro.html"/>
       <item name="Philosophy" href="philosophy.html"/>
+    </menu>
+    
+    <menu name="User Info">
       <item name="Goals" href="plugin-info.html"/>
       <item name="Usage" href="usage.html"/>
       <item name="Lifecycle" href="lifecycle.html"/>
       <item name="Configuration" href="configuration.html"/>
-      <item name="NAR Dependencies" href="narDependencies.html"/>
-      <item name="Bug Reports" href="http://bugs.freehep.org/browse/NARPLUGIN"/>
-      <item name="APIDocs" href="apidocs/index.html"/>
-      <item name="NAR Library" href="narLibrary.html"/>
       <item name="FAQ" href="faq.html"/>
       <item name="AOL Properties" href="aol.html"/>
+    </menu>
+   
+    <menu name="Developer Info">
+      <item name="NAR Dependencies" href="narDependencies.html"/>
+      <item name="Bug Reports" href="http://bugs.freehep.org/browse/NARPLUGIN"/>
+      <item name="Forum" href="http://forum.freehep.org/index.php?t=threadt&amp;frm_id=14&amp;rid=4"/>
+      <item name="APIDocs" href="apidocs/index.html"/>
+      <item name="NAR Library" href="narLibrary.html"/>
       <item name="CPPTasks" href="cpptasks.html"/>
+      <item name="SVN Browse" href="http://java.freehep.org/svn/repobrowser.svn?path=%2ffreehep%2ftrunk%2fmaven-plugins%2ffreehep-nar-plugin/&amp;revision=HEAD"/>
+      <item name="SVN Repository" href="source-repository.html"/>      
     </menu>
 <!--   
     <menu name="Examples">
