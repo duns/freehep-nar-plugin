@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java d82d5a6fbeb1 2006/10/19 00:09:24 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java ff41bf2da17a 2006/11/21 17:47:11 duns $
  */
 public abstract class Compiler {
 
@@ -267,8 +267,9 @@ public abstract class Compiler {
                 compiler.addConfiguredCompilerArg(arg);
            }
         } else {
-            String[] option = NarUtil.getDefaults().getProperty(prefix+"options").split(" ");
-            if (option != null) {
+        	String optionsProperty = NarUtil.getDefaults().getProperty(prefix+"options");
+        	if ( optionsProperty != null ) {
+        		String[] option = optionsProperty.split(" ");
                 for (int i=0; i<option.length; i++) {
                     CompilerArgument arg = new CompilerArgument();
                     arg.setValue(option[i]);
