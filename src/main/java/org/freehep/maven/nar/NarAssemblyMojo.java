@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -33,9 +33,15 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 	private List classifiers;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (shouldSkip()) {
+    		getLog().info("***********************************************************************");
+    		getLog().info("NAR Assembly SKIPPED since no NAR libraries were built/downloaded.");
+    		getLog().info("***********************************************************************");
+    		// NOTE: continue since the standard assemble mojo fails if we do not create the directories...
+		}
+
 		for (Iterator j = classifiers.iterator(); j.hasNext();) {
 			String classifier = (String) j.next();
-			System.err.println("For " + classifier);
 
 			// FIXME, hardcoded
 			String[] types = { "jni", "shared" };
@@ -47,7 +53,7 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 						narArtifacts, classifier, types[t]);
 				for (Iterator i = dependencies.iterator(); i.hasNext();) {
 					Artifact dependency = (Artifact) i.next();
-					System.err.println("Assemble from " + dependency);
+//					System.err.println("Assemble from " + dependency);
 
 					String prefix = classifier.replace("-", ".") + ".";
 
@@ -75,7 +81,17 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 					File dst = new File("target/nar/lib/" + classifier + "/"
 							+ types[t]);
 					try {
-						FileUtils.copyFileToDirectory(src, dst);
+						FileUtils.mkdir(dst.getPath());
+						if (shouldSkip()) {
+							File note = new File(dst, "NAR_ASSEMBLY_SKIPPED");
+							FileUtils.fileWrite(note.getPath(), 
+						        "The NAR Libraries of this distribution are missing because \n"+
+								"the NAR dependencies were not built/downloaded, presumably because\n"+
+						        "the the distribution was built with the '-Dnar.skip=true' flag."
+							);
+						} else {
+							FileUtils.copyFileToDirectory(src, dst);
+						}
 					} catch (IOException ioe) {
 						System.err.println("WARNING (ignored): Failed to copy "
 								+ src + " to " + dst);

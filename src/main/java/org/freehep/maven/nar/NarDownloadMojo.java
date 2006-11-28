@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java ef838d8b7f19 2006/10/03 21:41:57 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 
@@ -48,7 +48,13 @@ public class NarDownloadMojo extends AbstractDependencyMojo {
 	private List classifiers;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (shouldSkip()) return;
+		if (shouldSkip()) {
+    		getLog().info("***********************************************************************");
+    		getLog().info("NAR Plugin SKIPPED, no NAR Libraries will be produced.");
+    		getLog().info("***********************************************************************");
+    		
+    		return;
+		}
 		
 		List narArtifacts = getNarManager().getNarDependencies("compile");
 		if (classifiers == null) {

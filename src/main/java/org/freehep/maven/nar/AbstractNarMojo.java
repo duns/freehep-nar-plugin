@@ -15,12 +15,12 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java dfbee333a1d4 2006/11/07 17:21:00 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
     
     /**
-     * Skip running of NAR plugins (any) altogether
+     * Skip running of NAR plugins (any) altogether.
      * 
      * @parameter expression="${nar.skip}" default-value="false"
      */

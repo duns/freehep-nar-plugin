@@ -25,15 +25,12 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (shouldSkip()) {
-			getLog().warn("NAR Plugin running is SKIPPED.");
-			return;
-		}
+		if (shouldSkip()) return;
 
 		// make sure destination is there
 		getTargetDirectory().mkdirs();

@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java dfbee333a1d4 2006/11/07 17:21:00 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -73,6 +73,14 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
      * @required
      */
     private MavenProject project;    
+
+    // FREEHEP added because of naming conflict
+    /**
+     * Skip running of NAR plugins (any) altogether.
+     * 
+     * @parameter expression="${nar.skip}" default-value="false"
+     */
+    private boolean skipNAR;
 
     /**
      * Set this to 'true' to bypass unit tests entirely. Its use is NOT
@@ -263,7 +271,13 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
     private boolean childDelegation;
 
     public void execute() throws MojoExecutionException {
-    	if (shouldSkip()) return;
+    	// FREEHEP, shouldSkip() does not work...
+    	if (skipNAR) {
+    		getLog().info("***********************************************************************");
+    		getLog().info("NAR Integration Tests are SKIPPED since no NAR libraries were built.");
+    		getLog().info("***********************************************************************");
+    		return;
+    	}
     	
         if (skip) {
             getLog().info("Tests are skipped.");
