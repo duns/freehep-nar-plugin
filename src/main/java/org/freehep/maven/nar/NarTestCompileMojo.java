@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 8c1595ae1e05 2006/10/13 23:26:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 318395cefd0a 2006/11/29 00:19:53 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -179,15 +179,10 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
             }
         }
 
-        if (getOS().equals("MacOSX")) {
-            // add Framework for MacOS X
-            getJava().addMacOSXRuntime(task);
-        } else {
-            // Add JVM to linker
-            // FIXME, use "this".
-            getJava().addRuntime(antProject, task,
-                    getJavaHome(), getAOLKey() + "java.");
-        }
+        // Add JVM to linker
+        // FIXME, use "this".
+        getJava().addRuntime(antProject, task,
+                getJavaHome(), getOS(), getAOLKey() + "java.");
 
         // execute
         try {

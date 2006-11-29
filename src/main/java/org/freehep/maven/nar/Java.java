@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 318395cefd0a 2006/11/29 00:19:53 duns $
  */
 public class Java {
 
@@ -85,37 +85,37 @@ public class Java {
         }
     }
     
-    public void addRuntime(Project antProject, CCTask task, File javaHome, String prefix) throws MojoFailureException {
+    public void addRuntime(Project antProject, CCTask task, File javaHome, String os, String prefix) throws MojoFailureException {
         if (link) {
-            if (runtimeDirectory == null) {
-                runtimeDirectory = NarUtil.getDefaults().getProperty(prefix+"runtimeDirectory");
-                if (runtimeDirectory == null) {
-                    throw new MojoFailureException("NAR: Please specify a <RuntimeDirectory> as part of <Java>");
-                }
-            }
-            LibrarySet libset = new LibrarySet();
-            libset.setProject(antProject);
-            libset.setLibs(new CUtil.StringArrayBuilder(runtime));
-            libset.setDir(new File(javaHome, runtimeDirectory));
-            task.addLibset(libset);
-        }
-    }
-    
-    public void addMacOSXRuntime(CCTask task) {
-        if (link) {
-            CommandLineArgument.LocationEnum end = new CommandLineArgument.LocationEnum();
-            end.setValue("end");
-            
-            // add as argument rather than library to avoid argument quoting
-            LinkerArgument framework = new LinkerArgument();
-            framework.setValue("-framework");
-            framework.setLocation(end);
-            task.addConfiguredLinkerArg(framework);
+            if (os.equals("MacOSX")) {
+                CommandLineArgument.LocationEnum end = new CommandLineArgument.LocationEnum();
+                end.setValue("end");
+                
+                // add as argument rather than library to avoid argument quoting
+                LinkerArgument framework = new LinkerArgument();
+                framework.setValue("-framework");
+                framework.setLocation(end);
+                task.addConfiguredLinkerArg(framework);
 
-            LinkerArgument javavm = new LinkerArgument();
-            javavm.setValue("JavaVM");
-            javavm.setLocation(end);
-            task.addConfiguredLinkerArg(javavm);
+                LinkerArgument javavm = new LinkerArgument();
+                javavm.setValue("JavaVM");
+                javavm.setLocation(end);
+                task.addConfiguredLinkerArg(javavm);                
+            } else {
+                if (runtimeDirectory == null) {
+                    runtimeDirectory = NarUtil.getDefaults().getProperty(prefix+"runtimeDirectory");
+                    if (runtimeDirectory == null) {
+                        throw new MojoFailureException("NAR: Please specify a <RuntimeDirectory> as part of <Java>");
+                    }
+                }
+                System.err.println("**"+runtimeDirectory);
+                
+                LibrarySet libset = new LibrarySet();
+                libset.setProject(antProject);
+                libset.setLibs(new CUtil.StringArrayBuilder(runtime));
+                libset.setDir(new File(javaHome, runtimeDirectory));
+                task.addLibset(libset);
+            }
         }
-    }
+    }    
 }

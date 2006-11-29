@@ -25,7 +25,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 318395cefd0a 2006/11/29 00:19:53 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -185,11 +185,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 
 		// Add JVM to linker
-		if (!getOS().equals("MacOSX")) {
-			// FIXME, use "this".
-			getJava().addRuntime(antProject, task, getJavaHome(),
-					getAOLKey() + "java.");
-		}
+		// FIXME, use "this".
+		getJava().addRuntime(antProject, task, getJavaHome(), getOS(),
+				getAOLKey() + "java.");
 
 		// execute
 		try {
