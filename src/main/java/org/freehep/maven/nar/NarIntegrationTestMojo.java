@@ -1,4 +1,4 @@
-// Copied from Maven, 2006
+// Copied from Maven, 2006-2007
 /*
  * Copyright 2001-2006 The Apache Software Foundation.
  *
@@ -48,7 +48,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 61a1e1c512b7 2007/01/02 23:28:32 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -438,9 +438,15 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
                     String binding = info.getBinding(getAOL(), "static");
                     if (!binding.equals("static")) {
                         File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
-                        System.err.println("Adding to java.library.path: "+depLib.getPath());
+                        String depLibPath = depLib.getPath();
+                        System.err.println("Adding to java.library.path: "+depLibPath);
                         if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");
-                        javaLibraryPath.append(depLib.getPath());
+                        
+                        // NOTE: something is fishy here, it looks like surefireBooter will split the arguments and quote 
+                        // them if there are spaces... But it does not seem to do a proper job w/o spaces... we quote only if there are spaces.
+                        if (depLibPath.indexOf(" ") >= 0) javaLibraryPath.append("\"");
+                        javaLibraryPath.append(depLibPath);
+                        if (depLibPath.indexOf(" ") >= 0) javaLibraryPath.append("\"");
                     }
                 }
                 
