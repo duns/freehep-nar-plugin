@@ -31,6 +31,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.surefire.SurefireBooter;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Run integration tests using Surefire.
@@ -48,7 +49,7 @@ import org.apache.maven.surefire.SurefireBooter;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 61a1e1c512b7 2007/01/02 23:28:32 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 97b7257b9e8d 2007/01/03 23:11:17 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -440,22 +441,26 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
                         File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
                         String depLibPath = depLib.getPath();
                         System.err.println("Adding to java.library.path: "+depLibPath);
-                        if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");
-                        
-                        // NOTE: something is fishy here, it looks like surefireBooter will split the arguments and quote 
-                        // them if there are spaces... But it does not seem to do a proper job w/o spaces... we quote only if there are spaces.
-                        if (depLibPath.indexOf(" ") >= 0) javaLibraryPath.append("\"");
+                        if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");                        
                         javaLibraryPath.append(depLibPath);
-                        if (depLibPath.indexOf(" ") >= 0) javaLibraryPath.append("\"");
                     }
                 }
-                
+                                
                 // add final javalibrary path
                 if (javaLibraryPath.length() > 0) {
-                    argLine += " -Djava.library.path="+javaLibraryPath.toString();
+                    if ((javaLibraryPath.indexOf(" ") >= 0) || (javaLibraryPath.indexOf("\"") >= 0) || (javaLibraryPath.indexOf("'") >= 0)) {
+                        String windowsPath = javaLibraryPath.toString();
+                        String unixPath = windowsPath.replace(';', ':');
+                        addPathToEnv("PATH", windowsPath, ";");
+                        addPathToEnv("LD_LIBRARY_PATH", unixPath, ":");
+                        addPathToEnv("DYLD_LIBRARY_PATH", unixPath, ":");
+                    } else {
+                        // NOTE: does not work with arguments with spaces as SureFireBooter splits the line in parts and then quotes it wrongly
+                        argLine += " -Djava.library.path="+javaLibraryPath.toString();
+                    }
                 }
 // ENDFREEHEP
-                
+
                 surefireBooter.setArgLine(argLine);
 
                 surefireBooter.setEnvironmentVariables(environmentVariables);
@@ -486,6 +491,43 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
         }
     }
 
+// FREEHEP
+    private void addPathToEnv(String key, String path, String separator) {
+        String value = (String)environmentVariables.get(key);
+        if (value == null) {
+            value = getEnv(key, key, null);
+        }
+        
+        if (value != null) {
+            value += separator + path;
+        } else {
+            value = path;
+        }
+        environmentVariables.put(key, value);
+    }
+    
+    private String getEnv( String envKey, String alternateSystemProperty, String defaultValue ) {
+        String envValue = null;
+        try {
+            envValue = System.getenv( envKey );
+            if ( envValue == null && alternateSystemProperty != null ) {
+                envValue = System.getProperty( alternateSystemProperty );
+            }
+        } catch ( Error e ) {
+            //JDK 1.4?
+            if ( alternateSystemProperty != null ) {
+                envValue = System.getProperty( alternateSystemProperty );
+            }
+        }
+
+        if ( envValue == null ) {
+            envValue = defaultValue;
+        }
+
+        return envValue;
+    } 
+// ENDFREEHEP
+    
     protected void processSystemProperties() {
         System.setProperty("basedir", basedir.getAbsolutePath());
 
