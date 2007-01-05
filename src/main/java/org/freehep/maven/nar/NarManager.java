@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005-2006.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -152,6 +152,7 @@ public class NarManager {
 		if (nars != null) {
 			for (int j = 0; j < nars.length; j++) {
 //				System.err.println("==== " + nars[j]);
+                if (nars[j].equals("")) continue;
 				String[] nar = nars[j].split(":", 5);
 				if (nar.length >= 4) {
 					try {
