@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2006.
+// Copyright FreeHEP, 2006-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 257950754a8f 2007/01/05 19:33:00 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -51,9 +51,9 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 						"compile");
 				List dependencies = getNarManager().getAttachedNarDependencies(
 						narArtifacts, classifier, types[t]);
-				for (Iterator i = dependencies.iterator(); i.hasNext();) {
-					Artifact dependency = (Artifact) i.next();
-//					System.err.println("Assemble from " + dependency);
+				for (Iterator d = dependencies.iterator(); d.hasNext();) {
+					Artifact dependency = (Artifact) d.next();
+					getLog().debug("Assemble from " + dependency);
 
 					String prefix = classifier.replace("-", ".") + ".";
 
@@ -62,40 +62,38 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 					// of getBaseVersion, called in pathOf.
 					if (dependency.isSnapshot())
 						;
-					File src = new File(getLocalRepository().pathOf(dependency));
-					src = new File(getLocalRepository().getBasedir(), src
+					File srcDir = new File(getLocalRepository().pathOf(dependency));
+					srcDir = new File(getLocalRepository().getBasedir(), srcDir
 							.getParent());
-					src = new File(src, "nar/lib/"
-							+ classifier
-							+ "/"
-							+ types[t]
-							+ "/"
-							+ NarUtil.getDefaults().getProperty(
-									prefix + "lib.prefix")
-							+ dependency.getArtifactId()
-							+ "-"
-							+ dependency.getVersion()
-							+ "."
-							+ NarUtil.getDefaults().getProperty(
-									prefix + types[t] + ".extension"));
+                    srcDir = new File(srcDir, "nar/lib/"
+                            + classifier
+                            + "/"
+                            + types[t]
+                            + "/");
 					File dst = new File("target/nar/lib/" + classifier + "/"
 							+ types[t]);
 					try {
-						FileUtils.mkdir(dst.getPath());
-						if (shouldSkip()) {
-							File note = new File(dst, "NAR_ASSEMBLY_SKIPPED");
-							FileUtils.fileWrite(note.getPath(), 
-						        "The NAR Libraries of this distribution are missing because \n"+
-								"the NAR dependencies were not built/downloaded, presumably because\n"+
-						        "the the distribution was built with the '-Dnar.skip=true' flag."
-							);
-						} else {
-							FileUtils.copyFileToDirectory(src, dst);
+                        FileUtils.mkdir(dst.getPath());
+                        if (shouldSkip()) {
+                            File note = new File(dst, "NAR_ASSEMBLY_SKIPPED");
+                            FileUtils.fileWrite(note.getPath(), 
+                                "The NAR Libraries of this distribution are missing because \n"+
+                                "the NAR dependencies were not built/downloaded, presumably because\n"+
+                                "the the distribution was built with the '-Dnar.skip=true' flag."
+                            );
+                        } else {                        
+                            getLog().debug("SrcDir: "+srcDir);
+                            if (srcDir.exists()) {
+                                List fileNames = FileUtils.getFileNames(srcDir, "*.so,*.a,*.dll,*.lib,*.jnilib", "", true, false);
+                                for (Iterator f = fileNames.iterator(); f.hasNext(); ) {
+                                    String fileName = (String)f.next();
+                                    FileUtils.copyFileToDirectory(new File(fileName), dst);
+                                }
+                            }
 						}
 					} catch (IOException ioe) {
-						System.err.println("WARNING (ignored): Failed to copy "
-								+ src + " to " + dst);
-						// System.err.println(ioe);
+						throw new MojoExecutionException("Failed to copy files from dependency "
+								+ dependency + " to " + dst, ioe);
 					}
 				}
 			}
