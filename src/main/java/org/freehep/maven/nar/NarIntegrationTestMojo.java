@@ -49,7 +49,7 @@ import org.codehaus.plexus.util.FileUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 97b7257b9e8d 2007/01/03 23:11:17 duns $, 2.1.x maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 29054d5a8562 2007/01/05 00:12:48 duns $, 2.1.x maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -441,7 +441,7 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
                         File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
                         String depLibPath = depLib.getPath();
                         System.err.println("Adding to java.library.path: "+depLibPath);
-                        if (javaLibraryPath.length() > 0) javaLibraryPath.append(";");                        
+                        if (javaLibraryPath.length() > 0) javaLibraryPath.append(File.pathSeparator);                        
                         javaLibraryPath.append(depLibPath);
                     }
                 }
@@ -450,7 +450,7 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
                 if (javaLibraryPath.length() > 0) {
                     if ((javaLibraryPath.indexOf(" ") >= 0) || (javaLibraryPath.indexOf("\"") >= 0) || (javaLibraryPath.indexOf("'") >= 0)) {
                         String windowsPath = javaLibraryPath.toString();
-                        String unixPath = windowsPath.replace(';', ':');
+                        String unixPath = windowsPath.replace(File.pathSeparatorChar, ':');
                         addPathToEnv("PATH", windowsPath, ";");
                         addPathToEnv("LD_LIBRARY_PATH", unixPath, ":");
                         addPathToEnv("DYLD_LIBRARY_PATH", unixPath, ":");
