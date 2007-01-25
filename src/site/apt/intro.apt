@@ -193,10 +193,10 @@ The following jar and nar files are created:
     * \<Artifact\>-\<version\>-noarch.nar, a compressed jar file containing non machine
     specific parts of the distribution, such as the include directories.
     
-    * \<Artifact\>-\<version\>-\<aol\>.nar, a compressed jar file containing machine
+    * \<Artifact\>-\<version\>-\<aol\>-\<type\>.nar, a compressed jar file containing machine
     specific parts of the distribution, such as the libraries. This file is specific to a particular
     Architecture-OS-Linker (AOL) combination <<TBD and is not generated if freehep.nar.includefilesonly
-    is set>>.
+    is set>>. Type specifies if this nar is either of type shared, static or jni.
     
     []
 
