@@ -42,6 +42,7 @@ and link native code.
       <plugin>
         <groupId>org.freehep</groupId>
         <artifactId>freehep-nar-plugin</artifactId>
+        <extensions>true</extensions>
         <configuration>
           <libraries>
             <library>
@@ -55,7 +56,7 @@ and link native code.
 </project>
 +--
 
-* Create a JNI Library withouit linking to C++
+* Create a JNI Library without linking to C++
 
 	It is possible to write your JNI code in C++, use the C++ compiler
 to compile it and then link it only with the C library (as long as
@@ -72,6 +73,7 @@ to disable exceptions and not link with C++.
       <plugin>
         <groupId>org.freehep</groupId>
         <artifactId>freehep-nar-plugin</artifactId>
+        <extensions>true</extensions>
         <configuration>
           <cpp>
             <exceptions>false</exceptions>
@@ -107,6 +109,7 @@ The example also shows how to configure the
       <plugin>
         <groupId>org.freehep</groupId>
         <artifactId>freehep-swig-plugin</artifactId>
+        <extensions>true</extensions>
         <executions>
           <execution>
             <id>swig</id>
@@ -159,7 +162,7 @@ assemblies would be "pom".
 +--
 <project>
   ...
-  <packaging>nar</packaging>
+  <packaging>pom</packaging>
   ...
   <build>
     <plugins>
