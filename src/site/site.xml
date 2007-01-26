@@ -23,6 +23,8 @@
     <menu name="Overview">
       <item name="Introduction" href="intro.html"/>
       <item name="Philosophy" href="philosophy.html"/>
+      <item name="Presentation (pdf)" href="NARPlugin.pdf"/>
+      <item name="Presentation (ppt)" href="NARPlugin.ppt"/>
     </menu>
     
     <menu name="User Info">
