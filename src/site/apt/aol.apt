@@ -309,6 +309,41 @@ ppc.MacOSX.g++.executable.extension=
 #ppc.MacOSX.g++.arch.includes=lib/**/*.a lib/**/*.so lib/**/*.dylib lib/**/*.jnilib
 
 #
+# MacOSX ("Mac OS X" => MacOSX) Intel
+#
+i386.MacOSX.linker=g++
+
+i386.MacOSX.g++.cpp.compiler=g++
+i386.MacOSX.g++.cpp.defines=Darwin GNU_GCC 
+i386.MacOSX.g++.cpp.options=-Wall -Wno-long-long -Wpointer-arith -Wconversion
+i386.MacOSX.g++.cpp.includes=**/*.cc **/*.cpp **/*.cxx
+i386.MacOSX.g++.cpp.excludes=
+
+i386.MacOSX.g++.c.compiler=gcc
+i386.MacOSX.g++.c.defines=Darwin GNU_GCC 
+i386.MacOSX.g++.c.options=-Wall -Wno-long-long -Wpointer-arith -Wconversion
+i386.MacOSX.g++.c.includes=**/*.c
+i386.MacOSX.g++.c.excludes=
+
+i386.MacOSX.g++.fortran.compiler=gfortran
+i386.MacOSX.g++.fortran.defines=Darwin GNU_GCC 
+i386.MacOSX.g++.fortran.options=-Wall -fno-automatic -fno-second-underscore
+i386.MacOSX.g++.fortran.includes=**/*.f **/*.for
+i386.MacOSX.g++.fortran.excludes=
+
+i386.MacOSX.g++.java.include=include
+i386.MacOSX.g++.java.runtimeDirectory=IGNORED
+
+i386.MacOSX.g++.lib.prefix=lib
+i386.MacOSX.g++.static.extension=a
+i386.MacOSX.g++.shared.extension=dylib
+i386.MacOSX.g++.plugin.extension=bundle
+i386.MacOSX.g++.jni.extension=jnilib
+i386.MacOSX.g++.executable.extension=
+
+#i386.MacOSX.g++.arch.includes=lib/**/*.a lib/**/*.so lib/**/*.dylib lib/**/*.jnilib
+
+#
 # Solaris
 #
 sparc.SunOS.linker=CC
