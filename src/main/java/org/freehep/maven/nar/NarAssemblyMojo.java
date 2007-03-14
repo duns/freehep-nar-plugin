@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java 257950754a8f 2007/01/05 19:33:00 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java b31201cd71ad 2007/03/14 21:09:59 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -32,69 +32,68 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 	 */
 	private List classifiers;
 
+	/**
+	 * Copies the unpacked nar libraries and files into the projects target area
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip()) {
-    		getLog().info("***********************************************************************");
-    		getLog().info("NAR Assembly SKIPPED since no NAR libraries were built/downloaded.");
-    		getLog().info("***********************************************************************");
-    		// NOTE: continue since the standard assemble mojo fails if we do not create the directories...
+			getLog()
+					.info(
+							"***********************************************************************");
+			getLog()
+					.info(
+							"NAR Assembly SKIPPED since no NAR libraries were built/downloaded.");
+			getLog()
+					.info(
+							"***********************************************************************");
+			// NOTE: continue since the standard assemble mojo fails if we do
+			// not create the directories...
 		}
 
 		for (Iterator j = classifiers.iterator(); j.hasNext();) {
 			String classifier = (String) j.next();
 
-			// FIXME, hardcoded
-			String[] types = { "jni", "shared" };
+			List narArtifacts = getNarManager().getNarDependencies("compile");
+			List dependencies = getNarManager().getAttachedNarDependencies(
+					narArtifacts, classifier);
+			// this may make some extra copies...
+			for (Iterator d = dependencies.iterator(); d.hasNext();) {
+				Artifact dependency = (Artifact) d.next();
+				getLog().debug("Assemble from " + dependency);
+System.err.println("Assemble from "+dependency);
+				String prefix = classifier.replace("-", ".") + ".";
 
-			for (int t = 0; t < types.length; t++) {
-				List narArtifacts = getNarManager().getNarDependencies(
-						"compile");
-				List dependencies = getNarManager().getAttachedNarDependencies(
-						narArtifacts, classifier, types[t]);
-				for (Iterator d = dependencies.iterator(); d.hasNext();) {
-					Artifact dependency = (Artifact) d.next();
-					getLog().debug("Assemble from " + dependency);
+				// FIXME reported to maven developer list, isSnapshot
+				// changes behaviour
+				// of getBaseVersion, called in pathOf.
+				if (dependency.isSnapshot())
+					;
 
-					String prefix = classifier.replace("-", ".") + ".";
-
-					// FIXME reported to maven developer list, isSnapshot
-					// changes behaviour
-					// of getBaseVersion, called in pathOf.
-					if (dependency.isSnapshot())
-						;
-					File srcDir = new File(getLocalRepository().pathOf(dependency));
-					srcDir = new File(getLocalRepository().getBasedir(), srcDir
-							.getParent());
-                    srcDir = new File(srcDir, "nar/lib/"
-                            + classifier
-                            + "/"
-                            + types[t]
-                            + "/");
-					File dst = new File("target/nar/lib/" + classifier + "/"
-							+ types[t]);
-					try {
-                        FileUtils.mkdir(dst.getPath());
-                        if (shouldSkip()) {
-                            File note = new File(dst, "NAR_ASSEMBLY_SKIPPED");
-                            FileUtils.fileWrite(note.getPath(), 
-                                "The NAR Libraries of this distribution are missing because \n"+
-                                "the NAR dependencies were not built/downloaded, presumably because\n"+
-                                "the the distribution was built with the '-Dnar.skip=true' flag."
-                            );
-                        } else {                        
-                            getLog().debug("SrcDir: "+srcDir);
-                            if (srcDir.exists()) {
-                                List fileNames = FileUtils.getFileNames(srcDir, "*.so,*.a,*.dll,*.lib,*.jnilib", "", true, false);
-                                for (Iterator f = fileNames.iterator(); f.hasNext(); ) {
-                                    String fileName = (String)f.next();
-                                    FileUtils.copyFileToDirectory(new File(fileName), dst);
-                                }
-                            }
+				File srcDir = new File(getLocalRepository().pathOf(dependency));
+				srcDir = new File(getLocalRepository().getBasedir(), srcDir
+						.getParent());
+				srcDir = new File(srcDir, "nar/");
+				File dstDir = new File("target/nar/");
+				try {
+					FileUtils.mkdir(dstDir.getPath());
+					if (shouldSkip()) {
+						File note = new File(dstDir, "NAR_ASSEMBLY_SKIPPED");
+						FileUtils
+								.fileWrite(
+										note.getPath(),
+										"The NAR Libraries of this distribution are missing because \n"
+												+ "the NAR dependencies were not built/downloaded, presumably because\n"
+												+ "the the distribution was built with the '-Dnar.skip=true' flag.");
+					} else {
+						getLog().debug("SrcDir: " + srcDir);
+						if (srcDir.exists()) {
+							FileUtils.copyDirectoryStructure(srcDir, dstDir);
 						}
-					} catch (IOException ioe) {
-						throw new MojoExecutionException("Failed to copy files from dependency "
-								+ dependency + " to " + dst, ioe);
 					}
+				} catch (IOException ioe) {
+					throw new MojoExecutionException(
+							"Failed to copy directory for dependency "
+									+ dependency + " from "+srcDir+" to " + dstDir, ioe);
 				}
 			}
 		}

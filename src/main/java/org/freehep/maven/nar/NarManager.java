@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.FileUtils;
 public class NarManager {
 
 	private Log log;
-	
+
 	private int logLevel;
 
 	private MavenProject project;
@@ -91,9 +91,27 @@ public class NarManager {
 	}
 
 	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-			List/* <NarArtifacts> */narArtifacts) throws MojoExecutionException,
-			MojoFailureException {
-		return getAttachedNarDependencies(narArtifacts, null, null);
+			List/* <NarArtifacts> */narArtifacts)
+			throws MojoExecutionException, MojoFailureException {
+		return getAttachedNarDependencies(narArtifacts, null);
+	}
+
+	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
+			List/* <NarArtifacts> */narArtifacts, String classifier)
+			throws MojoExecutionException, MojoFailureException {
+		String aol = null;
+		String type = null;
+		if (classifier != null) {
+			int dash = classifier.lastIndexOf('-');
+			if (dash < 0) {
+				aol = classifier;
+				type = null;
+			} else {
+				aol = classifier.substring(0, dash);
+				type = classifier.substring(dash + 1);
+			}
+		}
+		return getAttachedNarDependencies(narArtifacts, aol, type);
 	}
 
 	/**
@@ -102,7 +120,7 @@ public class NarManager {
 	 * 
 	 * @param scope
 	 *            compile, test, runtime, ....
-	 * @param classifier
+	 * @param aol
 	 *            either a valid aol, noarch or null. In case of null both the
 	 *            default getAOL() and noarch dependencies are returned.
 	 * @param type
@@ -134,9 +152,15 @@ public class NarManager {
 			String binding = narInfo.getBinding(aol, type != null ? type
 					: "static");
 
-			// FIXME no handling of local
-			artifactList.addAll(getAttachedNarDependencies(dependency, aol,
-					binding));
+			// FIXME kludge
+			if (aol.equals("noarch")) {
+				// FIXME no handling of local
+				artifactList.addAll(getAttachedNarDependencies(dependency,
+						null, "noarch"));
+			} else {
+				artifactList.addAll(getAttachedNarDependencies(dependency, aol,
+						binding));
+			}
 		}
 		return artifactList;
 	}
@@ -144,15 +168,16 @@ public class NarManager {
 	private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
 			Artifact dependency, String aol, String type)
 			throws MojoExecutionException, MojoFailureException {
-//		System.err.println("***** " + dependency + " " + aol + " " + type);
+		System.err.println("***** " + dependency + " " + aol + " " + type);
 		List artifactList = new ArrayList();
 		NarInfo narInfo = getNarInfo(dependency);
 		String[] nars = narInfo.getAttachedNars(aol, type);
 		// FIXME Move this to info....
 		if (nars != null) {
 			for (int j = 0; j < nars.length; j++) {
-//				System.err.println("==== " + nars[j]);
-                if (nars[j].equals("")) continue;
+				// System.err.println("==== " + nars[j]);
+				if (nars[j].equals(""))
+					continue;
 				String[] nar = nars[j].split(":", 5);
 				if (nar.length >= 4) {
 					try {
@@ -241,26 +266,18 @@ public class NarManager {
 			MojoFailureException {
 		// FIXME this may not be the right way to do this.... -U ignored and
 		// also SNAPSHOT not used
-
-		// FIXME, hardcoded
-		String[] types = { "jni", "shared", "static" };
-
-		for (int t = 0; t < types.length; t++) {
-			List dependencies = getAttachedNarDependencies(narArtifacts,
-					classifier, types[t]);
-			for (Iterator i = dependencies.iterator(); i.hasNext();) {
-				Artifact dependency = (Artifact) i.next();
-				try {
-//					System.err.println("Resolving " + dependency);
-					resolver
-							.resolve(dependency, remoteRepositories, repository);
-				} catch (ArtifactNotFoundException e) {
-					String message = "nar not found " + dependency.getId();
-					throw new MojoExecutionException(message, e);
-				} catch (ArtifactResolutionException e) {
-					String message = "nar cannot resolve " + dependency.getId();
-					throw new MojoExecutionException(message, e);
-				}
+		List dependencies = getAttachedNarDependencies(narArtifacts, classifier);
+		for (Iterator i = dependencies.iterator(); i.hasNext();) {
+			Artifact dependency = (Artifact) i.next();
+			try {
+				// System.err.println("Resolving " + dependency);
+				resolver.resolve(dependency, remoteRepositories, repository);
+			} catch (ArtifactNotFoundException e) {
+				String message = "nar not found " + dependency.getId();
+				throw new MojoExecutionException(message, e);
+			} catch (ArtifactResolutionException e) {
+				String message = "nar cannot resolve " + dependency.getId();
+				throw new MojoExecutionException(message, e);
 			}
 		}
 	}
@@ -268,45 +285,38 @@ public class NarManager {
 	public void unpackAttachedNars(List/* <NarArtifacts> */narArtifacts,
 			ArchiverManager manager, String classifier, String os)
 			throws MojoExecutionException, MojoFailureException {
-		// FIXME should this be runtime ?
-		// FIXME, hardcoded
-		String[] types = { "jni", "shared", "static" };
+		// FIXME, kludge to get to download the -noarch, based on classifier
+		List dependencies = getAttachedNarDependencies(narArtifacts, classifier);
+		for (Iterator i = dependencies.iterator(); i.hasNext();) {
+			Artifact dependency = (Artifact) i.next();
+			// System.err.println("Unpack " + dependency);
+			File file = getNarFile(dependency);
+			File narLocation = new File(file.getParentFile(), "nar");
+			File flagFile = new File(narLocation, FileUtils.basename(file
+					.getPath(), "." + AbstractNarMojo.NAR_EXTENSION)
+					+ ".flag");
 
-		for (int t = 0; t < types.length; t++) {
-			List dependencies = getAttachedNarDependencies(narArtifacts,
-					classifier, types[t]);
-			for (Iterator i = dependencies.iterator(); i.hasNext();) {
-				Artifact dependency = (Artifact) i.next();
-//				System.err.println("Unpack " + dependency);
-				File file = getNarFile(dependency);
-				File narLocation = new File(file.getParentFile(), "nar");
-				File flagFile = new File(narLocation, FileUtils.basename(file
-						.getPath(), "." + AbstractNarMojo.NAR_EXTENSION)
-						+ ".flag");
+			boolean process = false;
+			if (!narLocation.exists()) {
+				narLocation.mkdirs();
+				process = true;
+			} else if (!flagFile.exists()) {
+				process = true;
+			} else if (file.lastModified() > flagFile.lastModified()) {
+				process = true;
+			}
 
-				boolean process = false;
-				if (!narLocation.exists()) {
-					narLocation.mkdirs();
-					process = true;
-				} else if (!flagFile.exists()) {
-					process = true;
-				} else if (file.lastModified() > flagFile.lastModified()) {
-					process = true;
-				}
-
-				if (process) {
-					try {
-						unpackNar(manager, file, narLocation);
-						if (!NarUtil.getOS(os).equals("Windows")) {
-							NarUtil.makeExecutable(
-									new File(narLocation, "bin"), log);
-						}
-						FileUtils.fileDelete(flagFile.getPath());
-						FileUtils.fileWrite(flagFile.getPath(), "");
-					} catch (IOException e) {
-						log.warn("Cannot create flag file: "
-								+ flagFile.getPath());
+			if (process) {
+				try {
+					unpackNar(manager, file, narLocation);
+					if (!NarUtil.getOS(os).equals("Windows")) {
+						NarUtil.makeExecutable(new File(narLocation, "bin"),
+								log);
 					}
+					FileUtils.fileDelete(flagFile.getPath());
+					FileUtils.fileWrite(flagFile.getPath(), "");
+				} catch (IOException e) {
+					log.warn("Cannot create flag file: " + flagFile.getPath());
 				}
 			}
 		}
