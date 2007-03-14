@@ -25,7 +25,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 318395cefd0a 2006/11/29 00:19:53 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 505d02a814e1 2007/03/14 23:28:31 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -65,13 +65,18 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setLinkCPP(library.linkCPP());
 
 		// outDir
-		File outDir = new File(getTargetDirectory(), "lib");
+		File outDir = new File(getTargetDirectory(), type.equals("executable") ? "bin" : "lib");
 		outDir = new File(outDir, getAOL());
-		outDir = new File(outDir, type);
+		if (!type.equals("executable")) outDir = new File(outDir, type);
 		outDir.mkdirs();
 
 		// outFile
-		File outFile = new File(outDir, getOutput());
+		File outFile;
+		if (type.equals("executable")) {
+			outFile = new File(outDir, getMavenProject().getArtifactId()+(getOS().equals("Windows") ? ".exe" : ""));
+		} else {
+			outFile = new File(outDir, getOutput());
+		}
 		if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
 		task.setOutfile(outFile);
 
