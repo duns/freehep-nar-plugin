@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarDownloadMojo.java 896b1829365e 2007/03/16 17:23:28 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 
@@ -55,6 +55,8 @@ public class NarDownloadMojo extends AbstractDependencyMojo {
     		
     		return;
 		}
+		
+		getLog().info("AOL: "+getAOL());
 		
 		List narArtifacts = getNarManager().getNarDependencies("compile");
 		if (classifiers == null) {
