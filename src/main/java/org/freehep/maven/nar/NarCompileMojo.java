@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005-2006.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -25,7 +25,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 505d02a814e1 2007/03/14 23:28:31 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java f8c03648e73f 2007/03/20 19:53:55 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -72,11 +72,11 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 		// outFile
 		File outFile;
-		if (type.equals("executable")) {
-			outFile = new File(outDir, getMavenProject().getArtifactId()+(getOS().equals("Windows") ? ".exe" : ""));
-		} else {
+//		if (type.equals("executable")) {
+//			outFile = new File(outDir, getMavenProject().getArtifactId());
+//		} else {
 			outFile = new File(outDir, getOutput());
-		}
+//		}
 		if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
 		task.setOutfile(outFile);
 
