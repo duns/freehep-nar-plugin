@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 318395cefd0a 2006/11/29 00:19:53 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java c43a9ac31674 2007/04/11 22:58:11 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -82,20 +82,14 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         task.setRuntime(runtimeType);
 
         // add C++ compiler
-        // FIXME use this as param
-        task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(),
-                antProject, getOS(), getAOLKey(), type,
+        task.addConfiguredCompiler(getCpp().getCompiler(this, type,
                 test.getName()));
 
         // add C compiler
-        // FIXME use this as param
-        task.addConfiguredCompiler(getC().getCompiler(getMavenProject(), antProject,
-                getOS(), getAOLKey(), type, test.getName()));
+        task.addConfiguredCompiler(getC().getCompiler(this, type, test.getName()));
 
         // add Fortran compiler
-        // FIXME use this as param
-        task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(),
-                antProject, getOS(), getAOLKey(), type,
+        task.addConfiguredCompiler(getFortran().getCompiler(this, type,
                 test.getName()));
 
         // add java include paths

@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java ff41bf2da17a 2006/11/21 17:47:11 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java c43a9ac31674 2007/04/11 22:58:11 duns $
  */
 public abstract class Compiler {
 
@@ -182,11 +182,10 @@ public abstract class Compiler {
         return includePaths;
     }
 
-    public CompilerDef getCompiler(MavenProject mavenProject, Project antProject, 
-                                   String os, String aol, 
+    public CompilerDef getCompiler(AbstractCompileMojo mojo, 
                                    String type, String output) throws MojoFailureException {
                                     
-        String prefix = aol+getName()+".";                                
+        String prefix = mojo.getAOLKey()+getName()+".";                                
                                     
         // adjust default values
         if (name == null) name = NarUtil.getDefaults().getProperty(prefix+"compiler");
@@ -222,28 +221,39 @@ public abstract class Compiler {
                 finalExcludes.addAll(excludes);
             }
         } else {
-            // include only the output.xxx files
             String defaultIncludes = NarUtil.getDefaults().getProperty(prefix+"includes");
             if (defaultIncludes == null) {
                 throw new MojoFailureException("NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "+prefix);
             }
-            // FIXME, includes is ignored here. 
+
             String[] include = defaultIncludes.split(" ");
             for (int i=0; i<include.length; i++) {
-                String file = include[i].trim();
-                int slash = file.lastIndexOf("/");
-                if (slash < 0) slash = 0;
-                int star = file.indexOf("*",slash);
-                if (star >= 0) {
-                    file = file.substring(0, star) + output + file.substring(star+1);
-                }
-                finalIncludes.add(file);
+                finalIncludes.add(include[i].trim());            	
             }
-            finalExcludes.addAll(excludes);
+            
+            if (excludes.isEmpty()) {
+                String defaultExcludes = NarUtil.getDefaults().getProperty(prefix+"excludes");
+                if (defaultExcludes != null) {
+                    String[] exclude = defaultExcludes.split(" ");
+                    for (int i=0; i<exclude.length; i++) {
+                        finalExcludes.add(exclude[i].trim());
+                    }
+                }
+            } else {
+                finalExcludes.addAll(excludes);
+            }
+            
+            // now add all but the current test to the excludes
+            for (Iterator i = mojo.getTests().iterator(); i.hasNext(); ) {
+            	Test test = (Test)i.next();
+            	if (!test.getName().equals(output)) {
+            		finalExcludes.add("**/"+test.getName()+".*");
+            	}
+            }
         }
         
         CompilerDef compiler = new CompilerDef();
-        compiler.setProject(antProject);
+        compiler.setProject(mojo.getAntProject());
         CompilerEnum compilerName = new CompilerEnum();
         compilerName.setValue(name);
         compiler.setName(compilerName);
@@ -252,7 +262,7 @@ public abstract class Compiler {
         compiler.setDebug(debug);
         compiler.setExceptions(exceptions);
         compiler.setRtti(rtti);
-        compiler.setMultithreaded(os.equals("Windows") ? true : multiThreaded);
+        compiler.setMultithreaded(mojo.getOS().equals("Windows") ? true : multiThreaded);
 
         // optimize
         OptimizationEnum optimization = new OptimizationEnum();
@@ -323,7 +333,7 @@ public abstract class Compiler {
         }
         
         // add include path
-        for (Iterator i=getIncludePaths(mavenProject, type).iterator(); i.hasNext(); ) {
+        for (Iterator i=getIncludePaths(mojo.getMavenProject(), type).iterator(); i.hasNext(); ) {
             String path = (String)i.next();
             compiler.createIncludePath().setPath(path);
         }            
@@ -338,16 +348,16 @@ public abstract class Compiler {
         
         // Add default fileset
         ConditionalFileSet fileSet = new ConditionalFileSet();
-        fileSet.setProject(antProject);
+        fileSet.setProject(mojo.getAntProject());
         fileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
         fileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
-        fileSet.setDir(getSourceDirectory(mavenProject, type));
+        fileSet.setDir(getSourceDirectory(mojo.getMavenProject(), type));
         compiler.addFileset(fileSet);
         
         // add other sources
-        for (Iterator i = mavenProject.getCompileSourceRoots().iterator(); i.hasNext(); ) {
+        for (Iterator i = mojo.getMavenProject().getCompileSourceRoots().iterator(); i.hasNext(); ) {
         	ConditionalFileSet otherFileSet = new ConditionalFileSet();
-        	otherFileSet.setProject(antProject);
+        	otherFileSet.setProject(mojo.getAntProject());
         	otherFileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
         	otherFileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
         	otherFileSet.setDir(new File((String)i.next()));

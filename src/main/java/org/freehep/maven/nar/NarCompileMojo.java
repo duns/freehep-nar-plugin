@@ -25,7 +25,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java a1e2d2f33dda 2007/03/20 20:29:08 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java c43a9ac31674 2007/04/11 22:58:11 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -97,19 +97,13 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setRuntime(runtimeType);
 
 		// add C++ compiler
-		// FIXME use this as param
-		task.addConfiguredCompiler(getCpp().getCompiler(getMavenProject(),
-				antProject, getOS(), getAOLKey(), type, getOutput()));
+		task.addConfiguredCompiler(getCpp().getCompiler(this, type, getOutput()));
 
 		// add C compiler
-		// FIXME use this as param
-		task.addConfiguredCompiler(getC().getCompiler(getMavenProject(),
-				antProject, getOS(), getAOLKey(), type, getOutput()));
+		task.addConfiguredCompiler(getC().getCompiler(this, type, getOutput()));
 
 		// add Fortran compiler
-		// FIXME use this as param
-		task.addConfiguredCompiler(getFortran().getCompiler(getMavenProject(),
-				antProject, getOS(), getAOLKey(), type, getOutput()));
+		task.addConfiguredCompiler(getFortran().getCompiler(this, type, getOutput()));
 
 		// add javah include path
 		File jniDirectory = getJavah().getJniDirectory(getMavenProject());
