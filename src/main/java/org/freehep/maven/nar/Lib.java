@@ -19,7 +19,7 @@ import org.apache.tools.ant.Project;
  * Keeps info on a library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java 417210bb60fa 2006/09/27 23:02:41 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java 1fde7b28c6b5 2007/04/20 18:04:46 duns $
  */
 public class Lib {
 
@@ -63,7 +63,7 @@ public class Lib {
             throw new MojoFailureException("NAR: Please specify <Name> as part of <Lib>");
         }
         if (libs == null) {
-            if (dir == null) {
+            if (!type.equals("framework") && (dir == null)) {
                 throw new MojoFailureException("NAR: Please specify <Directory> as part of <Lib>");
             }
             LibrarySet libSet = new LibrarySet();
