@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java b31201cd71ad 2007/03/14 21:09:59 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java e60800b200af 2007/06/06 21:41:03 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -80,8 +80,8 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			}
 		}
 
-		// FIXME hardcoded
-		info.setBinding(null, bindingType);
+		// FIXME hardcoded JNI as default
+		info.setBinding(null, bindingType != null ? bindingType : "jni");
 
 		try {
 			info.writeToFile(propertiesFile);
