@@ -46,12 +46,13 @@
       <item name="SVN Browse" href="http://java.freehep.org/svn/repobrowser.svn?path=%2ffreehep%2ftrunk%2fmaven-plugins%2ffreehep-nar-plugin/&amp;revision=HEAD"/>
       <item name="SVN Repository" href="source-repository.html"/>      
     </menu>
-<!--   
     <menu name="Examples">
+      <item name="HelloWorld JNI" href="HelloWorldJNI.html"/>
+<!--   
       <item name="Static Library" href=".html"/>
       <item name="Executable" href=".html"/>
-    </menu>
 -->
+    </menu>
     <menu name="Other Information">
       <item name="Maven and other languages" href="http://docs.codehaus.org/display/MAVEN/Support+for+other+languages"/>
     </menu>
