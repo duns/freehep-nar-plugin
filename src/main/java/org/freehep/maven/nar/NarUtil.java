@@ -18,7 +18,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 52af5aa4d82d 2006/09/28 21:45:13 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUtil.java 6983fe903d61 2007/06/15 23:07:49 duns $
  */
 public class NarUtil {
 
@@ -62,7 +62,7 @@ public class NarUtil {
 		return linker;
 	}
 
-	private static String getLinkerName(String architecture, String os,
+	public static String getLinkerName(String architecture, String os,
 			Linker linker) throws MojoFailureException {
 		return getLinker(linker).getName(getDefaults(),
 				getArchitecture(architecture) + "." + getOS(os) + ".");
@@ -130,7 +130,39 @@ public class NarUtil {
 			}
 		}
 	}
-	
+
+	public static void runRanlib(File file, final Log log) throws MojoExecutionException  {
+		if (!file.exists()) return;
+		
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			for (int i=0; i<files.length; i++) {
+				runRanlib(files[i], log);
+			}
+		} if (file.isFile() && file.canRead() && file.canWrite() && !file.isHidden() && file.getName().endsWith(".a")) {
+			// ranlib file
+	        Commandline commandLine = new Commandline();
+	        commandLine.setExecutable("ranlib");
+	        commandLine.createArgument().setFile(file);
+	        
+			StreamConsumer consumer = new StreamConsumer() {
+	            public void consumeLine ( String line ) {
+	                log.info( line );
+	            }
+	        };
+			
+			log.info(commandLine.toString());
+			try {
+				int result = CommandLineUtils.executeCommandLine(commandLine, consumer, consumer);
+				if (result != 0) {
+					throw new  MojoExecutionException("Result of " + commandLine + " execution is: \'" + result + "\'." );
+				}
+			} catch (CommandLineException e) {
+				throw new MojoExecutionException("Failed to execute "+commandLine, e);
+			}
+		}
+	}
+
 	/**
 	 * Returns the Bcel Class corresponding to the given class filename
 	 * 

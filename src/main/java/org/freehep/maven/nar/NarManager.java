@@ -37,7 +37,8 @@ public class NarManager {
 	private ArtifactRepository repository;
 
 	private String defaultAOL;
-
+	private String linkerName;
+	
 	private String[] narTypes = { "noarch", "static", "dynamic", "jni",
 			"plugin" };
 
@@ -49,6 +50,7 @@ public class NarManager {
 		this.repository = repository;
 		this.project = project;
 		this.defaultAOL = NarUtil.getAOL(architecture, os, linker, null);
+		this.linkerName = NarUtil.getLinkerName(architecture, os, linker);
 	}
 
 	/**
@@ -312,6 +314,9 @@ public class NarManager {
 					if (!NarUtil.getOS(os).equals("Windows")) {
 						NarUtil.makeExecutable(new File(narLocation, "bin"),
 								log);
+					}
+					if (linkerName.equals("gcc") || linkerName.equals("g++")) {
+						NarUtil.runRanlib(new File(narLocation, "lib"), log);
 					}
 					FileUtils.fileDelete(flagFile.getPath());
 					FileUtils.fileWrite(flagFile.getPath(), "");
