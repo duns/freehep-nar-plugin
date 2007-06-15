@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 3edb5ca24db1 2007/06/15 22:04:56 duns $, 2.3 maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 22f054423067 2007/06/15 23:34:05 duns $, 2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -86,7 +86,7 @@ public class NarIntegrationTestMojo
     private boolean testJNIModule() {
         for (Iterator i = getLibraries().iterator(); i.hasNext();) {
             Library lib = (Library) i.next();
-            if (lib.getType().equals("jni"))
+            if (lib.getType().equals(Library.JNI))
                 return true;
         }
         return false;
@@ -712,7 +712,7 @@ public class NarIntegrationTestMojo
                 fork.setWorkingDirectory( basedir );
             }
 
-         // BEGINFREEHEP      
+// BEGINFREEHEP      
             if (argLine == null) argLine = "";
             
             StringBuffer javaLibraryPath = new StringBuffer();
@@ -735,8 +735,8 @@ public class NarIntegrationTestMojo
             for (Iterator i=dependencies.iterator(); i.hasNext(); ) {
                 NarArtifact dependency = (NarArtifact)i.next();
                 NarInfo info = dependency.getNarInfo();
-                String binding = info.getBinding(getAOL(), "static");
-                if (!binding.equals("static")) {
+                String binding = info.getBinding(getAOL(), Library.STATIC);
+                if (!binding.equals(Library.STATIC)) {
                     File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
                     String depLibPath = depLib.getPath();
                     System.err.println("Adding to java.library.path: "+depLibPath);

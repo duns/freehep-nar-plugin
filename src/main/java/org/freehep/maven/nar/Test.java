@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import org.apache.maven.plugin.MojoFailureException;
@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Sets up a test to create
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Test.java bcdae088c368 2005/11/19 07:52:18 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Test.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public class Test {
 
@@ -26,7 +26,7 @@ public class Test {
      * 
      * @parameter expression=""
      */
-    protected String link = "shared";
+    protected String link = Library.SHARED;
     
     public String getName() throws MojoFailureException {
         if (name == null) throw new MojoFailureException("NAR: Please specify <Name> as part of <Test>");

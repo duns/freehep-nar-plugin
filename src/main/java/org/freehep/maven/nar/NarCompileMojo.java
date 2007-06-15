@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -64,14 +64,14 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setLinkCPP(library.linkCPP());
 
 		// outDir
-		File outDir = new File(getTargetDirectory(), type.equals("executable") ? "bin" : "lib");
+		File outDir = new File(getTargetDirectory(), type.equals(Library.EXECUTABLE) ? "bin" : "lib");
 		outDir = new File(outDir, getAOL());
-		if (!type.equals("executable")) outDir = new File(outDir, type);
+		if (!type.equals(Library.EXECUTABLE)) outDir = new File(outDir, type);
 		outDir.mkdirs();
 
 		// outFile
 		File outFile;
-		if (type.equals("executable")) {
+		if (type.equals(Library.EXECUTABLE)) {
 			// executable has no version number
 			outFile = new File(outDir, getMavenProject().getArtifactId());
 		} else {
@@ -119,8 +119,8 @@ public class NarCompileMojo extends AbstractCompileMojo {
 			// FIXME, handle multiple includes from one NAR
 			NarArtifact narDependency = (NarArtifact) i.next();
 			String binding = narDependency.getNarInfo().getBinding(getAOL(),
-					"static");
-			if (!binding.equals("jni")) {
+					Library.STATIC);
+			if (!binding.equals(Library.JNI)) {
 				File include = new File(getNarManager().getNarFile(
 						narDependency).getParentFile(), "nar/include");
 				if (include.exists()) {
@@ -134,7 +134,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				getOS(), getAOLKey() + "linker.", type));
 
 		// add dependency libraries
-		if (type.equals("shared") || type.equals("jni")) {
+		if (type.equals(Library.SHARED) || type.equals(Library.JNI)) {
 			for (Iterator i = getNarManager().getNarDependencies("compile")
 					.iterator(); i.hasNext();) {
 				NarArtifact dependency = (NarArtifact) i.next();
@@ -143,13 +143,13 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 				// FIXME, no way to override this at this stage
 				String binding = dependency.getNarInfo().getBinding(getAOL(),
-						"static");
+						Library.STATIC);
 //				System.err.println("BINDING " + binding);
 				String aol = getAOL();
 				aol = dependency.getNarInfo().getAOL(getAOL());
 //				System.err.println("LIB AOL " + aol);
 
-				if (!binding.equals("jni")) {
+				if (!binding.equals(Library.JNI)) {
 					File dir = new File(getNarManager().getNarFile(dependency)
 							.getParentFile(), "nar/lib/" + aol + "/" + binding);
 //					System.err.println("LIB DIR " + dir);

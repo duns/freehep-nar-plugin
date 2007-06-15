@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -9,7 +9,7 @@ import org.apache.tools.ant.Project;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 

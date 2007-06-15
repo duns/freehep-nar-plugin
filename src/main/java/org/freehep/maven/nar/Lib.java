@@ -19,7 +19,7 @@ import org.apache.tools.ant.Project;
  * Keeps info on a library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java 1fde7b28c6b5 2007/04/20 18:04:46 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Lib.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public class Lib {
 
@@ -37,7 +37,7 @@ public class Lib {
      * @parameter expression="" default-value="shared"
      * @required
      */
-    private String type = "shared";
+    private String type = Library.SHARED;
 
     /**
      * Location for this library

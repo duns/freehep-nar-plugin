@@ -39,8 +39,7 @@ public class NarManager {
 	private String defaultAOL;
 	private String linkerName;
 	
-	private String[] narTypes = { "noarch", "static", "dynamic", "jni",
-			"plugin" };
+	private String[] narTypes = { "noarch", Library.STATIC, Library.SHARED, Library.JNI, Library.PLUGIN };
 
 	public NarManager(Log log, int logLevel, ArtifactRepository repository,
 			MavenProject project, String architecture, String os, Linker linker)

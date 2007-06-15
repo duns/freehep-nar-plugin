@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -12,7 +12,7 @@ import org.apache.tools.ant.Project;
  * Keeps info on a system library
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/SysLib.java aaed00b12053 2006/06/17 00:35:37 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/SysLib.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public class SysLib {
 
@@ -30,7 +30,7 @@ public class SysLib {
      * @parameter expression="" default-value="shared"
      * @required
      */
-    private String type = "shared";
+    private String type = Library.SHARED;
 
     public SystemLibrarySet getSysLibSet(Project antProject) throws MojoFailureException {
         if (name == null) {

@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005-2006.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java c43a9ac31674 2007/04/11 22:58:11 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 22f054423067 2007/06/15 23:34:05 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -52,7 +52,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // outtype
         OutputTypeEnum outTypeEnum = new OutputTypeEnum();
-        outTypeEnum.setValue("executable");
+        outTypeEnum.setValue(Library.EXECUTABLE);
         task.setOuttype(outTypeEnum);
 
         // outDir
@@ -117,7 +117,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
                 "nar/lib/" + getAOL() + "/" + test.getLink());
 
         // copy shared library
-        if (test.getLink().equals("shared")) {
+        if (test.getLink().equals(Library.SHARED)) {
             try {
                 // defaults are Unix
                 String libPrefix = NarUtil.getDefaults().getProperty(
