@@ -20,6 +20,13 @@
       <url>http://java.freehep.org/maven2</url>
     </pluginRepository>
   </pluginRepositories>
+  <distributionManagement>
+    <repository>
+      <id>freehep-maven-deploy</id>
+      <name>FreeHEP Maven Repository</name>
+      <url>scpexe://svn.freehep.org/nfs/slac/g/jas/maven2/REMOVEME</url>
+    </repository>
+  </distributionManagement>
   <build>
     <defaultGoal>integration-test</defaultGoal>
     <plugins>

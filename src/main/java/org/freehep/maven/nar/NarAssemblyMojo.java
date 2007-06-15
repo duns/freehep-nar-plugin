@@ -19,13 +19,13 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java ef5886749b63 2007/05/15 12:50:49 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java bc4569de7469 2007/06/15 22:43:50 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
 	/**
-	 * List of classifiers which you want to assemble. Example ppc-MacOSX-g++,
-	 * x86-Windows-msvc, i386-Linux-g++.
+	 * List of classifiers which you want to assemble. Example ppc-MacOSX-g++-static,
+	 * x86-Windows-msvc-shared, i386-Linux-g++-executable, ....
 	 * 
 	 * @parameter expression=""
 	 * @required
