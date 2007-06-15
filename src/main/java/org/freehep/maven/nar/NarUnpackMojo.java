@@ -1,19 +1,12 @@
 // Copyright FreeHEP, 2005-2006.
 package org.freehep.maven.nar;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Unpacks NAR files. Unpacking happens in the local repository, 
@@ -24,7 +17,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 2bfc7ab24863 2006/10/17 00:24:06 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarUnpackMojo.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
  */
 public class NarUnpackMojo extends AbstractDependencyMojo {
 

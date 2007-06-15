@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -21,7 +20,6 @@ import net.sf.antcontrib.cpptasks.types.DefineSet;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.Project;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -29,7 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java c43a9ac31674 2007/04/11 22:58:11 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
  */
 public abstract class Compiler {
 

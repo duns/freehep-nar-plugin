@@ -12,7 +12,6 @@ import net.sf.antcontrib.cpptasks.RuntimeType;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
 import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.BuildException;
@@ -25,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java c43a9ac31674 2007/04/11 22:58:11 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 

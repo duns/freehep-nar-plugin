@@ -2,20 +2,15 @@
 package org.freehep.maven.nar;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 18a63685dd10 2006/11/28 14:41:14 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
     

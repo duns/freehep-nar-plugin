@@ -4,7 +4,6 @@ package org.freehep.maven.nar;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -20,7 +19,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 318395cefd0a 2006/11/29 00:19:53 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Java.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
  */
 public class Java {
 
