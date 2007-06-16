@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -19,9 +20,16 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 22f054423067 2007/06/15 23:34:05 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java b51c72fd0996 2007/06/16 14:42:43 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
+
+	/**
+	 * Used for attaching the artifact in the project
+	 * 
+	 * @component
+	 */
+	private MavenProjectHelper projectHelper;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
@@ -53,7 +61,7 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			File noarchFile = new File(getOutputDirectory(), getFinalName()
 					+ "-" + NAR_NO_ARCH + "." + NAR_EXTENSION);
 			nar(noarchFile, narDirectory, new String[] { include });
-			addNarArtifact(NAR_TYPE, NAR_NO_ARCH, noarchFile);
+			projectHelper.attachArtifact(getMavenProject(), NAR_TYPE, NAR_NO_ARCH, noarchFile);
 			info.setNar(null, "noarch", getMavenProject().getGroupId() + ":"
 					+ getMavenProject().getArtifactId() + ":" + NAR_TYPE + ":"
 					+ NAR_NO_ARCH);
@@ -63,7 +71,8 @@ public class NarPackageMojo extends AbstractCompileMojo {
 		for (Iterator i = getLibraries().iterator(); i.hasNext();) {
 			Library library = (Library) i.next();
 			String type = library.getType();
-			if (bindingType == null) bindingType = type;
+			if (bindingType == null)
+				bindingType = type;
 			// aol
 			String bin = "bin";
 			String lib = "lib";
@@ -73,7 +82,7 @@ public class NarPackageMojo extends AbstractCompileMojo {
 				File archFile = new File(getOutputDirectory(), getFinalName()
 						+ "-" + getAOL() + "-" + type + "." + NAR_EXTENSION);
 				nar(archFile, narDirectory, new String[] { bin, lib });
-				addNarArtifact(NAR_TYPE, getAOL() + "-" + type, archFile);
+				projectHelper.attachArtifact(getMavenProject(), NAR_TYPE, getAOL() + "-" + type, archFile);
 				info.setNar(null, type, getMavenProject().getGroupId() + ":"
 						+ getMavenProject().getArtifactId() + ":" + NAR_TYPE
 						+ ":" + "${aol}-" + type);
@@ -117,20 +126,5 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			throw new MojoExecutionException(
 					"Error while creating NAR archive.", e);
 		}
-	}
-
-	private void addNarArtifact(String artifactType, String artifactClassifier,
-			File artifactFile) {
-		Artifact artifact = new AttachedNarArtifact(getMavenProject()
-				.getArtifact(), artifactType, artifactClassifier);
-
-		artifact.setFile(artifactFile);
-		artifact.setResolved(true);
-
-		// FIXME, the build number retrieved for SNAPSHOT is one too high (mvn
-		// 2.0)
-		// CHECK this may be due to the fact that multiple SNAPSHOTS are
-		// deployed and the build number (erroneously) incremented each time
-		getMavenProject().addAttachedArtifact(artifact);
 	}
 }
