@@ -47,6 +47,7 @@ and link native code.
           <libraries>
             <library>
               <type>jni</type>
+              <packageName>com.mycompany.mypackage</packageName>
             </library>
           </libraries>
         </configuration>

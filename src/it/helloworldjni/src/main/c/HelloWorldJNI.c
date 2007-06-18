@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "HelloWorldJNI.h"
+#include "com_mycompany_mypackage_HelloWorldJNI.h"
 
-JNIEXPORT jstring JNICALL Java_HelloWorldJNI_sayHello( JNIEnv *env, jobject obj ) {
+JNIEXPORT jstring JNICALL Java_com_mycompany_mypackage_HelloWorldJNI_sayHello( JNIEnv *env, jobject obj ) {
 	jstring value;           /* the return value */
 
 	char buf[40];            /* working buffer (really only need 20 ) */

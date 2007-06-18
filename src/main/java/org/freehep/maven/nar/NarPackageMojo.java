@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -20,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java b51c72fd0996 2007/06/16 14:42:43 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarPackageMojo.java 8dade358596e 2007/06/18 20:25:54 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -61,7 +60,8 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			File noarchFile = new File(getOutputDirectory(), getFinalName()
 					+ "-" + NAR_NO_ARCH + "." + NAR_EXTENSION);
 			nar(noarchFile, narDirectory, new String[] { include });
-			projectHelper.attachArtifact(getMavenProject(), NAR_TYPE, NAR_NO_ARCH, noarchFile);
+			projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
+					NAR_NO_ARCH, noarchFile);
 			info.setNar(null, "noarch", getMavenProject().getGroupId() + ":"
 					+ getMavenProject().getArtifactId() + ":" + NAR_TYPE + ":"
 					+ NAR_NO_ARCH);
@@ -82,7 +82,8 @@ public class NarPackageMojo extends AbstractCompileMojo {
 				File archFile = new File(getOutputDirectory(), getFinalName()
 						+ "-" + getAOL() + "-" + type + "." + NAR_EXTENSION);
 				nar(archFile, narDirectory, new String[] { bin, lib });
-				projectHelper.attachArtifact(getMavenProject(), NAR_TYPE, getAOL() + "-" + type, archFile);
+				projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
+						getAOL() + "-" + type, archFile);
 				info.setNar(null, type, getMavenProject().getGroupId() + ":"
 						+ getMavenProject().getArtifactId() + ":" + NAR_TYPE
 						+ ":" + "${aol}-" + type);

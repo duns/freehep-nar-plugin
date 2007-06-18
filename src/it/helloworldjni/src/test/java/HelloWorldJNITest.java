@@ -1,5 +1,7 @@
 import junit.framework.*;
 
+import com.mycompany.mypackage.HelloWorldJNI;
+
 public class HelloWorldJNITest extends TestCase {
 
     public HelloWorldJNITest(String name) {

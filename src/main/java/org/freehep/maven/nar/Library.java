@@ -5,7 +5,7 @@ package org.freehep.maven.nar;
  * Sets up a library to create
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Library.java 22f054423067 2007/06/15 23:34:05 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Library.java 8dade358596e 2007/06/18 20:25:54 duns $
  */
 public class Library {
 
@@ -30,11 +30,23 @@ public class Library {
 	 */
 	protected boolean linkCPP = true;
 
+	/**
+	 * If specified will create the NarSystem class with methods
+	 * to load a JNI library.
+	 * 
+	 * @parameter expression=""
+	 */
+	protected String packageName = null;
+	
 	public String getType() {
 		return type;
 	}
 
 	public boolean linkCPP() {
 		return linkCPP;
+	}
+	
+	public String getPackageName() {
+		return packageName;
 	}
 }

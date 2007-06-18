@@ -22,6 +22,20 @@ NAR Configuration
   <runtime/>
   <libtool/>
 
+  <libraries>
+    <library>
+      <type/>
+      <linkCPP/>
+    </library>
+  </libraries>
+
+  <tests>
+    <test>
+      <name/>
+      <link/>
+    </test>
+  </tests>
+
   <linker>
     <name/>
     <incremental/>
@@ -170,6 +184,31 @@ Default is dynamic.
 
 	Set use of libtool. If set to true, the "libtool " will be prepended to 
 the command line for compatible compilers/linkers. Default is false.
+
+* libraries
+
+	Section to specify what type or libraries to create. For each library you may specify:
+	
+	[type] The type of the library: shared, static, jni, plugin. Default is shared.
+
+	[linkCPP] Specifies if the stdc++ library should be linked with. Default is true.
+
+	[packageName] If specified a NarSystem class will be generated in this package and 
+	added to the main jar artifact. The NarSystem class contains the following methods:
+	
+	* loadLibrary() - which will load the <artifact>-<version> JNI library. 
+	
+	[]
+
+* tests
+
+	Section to specify which test executables should be created. For each test you may specify:
+	
+	[name] Name of the executable.
+	
+	[link] Type of linking to be used: shared or static. Default is shared.
+	
+	[]
 
 * linker
 
