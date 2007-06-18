@@ -8,6 +8,7 @@ Mark Donszelmann
 Example: HelloWorld Static Library
 
 	This example contains a simple C method "sayHello" in a static library.
+This example also contains a test executable.
 
 	For the Library source, see: 
 {{{http://java.freehep.org/svn/repobrowser.svn?path=%2ffreehep%2ftrunk%2fmaven-plugins%2ffreehep-nar-plugin%2fsrc%2fit%2fhelloworldstaticlib/&revision=HEAD}

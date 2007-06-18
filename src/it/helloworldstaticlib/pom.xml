@@ -41,6 +41,12 @@
               <type>static</type>
             </library>
           </libraries>
+          <tests>
+            <test>
+              <name>HelloWorldTest</name>
+              <link>static</link>
+            </test>
+          </tests>
         </configuration>
       </plugin>
       <plugin>
