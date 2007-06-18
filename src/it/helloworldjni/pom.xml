@@ -39,6 +39,7 @@
           <libraries>
             <library>
               <type>jni</type>
+              <packageName>com.mycompany.mypackage</packageName>
               <linkCPP>false</linkCPP>
             </library>
           </libraries>

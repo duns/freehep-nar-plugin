@@ -1,6 +1,8 @@
+package com.mycompany.mypackage;
+
 public class HelloWorldJNI {
     static {
-        System.loadLibrary("helloworldjni-1.0-SNAPSHOT");
+        NarSystem.loadLibrary();
     }
 
     public native String sayHello();
