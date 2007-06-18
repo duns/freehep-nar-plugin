@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 3edb5ca24db1 2007/06/15 22:04:56 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/Compiler.java 8b4b90540062 2007/06/18 06:03:27 duns $
  */
 public abstract class Compiler {
 
@@ -354,12 +354,15 @@ public abstract class Compiler {
         
         // add other sources
         for (Iterator i = mojo.getMavenProject().getCompileSourceRoots().iterator(); i.hasNext(); ) {
-        	ConditionalFileSet otherFileSet = new ConditionalFileSet();
-        	otherFileSet.setProject(mojo.getAntProject());
-        	otherFileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
-        	otherFileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
-        	otherFileSet.setDir(new File((String)i.next()));
-        	compiler.addFileset(otherFileSet);
+        	File dir = new File((String)i.next());
+        	if (dir.exists()) {
+	        	ConditionalFileSet otherFileSet = new ConditionalFileSet();
+	        	otherFileSet.setProject(mojo.getAntProject());
+	        	otherFileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
+	        	otherFileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
+	        	otherFileSet.setDir(dir);
+	        	compiler.addFileset(otherFileSet);
+        	}
         }
         return compiler;
     }
