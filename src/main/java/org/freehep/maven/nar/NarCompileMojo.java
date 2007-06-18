@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java 22f054423067 2007/06/15 23:34:05 duns $
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarCompileMojo.java e5e288a3bc43 2007/06/18 21:38:09 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -60,7 +60,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		outTypeEnum.setValue(type);
 		task.setOuttype(outTypeEnum);
 
-		// std c++
+		// stdc++
 		task.setLinkCPP(library.linkCPP());
 
 		// outDir
@@ -134,7 +134,8 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				getOS(), getAOLKey() + "linker.", type));
 
 		// add dependency libraries
-		if (type.equals(Library.SHARED) || type.equals(Library.JNI)) {
+// FIXME: what about PLUGIN and STATIC, depending on STATIC, should we not add all libraries, see NARPLUGIN-96
+		if (type.equals(Library.SHARED) || type.equals(Library.JNI) || type.equals(Library.EXECUTABLE)) {
 			for (Iterator i = getNarManager().getNarDependencies("compile")
 					.iterator(); i.hasNext();) {
 				NarArtifact dependency = (NarArtifact) i.next();

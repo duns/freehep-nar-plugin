@@ -48,6 +48,8 @@
     </menu>
     <menu name="Examples">
       <item name="HelloWorld JNI" href="HelloWorldJNI.html"/>
+      <item name="HelloWorld Static Library" href="HelloWorldStaticLibrary.html"/>
+      <item name="HelloWorld Static Executable" href="HelloWorldStaticExecutable.html"/>
 <!--   
       <item name="Static Library" href=".html"/>
       <item name="Executable" href=".html"/>
