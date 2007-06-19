@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 22f054423067 2007/06/15 23:34:05 duns $, 2.3 maven repository maven-surefire-plugin
+ * @version $Id: src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 69b9690c9265 2007/06/19 23:35:55 duns $, 2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -639,7 +639,8 @@ public class NarIntegrationTestMojo
             else
             {
                 String junitDirectoryTestSuite;
-                if ( junitArtifact.getBaseVersion().startsWith( "4" ) )
+// FREEHEP NP check
+                if ( junitArtifact != null && junitArtifact.getBaseVersion().startsWith( "4" ) )
                 {
                     junitDirectoryTestSuite = "org.apache.maven.surefire.junit4.JUnit4DirectoryTestSuite";
                 }
