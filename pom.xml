@@ -61,4 +61,7 @@
       <artifactId>bcel</artifactId>
     </dependency>
   </dependencies>
+  <modules>
+    <module>tests</module>
+  </modules>
 </project>
