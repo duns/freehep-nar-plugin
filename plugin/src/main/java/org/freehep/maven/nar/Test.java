@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Sets up a test to create
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Test.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Test.java 1c0efd4f1b40 2007/07/03 21:40:25 duns $
  */
 public class Test {
 
@@ -27,6 +27,14 @@ public class Test {
      * @parameter expression=""
      */
     protected String link = Library.SHARED;
+
+    /**
+     * When true run this test.
+     * Defaults to true;
+     * 
+     * @parameter expresssion=""
+     */
+	protected boolean run=true;
     
     public String getName() throws MojoFailureException {
         if (name == null) throw new MojoFailureException("NAR: Please specify <Name> as part of <Test>");
@@ -35,6 +43,10 @@ public class Test {
     
     public String getLink() {
         return link;
+    }
+    
+    public boolean shouldRun() {
+    	return run;
     }
 }
 

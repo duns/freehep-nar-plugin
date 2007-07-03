@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java bb1cc50c72db 2007/07/03 17:10:54 duns $, 2.3 maven repository maven-surefire-plugin
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 1c0efd4f1b40 2007/07/03 21:40:25 duns $, 2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -144,7 +144,8 @@ public class NarIntegrationTestMojo
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
-    private File classesDirectory;
+// FREEHEP
+//    private File classesDirectory;
 
     /**
      * The directory containing generated test classes of the project being tested.
