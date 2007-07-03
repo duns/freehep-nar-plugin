@@ -1,10 +1,10 @@
 import junit.framework.*;
 
-import com.mycompany.mypackage.HelloWorldJNI;
+import com.mycompany.mypackage.HelloWorldStaticJNI;
 
-public class HelloWorldJNITest extends TestCase {
+public class HelloWorldStaticJNITest extends TestCase {
 
-    public HelloWorldJNITest(String name) {
+    public HelloWorldStaticJNITest(String name) {
       super(name);
     }
 
@@ -17,9 +17,9 @@ public class HelloWorldJNITest extends TestCase {
     }
 
     public void testNativeHelloWorldJNI() throws Exception {
-        HelloWorldJNI app = new HelloWorldJNI();
+        HelloWorldStaticJNI app = new HelloWorldStaticJNI();
         
-        this.assertEquals( "Hello NAR World!", app.sayHello() );
+        this.assertEquals( "Hello Static NAR World!", app.sayHello() );
     }
 }
 
