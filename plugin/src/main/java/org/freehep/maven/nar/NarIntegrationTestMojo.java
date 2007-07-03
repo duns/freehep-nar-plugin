@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $, 2.3 maven repository maven-surefire-plugin
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java bb1cc50c72db 2007/07/03 17:10:54 duns $, 2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -719,10 +719,10 @@ public class NarIntegrationTestMojo
             StringBuffer javaLibraryPath = new StringBuffer();
             if (testJNIModule()) {
                 // Add libraries to java.library.path for testing
-                String thisLib = "target/nar/lib/"+getAOL()+"/jni";
-                if (new File(thisLib).exists()) {
-                    System.err.println("Adding to java.library.path: "+thisLib);
-                    javaLibraryPath.append(thisLib);
+            	File javaLibraryPathEntry = new File(project.getBasedir(), "target/nar/lib/"+getAOL()+"/jni");
+                if (javaLibraryPathEntry.exists()) {
+                    System.err.println("Adding to java.library.path: "+javaLibraryPathEntry);
+                    javaLibraryPath.append(javaLibraryPathEntry);
                 }
                 
                 // add jar file to classpath, as one may want to read a properties file for artifactId and version
