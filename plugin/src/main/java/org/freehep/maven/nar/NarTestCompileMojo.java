@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 1c0efd4f1b40 2007/07/03 21:40:25 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fe18a32612cc 2007/07/03 21:45:07 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -193,6 +193,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
             if (test.shouldRun()) {
             	String name = getTargetDirectory()+"/bin/"+getAOL()+"/"+test.getLink()+"/"+test.getName();
                 getLog().info( "Running "+name);
+                // FIXME do something with return...
                 runCommand(generateCommandLine(name, getLog()), getLog());
             }
         } catch (BuildException e) {
