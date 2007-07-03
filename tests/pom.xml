@@ -20,5 +20,8 @@
   </repositories>
   <modules>
     <module>helloworldjni</module>
+    <module>helloworldstaticjni</module>
+    <module>helloworldstaticlib</module>
+    <module>helloworldstaticexe</module>
   </modules>
 </project>
