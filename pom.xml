@@ -6,11 +6,11 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.freehep</groupId>
-  <artifactId>freehep-nar-plugin-tests</artifactId>
+  <artifactId>freehep-nar</artifactId>
   <packaging>pom</packaging>
-  <name>FreeHEP Maven Native Archive Plugin Tests</name>
+  <name>FreeHEP Maven Native Archive System</name>
   <version>1-SNAPSHOT</version>
-  <description>Tests for the FreeHEP NAR Plugin</description>
+  <description>FreeHEP NAR System</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>
@@ -19,11 +19,7 @@
     </repository>
   </repositories>
   <modules>
-    <module>helloworldjni</module>
-    <module>helloworldstaticjni</module>
-    <module>helloworldsharedlib</module>
-    <module>helloworldstaticlib</module>
-    <module>helloworldsharedexe</module>
-    <module>helloworldstaticexe</module>
+    <module>plugin</module>
+    <module>tests</module>
   </modules>
 </project>
