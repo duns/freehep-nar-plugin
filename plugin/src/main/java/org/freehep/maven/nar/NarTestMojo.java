@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java fc7c0e9b39c8 2007/07/04 16:50:32 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java 409b2cb0c2ba 2007/07/04 16:51:43 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -68,6 +68,8 @@ public class NarTestMojo extends AbstractCompileMojo {
 		List env = new ArrayList();
 
 		// FIXME, this should run over all produced libraries' types
+		// FIXME, path separator and platform
+		// FIXME, DY?
 		if (test.getLink().equals(Library.SHARED)) {
 		    // link to our own library
 			env.add("DYLD_LIBRARY_PATH="+getTargetDirectory()+"/"+"lib/"+getAOL()+"/"+test.getLink());
