@@ -33,6 +33,7 @@ NAR Configuration
     <test>
       <name/>
       <link/>
+      <run/>
     </test>
   </tests>
 
@@ -207,6 +208,8 @@ the command line for compatible compilers/linkers. Default is false.
 	[name] Name of the executable.
 	
 	[link] Type of linking to be used: shared or static. Default is shared.
+
+        [run] If true will run this test
 	
 	[]
 

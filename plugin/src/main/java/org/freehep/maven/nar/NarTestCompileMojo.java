@@ -1,14 +1,9 @@
 // Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -20,7 +15,6 @@ import net.sf.antcontrib.cpptasks.types.LibraryTypeEnum;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.codehaus.plexus.util.FileUtils;
@@ -32,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fe18a32612cc 2007/07/03 21:45:07 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fc7c0e9b39c8 2007/07/04 16:50:32 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -186,16 +180,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // execute
         try {
-            task.execute();
-            
-            // FIXME should move to NarTestMojo
-            // run if requested
-            if (test.shouldRun()) {
-            	String name = getTargetDirectory()+"/bin/"+getAOL()+"/"+test.getLink()+"/"+test.getName();
-                getLog().info( "Running "+name);
-                // FIXME do something with return...
-                runCommand(generateCommandLine(name, getLog()), getLog());
-            }
+            task.execute();            
         } catch (BuildException e) {
             throw new MojoExecutionException("NAR: Test-Compile failed", e);
         }
@@ -205,59 +190,4 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
     }
 
-    private String[] generateCommandLine(String name, Log log) throws MojoExecutionException {
-        
-        List cmdLine = new ArrayList();
-        
-        cmdLine.add(name);
-        
-        log.debug(cmdLine.toString());
-        
-        return (String[])cmdLine.toArray(new String[cmdLine.size()]);        
-    }
-
-    // NOTE: same as in Javah.java
-    private int runCommand(String[] cmdLine, Log log) throws MojoExecutionException {
-        try {
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec(cmdLine);
-            StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), true, log);
-            StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), false, log);
-            
-            errorGobbler.start();
-            outputGobbler.start();
-            return process.waitFor();
-        } catch (Throwable e) {
-            throw new MojoExecutionException("Could not launch " + cmdLine[0], e);
-        }
-    }
-    
-    class StreamGobbler extends Thread {
-        InputStream is;
-        boolean error;
-        Log log;
-        
-        StreamGobbler(InputStream is, boolean error, Log log) {
-            this.is = is;
-            this.error = error;
-            this.log = log;
-        }
-        
-        public void run() {
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    if (error) {
-                        log.error(line);
-                    } else {
-                        log.debug(line);
-                    }
-                }
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }
