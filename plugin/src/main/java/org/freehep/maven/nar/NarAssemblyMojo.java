@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarAssemblyMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarAssemblyMojo extends AbstractDependencyMojo {
 
@@ -60,8 +60,6 @@ public class NarAssemblyMojo extends AbstractDependencyMojo {
 			for (Iterator d = dependencies.iterator(); d.hasNext();) {
 				Artifact dependency = (Artifact) d.next();
 				getLog().debug("Assemble from " + dependency);
-System.err.println("Assemble from "+dependency);
-				String prefix = classifier.replace('-', '.') + ".";
 
 				// FIXME reported to maven developer list, isSnapshot
 				// changes behaviour

@@ -1,15 +1,18 @@
 // Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * Sets up a test to create
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Test.java 1c0efd4f1b40 2007/07/03 21:40:25 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Test.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
-public class Test {
+public class Test implements Executable {
 
     /**
      * Name of the test to create
@@ -35,6 +38,15 @@ public class Test {
      * @parameter expresssion=""
      */
 	protected boolean run=true;
+	
+	/**
+	 * Arguments to be used for running this test.
+	 * Defaults to empty list. This option is 
+	 * only used if run=true.
+	 * 
+	 * @parameter expression=""
+	 */
+    protected List/*<String>*/ args = new ArrayList();
     
     public String getName() throws MojoFailureException {
         if (name == null) throw new MojoFailureException("NAR: Please specify <Name> as part of <Test>");
@@ -47,6 +59,10 @@ public class Test {
     
     public boolean shouldRun() {
     	return run;
+    }
+    
+    public List/*<String>*/ getArgs() {
+    	return args;
     }
 }
 

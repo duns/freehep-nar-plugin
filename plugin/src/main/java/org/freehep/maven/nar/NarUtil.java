@@ -1,10 +1,12 @@
-// Copyright 2005, FreeHEP.
+// Copyright 2005-2007, FreeHEP.
 package org.freehep.maven.nar;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.apache.bcel.classfile.ClassFormatException;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,7 +20,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarUtil {
 
@@ -78,11 +80,12 @@ public class NarUtil {
 		return aol;
 	}
 
-	public static String getAOLKey(String architecture, String os, Linker linker) throws MojoFailureException{
+	public static String getAOLKey(String architecture, String os, Linker linker)
+			throws MojoFailureException {
 		if (aolKey == null) {
 			// construct AOL key prefix
-			aolKey = getArchitecture(architecture) + "." + getOS(os) + "." + getLinkerName(architecture, os, linker)
-					+ ".";
+			aolKey = getArchitecture(architecture) + "." + getOS(os) + "."
+					+ getLinkerName(architecture, os, linker) + ".";
 		}
 		return aolKey;
 	}
@@ -98,67 +101,81 @@ public class NarUtil {
 		return javaHome;
 	}
 
-	public static void makeExecutable(File file, final Log log) throws MojoExecutionException {
-		if (!file.exists()) return;
-		
+	public static void makeExecutable(File file, final Log log)
+			throws MojoExecutionException {
+		if (!file.exists())
+			return;
+
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
-			for (int i=0; i<files.length; i++) {
+			for (int i = 0; i < files.length; i++) {
 				makeExecutable(files[i], log);
 			}
-		} if (file.isFile() && file.canRead() && file.canWrite() && !file.isHidden()) {
+		}
+		if (file.isFile() && file.canRead() && file.canWrite()
+				&& !file.isHidden()) {
 			// chmod +x file
-	        Commandline commandLine = new Commandline();
-	        commandLine.setExecutable("chmod");
-	        commandLine.createArgument().setValue("+x");
-	        commandLine.createArgument().setFile(file);
-	        
+			Commandline commandLine = new Commandline();
+			commandLine.setExecutable("chmod");
+			commandLine.createArgument().setValue("+x");
+			commandLine.createArgument().setFile(file);
+
 			StreamConsumer consumer = new StreamConsumer() {
-	            public void consumeLine ( String line ) {
-	                log.info( line );
-	            }
-	        };
-			
+				public void consumeLine(String line) {
+					log.info(line);
+				}
+			};
+
 			log.info(commandLine.toString());
 			try {
-				int result = CommandLineUtils.executeCommandLine(commandLine, consumer, consumer);
+				int result = CommandLineUtils.executeCommandLine(commandLine,
+						consumer, consumer);
 				if (result != 0) {
-					throw new  MojoExecutionException("Result of " + commandLine + " execution is: \'" + result + "\'." );
+					throw new MojoExecutionException("Result of " + commandLine
+							+ " execution is: \'" + result + "\'.");
 				}
 			} catch (CommandLineException e) {
-				throw new MojoExecutionException("Failed to execute "+commandLine, e);
+				throw new MojoExecutionException("Failed to execute "
+						+ commandLine, e);
 			}
 		}
 	}
 
-	public static void runRanlib(File file, final Log log) throws MojoExecutionException  {
-		if (!file.exists()) return;
-		
+	public static void runRanlib(File file, final Log log)
+			throws MojoExecutionException {
+		if (!file.exists())
+			return;
+
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
-			for (int i=0; i<files.length; i++) {
+			for (int i = 0; i < files.length; i++) {
 				runRanlib(files[i], log);
 			}
-		} if (file.isFile() && file.canRead() && file.canWrite() && !file.isHidden() && file.getName().endsWith(".a")) {
+		}
+		if (file.isFile() && file.canRead() && file.canWrite()
+				&& !file.isHidden() && file.getName().endsWith(".a")) {
 			// ranlib file
-	        Commandline commandLine = new Commandline();
-	        commandLine.setExecutable("ranlib");
-	        commandLine.createArgument().setFile(file);
-	        
+			Commandline commandLine = new Commandline();
+			commandLine.setExecutable("ranlib");
+			commandLine.createArgument().setFile(file);
+
 			StreamConsumer consumer = new StreamConsumer() {
-	            public void consumeLine ( String line ) {
-	                log.info( line );
-	            }
-	        };
-			
+				public void consumeLine(String line) {
+					log.info(line);
+				}
+			};
+
 			log.info(commandLine.toString());
 			try {
-				int result = CommandLineUtils.executeCommandLine(commandLine, consumer, consumer);
+				int result = CommandLineUtils.executeCommandLine(commandLine,
+						consumer, consumer);
 				if (result != 0) {
-					throw new  MojoExecutionException("Result of " + commandLine + " execution is: \'" + result + "\'." );
+					throw new MojoExecutionException("Result of " + commandLine
+							+ " execution is: \'" + result + "\'.");
 				}
 			} catch (CommandLineException e) {
-				throw new MojoExecutionException("Failed to execute "+commandLine, e);
+				throw new MojoExecutionException("Failed to execute "
+						+ commandLine, e);
 			}
 		}
 	}
@@ -169,15 +186,13 @@ public class NarUtil {
 	 * @param filename
 	 *            the absolute file name of the class
 	 * @return the Bcel Class.
+	 * @throws IOException,
+	 *             ClassFormatException
 	 */
-	public static final JavaClass getBcelClass(String filename) {
-		try {
-			ClassParser parser = new ClassParser(filename);
-			return parser.parse();
-		} catch (Exception e) {
-			System.err.println("\nError parsing " + filename + ": " + e + "\n");
-			return null;
-		}
+	public static final JavaClass getBcelClass(String filename)
+			throws IOException, ClassFormatException {
+		ClassParser parser = new ClassParser(filename);
+		return parser.parse();
 	}
 
 	/**
@@ -189,22 +204,16 @@ public class NarUtil {
 	 * @return the header file name.
 	 */
 	public static final String getHeaderName(String base, String filename) {
-		try {
-			base = base.replaceAll("\\\\", "/");
-			filename = filename.replaceAll("\\\\", "/");
-			if (!filename.startsWith(base)) {
-				System.out.println("\nError " + filename
-						+ " does not start with " + base);
-				return null;
-			}
-			String header = filename.substring(base.length() + 1);
-			header = header.replaceAll("/", "_");
-			header = header.replaceAll("\\.class", ".h");
-			return header;
-		} catch (Exception e) {
-			System.err.println("\nError parsing " + filename + ": " + e + "\n");
-			return null;
+		base = base.replaceAll("\\\\", "/");
+		filename = filename.replaceAll("\\\\", "/");
+		if (!filename.startsWith(base)) {
+			throw new IllegalArgumentException("Error " + filename + " does not start with "
+					+ base);
 		}
+		String header = filename.substring(base.length() + 1);
+		header = header.replaceAll("/", "_");
+		header = header.replaceAll("\\.class", ".h");
+		return header;
 	}
 
 	/**

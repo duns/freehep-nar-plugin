@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -77,7 +77,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		} else {
 			outFile = new File(outDir, getOutput());
 		}
-		if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
+		getLog().debug("NAR - output: '" + outFile + "'");
 		task.setOutfile(outFile);
 
 		// object directory
@@ -111,7 +111,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 		// add java include paths
 		// FIXME, get rid of task
-		getJava().addIncludePaths(getMavenProject(), task, this, type);
+		getJava().addIncludePaths(getMavenProject(), task, this, type, getLog());
 
 		// add dependency include paths
 		for (Iterator i = getNarManager().getNarDependencies("compile")
@@ -145,34 +145,34 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				// FIXME, no way to override this at this stage
 				String binding = dependency.getNarInfo().getBinding(getAOL(),
 						Library.STATIC);
-//				System.err.println("BINDING " + binding);
+				getLog().debug("Using Binding: " + binding);
 				String aol = getAOL();
 				aol = dependency.getNarInfo().getAOL(getAOL());
-//				System.err.println("LIB AOL " + aol);
+				getLog().debug("Using Library AOL: " + aol);
 
 				if (!binding.equals(Library.JNI)) {
 					File dir = new File(getNarManager().getNarFile(dependency)
 							.getParentFile(), "nar/lib/" + aol + "/" + binding);
-//					System.err.println("LIB DIR " + dir);
+					getLog().debug("Looking Library Directory: " + dir);
 					if (dir.exists()) {
 						LibrarySet libSet = new LibrarySet();
 						libSet.setProject(antProject);
 
 						// FIXME, no way to override
 						String libs = dependency.getNarInfo().getLibs(getAOL());
-//						System.err.println("LIBS = " + libs);
+						getLog().debug("Using LIBS = " + libs);
 						libSet.setLibs(new CUtil.StringArrayBuilder(libs));
 						libSet.setDir(dir);
 						task.addLibset(libSet);
 					} else {
-//						System.err.println("LIB DIR " + dir
-//								+ " does NOT exist.");
+						throw new MojoFailureException("LIB DIR " + dir
+								+ " does NOT exist.");
 					}
 
 					String sysLibs = dependency.getNarInfo().getSysLibs(
 							getAOL());
 					if (sysLibs != null) {
-//						System.err.println("SYSLIBS = " + sysLibs);
+						getLog().debug("Using SYSLIBS = " + sysLibs);
 						SystemLibrarySet sysLibSet = new SystemLibrarySet();
 						sysLibSet.setProject(antProject);
 
@@ -187,7 +187,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		// Add JVM to linker
 		// FIXME, use "this".
 		getJava().addRuntime(antProject, task, getJavaHome(), getOS(),
-				getAOLKey() + "java.");
+				getAOLKey() + "java.", getLog());
 
 		// execute
 		try {

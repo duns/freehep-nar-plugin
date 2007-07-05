@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.BufferedReader;
@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.bcel.classfile.ClassFormatException;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -30,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class Javah {
 
@@ -191,8 +192,10 @@ public class Javah {
         } catch (InclusionScanException e) {
             throw new MojoExecutionException( "JAVAH: Class scanning failed", e );
         } catch (IOException e) {
-            throw new MojoExecutionException( "JAVAH: Creating timestamp file failed", e );
-        }   
+            throw new MojoExecutionException( "JAVAH: IO Exception", e );
+        } catch (ClassFormatException e) {
+        	throw new MojoExecutionException( "JAVAH: Class could not be inspected", e);
+        }
     }
 
     private String[] generateCommandLine(MavenProject mavenProject, Set/*<String>*/ classes, Log log) throws MojoExecutionException {

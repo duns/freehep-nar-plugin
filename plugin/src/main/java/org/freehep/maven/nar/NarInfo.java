@@ -10,21 +10,25 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.maven.plugin.logging.Log;
+
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarInfo {
 
     public static final String NAR_PROPERTIES = "nar.properties";
     private String groupId, artifactId, version;
     private Properties info;
+    private Log log;
 	
-	public NarInfo(String groupId, String artifactId, String version) {
+	public NarInfo(String groupId, String artifactId, String version, Log log) {
 		this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.log = log;
         info = new Properties();
     }
     
@@ -46,7 +50,6 @@ public class NarInfo {
     
     public void read(InputStream is) throws IOException {
         info.load(is);
-//		info.list(System.out);
     }
 
     /**
@@ -98,7 +101,7 @@ public class NarInfo {
         if (key == null) return defaultValue;
 		String value = info.getProperty(key, defaultValue);
 		value = aol == null ? value : info.getProperty(aol+"."+key, value);
-//		System.err.println("getProperty("+aol+", "+key+", "+defaultValue+") = " + value);
+		log.debug("getProperty("+aol+", "+key+", "+defaultValue+") = " + value);
 		return value;
 	}
     

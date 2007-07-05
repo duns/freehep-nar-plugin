@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java 1c0efd4f1b40 2007/07/03 21:40:25 duns $, 2.3 maven repository maven-surefire-plugin
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java c867ab546be1 2007/07/05 21:26:30 duns $, 2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
  * @phase integration-test
@@ -722,7 +722,7 @@ public class NarIntegrationTestMojo
                 // Add libraries to java.library.path for testing
             	File javaLibraryPathEntry = new File(project.getBasedir(), "target/nar/lib/"+getAOL()+"/jni");
                 if (javaLibraryPathEntry.exists()) {
-                    System.err.println("Adding to java.library.path: "+javaLibraryPathEntry);
+                    getLog().debug("Adding library directory to java.library.path: "+javaLibraryPathEntry);
                     javaLibraryPath.append(javaLibraryPathEntry);
                 }
                 
@@ -741,7 +741,7 @@ public class NarIntegrationTestMojo
                 if (!binding.equals(Library.STATIC)) {
                     File depLib = new File(getNarManager().getNarFile(dependency).getParent(), "nar/lib/"+getAOL()+"/"+binding);
                     String depLibPath = depLib.getPath();
-                    System.err.println("Adding to java.library.path: "+depLibPath);
+                    getLog().debug("Adding dependency directory to java.library.path: "+depLibPath);
                     if (javaLibraryPath.length() > 0) javaLibraryPath.append(File.pathSeparator);                        
                     javaLibraryPath.append(depLibPath);
                 }

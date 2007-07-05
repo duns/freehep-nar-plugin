@@ -26,6 +26,10 @@ NAR Configuration
     <library>
       <type/>
       <linkCPP/>
+      <run/>
+      <args>
+        <arg/>
+      </args>
     </library>
   </libraries>
 
@@ -34,6 +38,9 @@ NAR Configuration
       <name/>
       <link/>
       <run/>
+      <args>
+        <arg/>
+      </args>
     </test>
   </tests>
 
@@ -44,6 +51,7 @@ NAR Configuration
     <options>
       <option/>
     </options>
+    <clearDefaultOptions/>
     <definitions>
       <definition>
     </definitions>
@@ -93,6 +101,7 @@ NAR Configuration
     <options>
       <option/>
     </options>
+    <clearDefaultOptions/>
   </cpp>
 
   <c>
@@ -190,7 +199,7 @@ the command line for compatible compilers/linkers. Default is false.
 
 	Section to specify what type or libraries to create. For each library you may specify:
 	
-	[type] The type of the library: shared, static, jni, plugin. Default is shared.
+	[type] The type of the library: shared, static, jni, plugin, executable. Default is shared.
 
 	[linkCPP] Specifies if the stdc++ library should be linked with. Default is true.
 
@@ -198,6 +207,12 @@ the command line for compatible compilers/linkers. Default is false.
 	added to the main jar artifact. The NarSystem class contains the following methods:
 	
 	* loadLibrary() - which will load the <artifact>-<version> JNI library. 
+	
+	[]
+	
+	[run] If true will run this executable (only if type is executable).
+	
+	[args] List of arguments to be provided to executable.
 	
 	[]
 
@@ -209,7 +224,9 @@ the command line for compatible compilers/linkers. Default is false.
 	
 	[link] Type of linking to be used: shared or static. Default is shared.
 
-        [run] If true will run this test
+	[run] If true will run this test
+	
+	[args] List of arguments to be provided to test.
 	
 	[]
 
@@ -232,8 +249,12 @@ the command line for compatible compilers/linkers. Default is false.
 
 ** options
 
-	Options for the linker.
+	Additional options for the linker.
     Defaults to AOL specific values.
+
+** clearDefaultOptions
+
+	Clear options specified in AOL properties.
 
 ** definitions
 
@@ -309,7 +330,7 @@ the command line for compatible compilers/linkers. Default is false.
    
 ** defines
 
-	List of defines.
+	Additional list of defines.
 
 ** clearDefaultDefines
     
@@ -317,7 +338,7 @@ the command line for compatible compilers/linkers. Default is false.
     
 ** undefines
 
-	List of undefines.
+	Additional list of undefines.
      
 ** clearDefaultUndefines
     
@@ -334,10 +355,13 @@ the command line for compatible compilers/linkers. Default is false.
     
 ** options
 
-	Options for the C++ compiler
+	Additional options for the C++ compiler. Some of these options can be set by specific tags (debug, rtti, ...).
     Defaults to AOL specific values.
       
+** clearDefaultOptions
 
+	Clear options specified in AOL properties.
+	
 * c
 
 	Same definitions as for \<cpp\>

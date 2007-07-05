@@ -6,7 +6,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractDependencyMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public abstract class AbstractDependencyMojo extends AbstractNarMojo {
 
@@ -22,6 +22,6 @@ public abstract class AbstractDependencyMojo extends AbstractNarMojo {
     }
 	
 	protected NarManager getNarManager() throws MojoFailureException {
-		return new NarManager(getLog(), getLogLevel(), getLocalRepository(), getMavenProject(), getArchitecture(), getOS(), getLinker());
+		return new NarManager(getLog(), getLocalRepository(), getMavenProject(), getArchitecture(), getOS(), getLinker());
 	}
 }

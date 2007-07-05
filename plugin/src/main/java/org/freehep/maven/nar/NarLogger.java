@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import org.apache.maven.plugin.logging.Log;
@@ -10,7 +10,7 @@ import org.apache.tools.ant.Project;
  * Logger to connect the Ant logging to the Maven logging.
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarLogger implements BuildListener {
     
@@ -21,47 +21,51 @@ public class NarLogger implements BuildListener {
     }
     
     public void buildStarted(BuildEvent event) {
-        System.err.println("bs "+event);
     }
     
     public void buildFinished(BuildEvent event) {
-        System.err.println("bf "+event);
     }
     
     public void targetStarted(BuildEvent event) {
-        System.err.println("gs "+event);
     }
     
     public void targetFinished(BuildEvent event) {
-        System.err.println("gf "+event);
     }
     
     public void taskStarted(BuildEvent event) {
-        System.err.println("ts "+event);
     }
     
     public void taskFinished(BuildEvent event) {
-        System.err.println("tf "+event);
     }
 
     public void messageLogged(BuildEvent event) {
-//                System.err.println("m "+event.getPriority()+" "+event.getMessage());
+    	String msg = event.getMessage();
         switch (event.getPriority()) {
             case Project.MSG_ERR:
-                log.error(event.getMessage());
+            	if (msg.indexOf("ar: creating archive") >= 0) {
+            		log.debug(msg);
+            	} else if (msg.indexOf("warning") < 0) {
+            		log.error(msg);
+            	} else {
+            		log.warn(msg);
+            	}
                 break;    
             case Project.MSG_WARN:
-                log.warn(event.getMessage());
+                log.warn(msg);
                 break;    
             case Project.MSG_INFO:
-                log.info(event.getMessage());
+            	if (msg.indexOf("total files to be compiled.") < 0) {
+            		log.debug(msg);
+            	} else {
+            		log.info(msg);
+            	}
                 break;    
             case Project.MSG_VERBOSE:
-                log.info(event.getMessage());
+                log.debug(msg);
                 break;    
             default:    
             case Project.MSG_DEBUG:
-                log.debug(event.getMessage());
+                log.debug(msg);
                 break;
         }
     }

@@ -30,8 +30,6 @@ public class NarManager {
 
 	private Log log;
 
-	private int logLevel;
-
 	private MavenProject project;
 
 	private ArtifactRepository repository;
@@ -41,11 +39,10 @@ public class NarManager {
 	
 	private String[] narTypes = { "noarch", Library.STATIC, Library.SHARED, Library.JNI, Library.PLUGIN };
 
-	public NarManager(Log log, int logLevel, ArtifactRepository repository,
+	public NarManager(Log log, ArtifactRepository repository,
 			MavenProject project, String architecture, String os, Linker linker)
 			throws MojoFailureException {
 		this.log = log;
-		this.logLevel = logLevel;
 		this.repository = repository;
 		this.project = project;
 		this.defaultAOL = NarUtil.getAOL(architecture, os, linker, null);
@@ -169,14 +166,14 @@ public class NarManager {
 	private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
 			Artifact dependency, String aol, String type)
 			throws MojoExecutionException, MojoFailureException {
-		System.err.println("***** " + dependency + " " + aol + " " + type);
+		log.debug("GetNarDependencies for " + dependency + ", aol: " + aol + ", type: " + type);
 		List artifactList = new ArrayList();
 		NarInfo narInfo = getNarInfo(dependency);
 		String[] nars = narInfo.getAttachedNars(aol, type);
 		// FIXME Move this to info....
 		if (nars != null) {
 			for (int j = 0; j < nars.length; j++) {
-				// System.err.println("==== " + nars[j]);
+				log.debug("    Checking: " + nars[j]);
 				if (nars[j].equals(""))
 					continue;
 				String[] nar = nars[j].split(":", 5);
@@ -225,7 +222,7 @@ public class NarManager {
 		try {
 			jar = new JarFile(file);
 			NarInfo info = new NarInfo(dependency.getGroupId(), dependency
-					.getArtifactId(), dependency.getVersion());
+					.getArtifactId(), dependency.getVersion(), log);
 			if (!info.exists(jar))
 				return null;
 			info.read(jar);
@@ -271,7 +268,7 @@ public class NarManager {
 		for (Iterator i = dependencies.iterator(); i.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
 			try {
-				// System.err.println("Resolving " + dependency);
+				log.debug("Resolving " + dependency);
 				resolver.resolve(dependency, remoteRepositories, repository);
 			} catch (ArtifactNotFoundException e) {
 				String message = "nar not found " + dependency.getId();
@@ -290,7 +287,7 @@ public class NarManager {
 		List dependencies = getAttachedNarDependencies(narArtifacts, classifier);
 		for (Iterator i = dependencies.iterator(); i.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
-			// System.err.println("Unpack " + dependency);
+			log.debug("Unpack " + dependency);
 			File file = getNarFile(dependency);
 			File narLocation = new File(file.getParentFile(), "nar");
 			File flagFile = new File(narLocation, FileUtils.basename(file

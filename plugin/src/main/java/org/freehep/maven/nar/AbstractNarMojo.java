@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -10,7 +10,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractNarMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractNarMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
     
@@ -20,13 +20,6 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
      * @parameter expression="${nar.skip}" default-value="false"
      */
     private boolean skip;
-    
-    /**
-     * Level of logging messages, 0 is minimum.
-     * 
-     * @parameter expression="${nar.logLevel}" default-value="0"
-     */
-    private int logLevel;
     
     /**
      * The Architecture for the nar,
@@ -94,10 +87,6 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
     
     protected boolean shouldSkip() {
     	return skip;
-    }
-    
-    protected int getLogLevel() {
-    	return logLevel;
     }
     
     protected String getArchitecture() {

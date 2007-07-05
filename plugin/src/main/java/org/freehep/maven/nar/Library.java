@@ -1,13 +1,16 @@
 // Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Sets up a library to create
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
-public class Library {
+public class Library implements Executable {
 
 	public static final String STATIC = "static";
 	public static final String SHARED = "shared";
@@ -17,7 +20,7 @@ public class Library {
 
 	/**
 	 * Type of the library to generate. Possible choices are: "plugin",
-	 * "shared", "static" or "jni". Defaults to "shared".
+	 * "shared", "static", "jni" or "executable". Defaults to "shared".
 	 * 
 	 * @parameter expression=""
 	 */
@@ -38,6 +41,23 @@ public class Library {
 	 */
 	protected String packageName = null;
 	
+	/**
+     * When true and if type is "executable" run this executable.
+     * Defaults to false;
+   	 * 
+	 * @parameter expression=""
+	 */
+	protected boolean run=false;
+	
+	/**
+	 * Arguments to be used for running this executable.
+	 * Defaults to empty list. This option is 
+	 * only used if run=true and type=executable.
+	 * 
+	 * @parameter expression=""
+	 */
+    protected List/*<String>*/ args = new ArrayList();
+
 	public String getType() {
 		return type;
 	}
@@ -49,4 +69,12 @@ public class Library {
 	public String getPackageName() {
 		return packageName;
 	}
+	
+	public boolean shouldRun() {
+		return run;
+	}
+	
+    public List/*<String>*/ getArgs() {
+    	return args;
+    }	
 }

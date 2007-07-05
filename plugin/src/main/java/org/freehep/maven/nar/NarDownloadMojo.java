@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005-2006.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * @requiresProject
  * @requiresDependencyResolution
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarDownloadMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarDownloadMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarDownloadMojo extends AbstractDependencyMojo {
 
@@ -48,7 +48,7 @@ public class NarDownloadMojo extends AbstractDependencyMojo {
 	private List classifiers;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		getLog().info("AOL: "+getAOL());
+		getLog().info("Using AOL: "+getAOL());
 		
 		if (shouldSkip()) {
     		getLog().info("***********************************************************************");

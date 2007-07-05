@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java fc7c0e9b39c8 2007/07/04 16:50:32 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -44,7 +44,6 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
     private void createTest(Project antProject, Test test)
             throws MojoExecutionException, MojoFailureException {
         String type = "test";
-//        System.err.println("TESTING " + test.getName());
 
         // configure task
         CCTask task = new CCTask();
@@ -63,7 +62,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // outFile
         File outFile = new File(outDir, test.getName());
-        if (getLogLevel() >= LOG_LEVEL_INFO) getLog().info("NAR - output: '" + outFile + "'");
+        getLog().debug("NAR - output: '" + outFile + "'");
         task.setOutfile(outFile);
 
         // object directory
@@ -94,7 +93,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
         // add java include paths
         // FIXME, get rid of task
-        getJava().addIncludePaths(getMavenProject(), task, this, type);
+        getJava().addIncludePaths(getMavenProject(), task, this, type, getLog());
 
         // add dependency include paths
         for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i.hasNext();) {
@@ -176,7 +175,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         // Add JVM to linker
         // FIXME, use "this".
         getJava().addRuntime(antProject, task,
-                getJavaHome(), getOS(), getAOLKey() + "java.");
+                getJavaHome(), getOS(), getAOLKey() + "java.", getLog());
 
         // execute
         try {

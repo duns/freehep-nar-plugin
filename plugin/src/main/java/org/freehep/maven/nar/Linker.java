@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
  * Linker tag
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class Linker {
 
@@ -60,6 +60,14 @@ public class Linker {
      * @parameter expression=""
      */
     private List options;
+
+    /**
+     * Clears default options
+	 *
+     * @parameter expression="" default-value="false"
+     * @required
+	 */
+    private boolean clearDefaultOptions;
 
     /**
      * (Windows only, Shared libs only) list of definition files.
@@ -139,7 +147,9 @@ public class Linker {
                 arg.setValue((String)i.next());
                 linker.addConfiguredLinkerArg(arg);
             }
-        } else {
+        }
+        
+        if (!clearDefaultOptions) {
             String options = NarUtil.getDefaults().getProperty(prefix+"options");
             if (options != null) {
                 String[] option = options.split(" ");

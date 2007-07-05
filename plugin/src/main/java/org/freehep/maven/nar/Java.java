@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005-2006.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.File;
@@ -12,6 +12,7 @@ import net.sf.antcontrib.cpptasks.types.LibrarySet;
 import net.sf.antcontrib.cpptasks.types.LinkerArgument;
 
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.Project;
 
@@ -19,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class Java {
 
@@ -64,7 +65,7 @@ public class Java {
     private String runtime = "jvm";
     
     // FIXME, NarCompileMojo, change to AbstractCompileMojo 
-    public void addIncludePaths(MavenProject mavenProject, CCTask task, AbstractCompileMojo mojo, String outType) throws MojoFailureException {
+    public void addIncludePaths(MavenProject mavenProject, CCTask task, AbstractCompileMojo mojo, String outType, Log log) throws MojoFailureException {
         if (include || mojo.getJavah().getJniDirectory(mavenProject).exists()) {
             if (includePaths != null) {
                 for (Iterator i=includePaths.iterator(); i.hasNext(); ) {
@@ -84,7 +85,7 @@ public class Java {
         }
     }
     
-    public void addRuntime(Project antProject, CCTask task, File javaHome, String os, String prefix) throws MojoFailureException {
+    public void addRuntime(Project antProject, CCTask task, File javaHome, String os, String prefix, Log log) throws MojoFailureException {
         if (link) {
             if (os.equals("MacOSX")) {
                 CommandLineArgument.LocationEnum end = new CommandLineArgument.LocationEnum();
@@ -107,7 +108,7 @@ public class Java {
                         throw new MojoFailureException("NAR: Please specify a <RuntimeDirectory> as part of <Java>");
                     }
                 }
-                System.err.println("**"+runtimeDirectory);
+                log.debug("Using Java Rumtime Directory: "+runtimeDirectory);
                 
                 LibrarySet libset = new LibrarySet();
                 libset.setProject(antProject);

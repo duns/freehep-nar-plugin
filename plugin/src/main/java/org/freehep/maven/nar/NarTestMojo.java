@@ -1,4 +1,4 @@
-// Copyright FreeHEP, 2005.
+// Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
 import java.io.BufferedReader;
@@ -7,22 +7,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.tools.ant.Project;
+import org.apache.maven.project.MavenProject;
 
 /**
- * Tests NAR files. Runs Native Tests
+ * Tests NAR files. Runs Native Tests and executables if produced.
  * 
  * @goal nar-test
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java 409b2cb0c2ba 2007/07/04 16:51:43 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -30,56 +33,117 @@ public class NarTestMojo extends AbstractCompileMojo {
 		if (shouldSkip())
 			return;
 
+		// run all tests
 		for (Iterator i = getTests().iterator(); i.hasNext();) {
-			runTest(getAntProject(), (Test) i.next());
+			runTest((Test) i.next());
+		}
+
+		for (Iterator i = getLibraries().iterator(); i.hasNext();) {
+			runExecutable((Library) i.next());
 		}
 	}
 
-	private void runTest(Project antProject, Test test)
-			throws MojoExecutionException, MojoFailureException {
-        // FIXME should move to NarTestMojo
-        // run if requested
-        if (test.shouldRun()) {
-        	String name = getTargetDirectory()+"/bin/"+getAOL()+"/"+test.getLink()+"/"+test.getName();
-            getLog().info( "Running "+name);
-            // FIXME do something with return...
-            int result = runCommand(generateCommandLine(name, getLog()), generateEnvironment(test, getLog()), getLog());
-            if (result != 0) throw new MojoFailureException("Test "+name+" failed with exit code: "+result);
-        }
+	private void runTest(Test test) throws MojoExecutionException,
+			MojoFailureException {
+		// run if requested
+		if (test.shouldRun()) {
+			String name = "target/test-nar/bin/" + getAOL() + "/"
+					+ test.getLink() + "/" + test.getName();
+			getLog().info("Running " + name);
+			int result = runCommand(generateCommandLine(getMavenProject()
+					.getBasedir()
+					+ "/" + name, test, getLog()), generateEnvironment(test,
+					getLog()), getLog());
+			if (result != 0)
+				throw new MojoFailureException("Test " + name
+						+ " failed with exit code: " + result);
+		}
 	}
 
-    protected File getTargetDirectory() {
-        return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
-    }
+	private void runExecutable(Library library) throws MojoExecutionException,
+			MojoFailureException {
+		if (library.getType().equals(Library.EXECUTABLE) && library.shouldRun()) {
+			MavenProject project = getMavenProject();
+			String name = "target/nar/bin/" + getAOL() + "/"
+					+ project.getArtifactId();
+			getLog().info("Running " + name);
+			int result = runCommand(generateCommandLine(project.getBasedir()
+					+ "/" + name, library, getLog()), generateEnvironment(
+					library, getLog()), getLog());
+			if (result != 0)
+				throw new MojoFailureException("Test " + name
+						+ " failed with exit code: " + result);
+		}
+	}
 
-	private String[] generateCommandLine(String name, Log log)
+	protected File getTargetDirectory() {
+		return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
+	}
+
+	private String[] generateCommandLine(String name, Executable exec, Log log)
 			throws MojoExecutionException {
 
 		List cmdLine = new ArrayList();
 
 		cmdLine.add(name);
 
-		log.debug(cmdLine.toString());
+		cmdLine.addAll(exec.getArgs());
+
+		log.debug("CommandLine: " + cmdLine.toString());
 
 		return (String[]) cmdLine.toArray(new String[cmdLine.size()]);
 	}
 
-	private String[] generateEnvironment(Test test, Log log) throws MojoFailureException {
+	private String[] generateEnvironment(Executable exec, Log log)
+			throws MojoExecutionException, MojoFailureException {
 		List env = new ArrayList();
 
-		// FIXME, this should run over all produced libraries' types
-		// FIXME, path separator and platform
-		// FIXME, DY?
-		if (test.getLink().equals(Library.SHARED)) {
-		    // link to our own library
-			env.add("DYLD_LIBRARY_PATH="+getTargetDirectory()+"/"+"lib/"+getAOL()+"/"+test.getLink());
+		Set/*<File>*/ sharedPaths = new HashSet();
+		
+		// add all shared libraries of this package
+		for (Iterator i=getLibraries().iterator(); i.hasNext(); ) {
+			Library lib = (Library)i.next();
+			if (lib.getType().equals(Library.SHARED)) {
+				sharedPaths.add(new File(getMavenProject().getBasedir(), "target/nar/lib/"+getAOL()+"/"+lib.getType()));
+			}
+		}
+
+		// add dependent shared libraries
+		String classifier = getAOL()+"-shared";
+		List narArtifacts = getNarManager().getNarDependencies("compile");
+		List dependencies = getNarManager().getAttachedNarDependencies(
+				narArtifacts, classifier);
+		for (Iterator d = dependencies.iterator(); d.hasNext();) {
+			Artifact dependency = (Artifact) d.next();
+			getLog().debug("Looking for dependency " + dependency);
+
+			// FIXME reported to maven developer list, isSnapshot
+			// changes behaviour
+			// of getBaseVersion, called in pathOf.
+			if (dependency.isSnapshot())
+				;
+
+			File libDir = new File(getLocalRepository().pathOf(dependency));
+			libDir = new File(getLocalRepository().getBasedir(), libDir
+					.getParent());
+			libDir = new File(libDir, "nar/lib/"+getAOL()+"/shared");
+			sharedPaths.add(libDir);
 		}
 		
-		// FIXME add dependent libs
+		// set environment
+		if (sharedPaths.size() > 0) {
+			String sharedPath = "";
+			for (Iterator i=sharedPaths.iterator(); i.hasNext(); ) {
+				sharedPath += ((File)i.next()).getPath();
+				if (i.hasNext()) sharedPath += File.pathSeparator;
+			}
+			
+			String sharedPathName = getOS().equals("MacOSX") ? "DYLD_LIBRARY_PATH" : getOS().startsWith("Windows") ? "PATH" : "LD_LIBRARY_PATH";
+			env.add(sharedPathName+"="+sharedPath);
+		}
 		
-		log.info("Test Environment:");
-		log.info(env.toString());
-		
+		log.debug("Environment:" + env.toString());
+
 		return (String[]) env.toArray(new String[env.size()]);
 	}
 
@@ -102,7 +166,7 @@ public class NarTestMojo extends AbstractCompileMojo {
 					e);
 		}
 	}
-	
+
 	class StreamGobbler extends Thread {
 		InputStream is;
 		boolean error;

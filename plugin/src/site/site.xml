@@ -47,13 +47,7 @@
       <item name="SVN Repository" href="source-repository.html"/>      
     </menu>
     <menu name="Examples">
-      <item name="HelloWorld JNI" href="HelloWorldJNI.html"/>
-      <item name="HelloWorld Static Library" href="HelloWorldStaticLibrary.html"/>
-      <item name="HelloWorld Static Executable" href="HelloWorldStaticExecutable.html"/>
-<!--   
-      <item name="Static Library" href=".html"/>
-      <item name="Executable" href=".html"/>
--->
+      <item name="HelloWorld" href="HelloWorld.html"/>
     </menu>
     <menu name="Other Information">
       <item name="Maven and other languages" href="http://docs.codehaus.org/display/MAVEN/Support+for+other+languages"/>

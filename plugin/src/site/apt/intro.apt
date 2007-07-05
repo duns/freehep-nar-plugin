@@ -189,7 +189,7 @@ skipped.>>
 
 * {nar-test}
            
-	<<TBD>>
+	Runs any native tests as well as any executables that have been produced.
                 
 * {nar-package}                
    
