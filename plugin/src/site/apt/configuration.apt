@@ -17,7 +17,6 @@ NAR Configuration
   <aol/>
   <targetDirectory/>
   <output/>
-  <type/>
   <failOnError/>
   <runtime/>
   <libtool/>
@@ -177,10 +176,6 @@ Defaults to "${project.build.directory}/test-nar" for "compile-test" goal
 
 	Name of the output. Default is ${project.artifactId}-${project.version}.
 	
-** type
-
-	NOT USED?
-
 ** failOnError
 
 	Fail on compilation/linking error. Default is true.
