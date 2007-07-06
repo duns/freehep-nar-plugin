@@ -5,8 +5,8 @@
     <version>8</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.freehep</groupId>
-  <artifactId>freehep-nar</artifactId>
+  <groupId>org.freehep.freehep-nar-plugin</groupId>
+  <artifactId>pom</artifactId>
   <packaging>pom</packaging>
   <name>FreeHEP Maven Native Archive System</name>
   <version>1-SNAPSHOT</version>
