@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -153,7 +153,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				if (!binding.equals(Library.JNI)) {
 					File dir = new File(getNarManager().getNarFile(dependency)
 							.getParentFile(), "nar/lib/" + aol + "/" + binding);
-					getLog().debug("Looking Library Directory: " + dir);
+					getLog().debug("Looking for Library Directory: " + dir);
 					if (dir.exists()) {
 						LibrarySet libSet = new LibrarySet();
 						libSet.setProject(antProject);
@@ -165,7 +165,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 						libSet.setDir(dir);
 						task.addLibset(libSet);
 					} else {
-						throw new MojoFailureException("LIB DIR " + dir
+						getLog().debug("Library Directory " + dir
 								+ " does NOT exist.");
 					}
 

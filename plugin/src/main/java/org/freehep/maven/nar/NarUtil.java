@@ -20,7 +20,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
  */
 public class NarUtil {
 
@@ -46,9 +46,9 @@ public class NarUtil {
 		if (os == null) {
 			os = System.getProperty("os.name");
 			if (os.startsWith("Windows"))
-				os = "Windows";
+				os = OS.WINDOWS;
 			if (os.equals("Mac OS X"))
-				os = "MacOSX";
+				os = OS.MACOSX;
 		}
 		return os;
 	}
@@ -122,7 +122,7 @@ public class NarUtil {
 
 			StreamConsumer consumer = new StreamConsumer() {
 				public void consumeLine(String line) {
-					log.info(line);
+					log.debug(line);
 				}
 			};
 
@@ -161,7 +161,7 @@ public class NarUtil {
 
 			StreamConsumer consumer = new StreamConsumer() {
 				public void consumeLine(String line) {
-					log.info(line);
+					log.debug(line);
 				}
 			};
 

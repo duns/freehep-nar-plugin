@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
  */
 public class Java {
 
@@ -87,7 +87,7 @@ public class Java {
     
     public void addRuntime(Project antProject, CCTask task, File javaHome, String os, String prefix, Log log) throws MojoFailureException {
         if (link) {
-            if (os.equals("MacOSX")) {
+            if (os.equals(OS.MACOSX)) {
                 CommandLineArgument.LocationEnum end = new CommandLineArgument.LocationEnum();
                 end.setValue("end");
                 

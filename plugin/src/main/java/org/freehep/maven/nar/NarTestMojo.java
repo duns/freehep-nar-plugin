@@ -25,7 +25,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -138,7 +138,7 @@ public class NarTestMojo extends AbstractCompileMojo {
 				if (i.hasNext()) sharedPath += File.pathSeparator;
 			}
 			
-			String sharedPathName = getOS().equals("MacOSX") ? "DYLD_LIBRARY_PATH" : getOS().startsWith("Windows") ? "PATH" : "LD_LIBRARY_PATH";
+			String sharedPathName = getOS().equals(OS.MACOSX) ? "DYLD_LIBRARY_PATH" : getOS().startsWith("Windows") ? "PATH" : "LD_LIBRARY_PATH";
 			env.add(sharedPathName+"="+sharedPath);
 		}
 		
