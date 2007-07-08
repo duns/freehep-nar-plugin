@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java e0a8d5a20fb5 2007/07/08 13:03:48 duns $
  */
 public abstract class Compiler {
 
@@ -98,7 +98,7 @@ public abstract class Compiler {
 	private String optimize = "none";
 
 	/**
-	 * Enables or disables generation of multithreaded code. Default value:
+	 * Enables or disables generation of multi-threaded code. Default value:
 	 * false, except on Windows.
 	 * 
 	 * @parameter expression="" default-value="false"
@@ -368,18 +368,23 @@ public abstract class Compiler {
 			}
 		}
 
-		// Add default fileset
-		ConditionalFileSet fileSet = new ConditionalFileSet();
-		fileSet.setProject(mojo.getAntProject());
-		fileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
-		fileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
-		fileSet.setDir(getSourceDirectory(mojo.getMavenProject(), type));
-		compiler.addFileset(fileSet);
-
+		// Add default fileset (if exists)
+		File srcDir = getSourceDirectory(mojo.getMavenProject(), type);
+		mojo.getLog().debug("Checking for existence of "+getName()+" sourceDirectory: "+srcDir);
+		if (srcDir.exists()) {
+			ConditionalFileSet fileSet = new ConditionalFileSet();
+			fileSet.setProject(mojo.getAntProject());
+			fileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
+			fileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
+			fileSet.setDir(srcDir);
+			compiler.addFileset(fileSet);
+		}
+		
 		// add other sources
 		for (Iterator i = mojo.getMavenProject().getCompileSourceRoots()
 				.iterator(); i.hasNext();) {
 			File dir = new File((String) i.next());
+			mojo.getLog().debug("Checking for existence of "+getName()+" sourceCompileRoot: "+dir);
 			if (dir.exists()) {
 				ConditionalFileSet otherFileSet = new ConditionalFileSet();
 				otherFileSet.setProject(mojo.getAntProject());
