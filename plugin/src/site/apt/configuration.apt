@@ -294,11 +294,11 @@ the command line for compatible compilers/linkers. Default is false.
     
 ** includes
 
-	Include patterns for sources.
+	Include patterns for sources, relative to sourceDirectory in "ant" style.
 
 ** excludes
       
-	Exclude patterns for sources. 
+	Exclude patterns for sources, relative to sourceDirectory in "ant" style. 
     
 ** debug
     
@@ -341,7 +341,7 @@ the command line for compatible compilers/linkers. Default is false.
 
 ** includePaths
 
-	Include Paths.
+	Include Paths, relative to ${baseDir}.
     Defaults to "${sourceDirectory}/include"
     
 ** systemIncludePaths
