@@ -10,7 +10,7 @@ import org.apache.tools.ant.Project;
  * Logger to connect the Ant logging to the Maven logging.
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java cf4f977f2a86 2007/07/09 03:50:23 duns $
  */
 public class NarLogger implements BuildListener {
     
@@ -54,7 +54,7 @@ public class NarLogger implements BuildListener {
                 log.warn(msg);
                 break;    
             case Project.MSG_INFO:
-            	if (msg.indexOf("total files to be compiled.") < 0) {
+            	if ((msg.indexOf("files were compiled") < 0) && (msg.indexOf("Linking...") < 0)) {
             		log.debug(msg);
             	} else {
             		log.info(msg);
