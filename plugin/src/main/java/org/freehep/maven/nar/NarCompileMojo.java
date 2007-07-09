@@ -2,7 +2,6 @@
 package org.freehep.maven.nar;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -25,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java cf4f977f2a86 2007/07/09 03:50:23 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 

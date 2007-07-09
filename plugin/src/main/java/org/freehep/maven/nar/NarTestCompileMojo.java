@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -57,7 +57,6 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
         // outDir
         File outDir = new File(getTargetDirectory(), "bin");
         outDir = new File(outDir, getAOL());
-        outDir = new File(outDir, test.getLink());
         outDir.mkdirs();
 
         // outFile

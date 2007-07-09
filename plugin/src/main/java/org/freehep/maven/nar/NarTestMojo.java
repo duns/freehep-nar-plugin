@@ -25,7 +25,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -47,8 +47,7 @@ public class NarTestMojo extends AbstractCompileMojo {
 			MojoFailureException {
 		// run if requested
 		if (test.shouldRun()) {
-			String name = "target/test-nar/bin/" + getAOL() + "/"
-					+ test.getLink() + "/" + test.getName();
+			String name = "target/test-nar/bin/" + getAOL() + "/" + test.getName();
 			getLog().info("Running " + name);
 			int result = runCommand(generateCommandLine(getMavenProject()
 					.getBasedir()

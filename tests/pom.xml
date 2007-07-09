@@ -32,6 +32,18 @@
       <url>scpexe://svn.freehep.org/nfs/slac/g/jas/maven2</url>
     </repository>
   </distributionManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.freehep</groupId>
+          <artifactId>freehep-nar-plugin</artifactId>
+          <version>2.0-alpha-9-SNAPSHOT</version>
+          <extensions>true</extensions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <modules>
     <module>helloworldjni</module>
     <module>helloworldstaticjni</module>
