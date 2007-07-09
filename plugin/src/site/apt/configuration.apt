@@ -143,54 +143,53 @@ NAR Configuration
 </configuration>
 +--
 
-* configuration
 
-** arch
+* {arch}
 
 	The Architecture for which we produce the native library. Examples are
 i386, x86, ppc, ppc64, etc... Default is the system property os.arch.
 
-** os
+* {os}
 
 	The Operating System  for which we produce the native library. Examples
 are Windows, Linux, MacOSX, SunOS, ... Default is derived from os.name, without spaces and
 in the case of Windows generalized.
 
-** javaHome
+* {javaHome}
 
 	The location of the Java installation. Default is derived from the system
 property java.home, corrected for MacOSX.
 
-** aol
+* {aol}
 
 	The Architecture-OS-Linker qualifier. Default is composed from the arch,
 os and linker.name value.
 
-** targetDirectory
+* {targetDirectory}
 
 	Directory for all NAR related output.
 Defaults to "${project.build.directory}/nar" for "compile" goal
 Defaults to "${project.build.directory}/test-nar" for "compile-test" goal
 
-** output
+* {output}
 
 	Name of the output. Default is ${project.artifactId}-${project.version}.
 	
-** failOnError
+* {failOnError}
 
 	Fail on compilation/linking error. Default is true.
 
-** runtime
+* {runtime}
 
 	Sets the type of runtime library, possible values "dynamic", "static".
 Default is dynamic.
 
-** libtool
+* {libtool}
 
 	Set use of libtool. If set to true, the "libtool " will be prepended to 
 the command line for compatible compilers/linkers. Default is false.
 
-* libraries
+* {libraries}
 
 	Section to specify what type or libraries to create. For each library you may specify:
 	
@@ -211,7 +210,7 @@ the command line for compatible compilers/linkers. Default is false.
 	
 	[]
 
-* tests
+* {tests}
 
 	Section to specify which test executables should be created. For each test you may specify:
 	
@@ -225,38 +224,38 @@ the command line for compatible compilers/linkers. Default is false.
 	
 	[]
 
-* linker
+* {linker}
 
 	Section to specify parameters for the linker.
 
-** name
+** {linker name}
 
 	The Linker. Some choices are: "msvc", "g++", "CC", "icpc", ...
     Default is Architecture OS specific.
 
-** incremental
+** {linker incremental}
 
 	Enables incremental linking. Default is false.
 
-** map
+** {linker map}
 
 	Enables the production of a map file. Default is false.
 
-** options
+** {linker options}
 
 	Additional options for the linker.
     Defaults to AOL specific values.
 
-** clearDefaultOptions
+** {linker clearDefaultOptions}
 
 	Clear options specified in AOL properties.
 
-** definitions
+** {linker definitions}
 
    	(Windows only, Shared libs only) list of definition files.
     Defaults to none.
 
-** libs
+** {linker libs}
 
 	Adds libraries to the linker. For each lib you have to specify:
     
@@ -268,7 +267,7 @@ the command line for compatible compilers/linkers. Default is false.
 	
 	[]
   
-** sysLibs
+** {linker sysLibs}
 
 	Adds system libraries to the linker. For each syslib you have to specify:
 	
@@ -279,150 +278,150 @@ the command line for compatible compilers/linkers. Default is false.
   	[]
   	 
 
-* cpp
+* {cpp}
 
 	Section to specify parameters for the c++ compiler.
 
-** name
+** {cpp name}
 
 	The name of the compiler. Some choices are: "msvc", "g++", "gcc", "CC", "cc", "icc", "icpc", ...
     Default is AOL specific.
     
-** sourceDirectory
+** {cpp sourceDirectory}
     
     Source directory for native files
     
-** includes
+** {cpp includes}
 
 	Include patterns for sources, relative to sourceDirectory in "ant" style.
 
-** excludes
+** {cpp excludes}
       
 	Exclude patterns for sources, relative to sourceDirectory in "ant" style. 
     
-** debug
+** {cpp debug}
     
     Compile with debug information. Default is false.
     
-** exceptions
+** {cpp exceptions}
 
 	Enables generation of exception handling code. Default is true.
     
-** rtti
+** {cpp rtti}
 
 	Enables run-time type information. Default is true.
     
-** optimize
+** {cpp optimize}
 
 	Sets optimization.
   	Possible choices are: "none", "size", "minimal", "speed", "full", "aggressive", "extreme", "unsafe".
   	Default is none.
    
-** multiThreaded
+** {cpp  multiThreaded}
    
     Enables or disables generation of multithreaded code.
     Default value: false, except on Windows.
    
-** defines
+** {cpp defines}
 
 	Additional list of defines.
 
-** clearDefaultDefines
+** {cpp clearDefaultDefines}
     
     Clear the defines specified in AOL properties.
     
-** undefines
+** {cpp undefines}
 
 	Additional list of undefines.
      
-** clearDefaultUndefines
+** {cpp clearDefaultUndefines}
     
 	Clear undefines specified in AOL properties.
 
-** includePaths
+** {cpp includePaths}
 
 	Include Paths, relative to ${baseDir}.
     Defaults to "${sourceDirectory}/include"
     
-** systemIncludePaths
+** {cpp systemIncludePaths}
 
 	System Include Paths, which are added at the end of all include paths
     
-** options
+** {cpp options}
 
 	Additional options for the C++ compiler. Some of these options can be set by specific tags (debug, rtti, ...).
     Defaults to AOL specific values.
       
-** clearDefaultOptions
+** {cpp clearDefaultOptions}
 
 	Clear options specified in AOL properties.
 	
-* c
+* {c}
 
 	Same definitions as for \<cpp\>
 
 
-* fortran
+* {fortran}
 
 	Same definitions as for \<cpp\>
 
 
-* java
+* {java}
 
 	Section to specify parameters for java
 
-** include
+** {java include}
 
 	Add Java includes to includepath. Default is false.
 
-** includePaths
+** {java includePaths}
 
 	List of Java Include Paths, relative to javaHome.
     Defaults to: "javaHome/include" and "javaHome/include/os-specific".
 
-** link
+** {java link}
 
 	Add Java Runtime to linker. Default is false.
 
-** runtimeDirectory
+** {java runtimeDirectory}
 
 	Relative path from javaHome to the java runtime to link with.
     Defaults to AOL specific value.
 
-** runtime
+** {java runtime}
 
 	Name of the runtime. Default is jvm.
 
-* javah
+* {javah}
 
 	Section to specify parameters for javah
 
-** name
+** {javah name}
 
 	Javah command to run.
 
-** bootClassPaths
+** {javah bootClassPaths}
 
 	List of boot class paths. By default none.
 
-** classPaths
+** {javah classPaths}
 
 	List of classpaths. By default the classDirectory directory is included and all dependent classes.
 
-** jniDirectory
+** {javah jniDirectory}
 
 	The target directory into which to generate the output.
 
-** classDirectory
+** {javah classDirectory}
 
 	The class directory to scan for class files with native interfaces.
 
-** includes
+** {javah includes}
 
-	The set of files/patterns to include. Defaults to "**/*.class"
+	The set of files/patterns to include, relative to classDirectory/sourceDirectory. Defaults to "**/*.class"
 
-** excludes
+** {javah excludes}
 
-	A list of exclusion filters. Defaults to none.
+	A list of exclusion filters, relative to classDirectory/sourceDirectory. Defaults to none.
 	
 
