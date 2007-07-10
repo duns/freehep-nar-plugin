@@ -20,14 +20,13 @@ import net.sf.antcontrib.cpptasks.types.DefineSet;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java e0a8d5a20fb5 2007/07/08 13:03:48 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 3ac1d2951571 2007/07/10 21:53:48 duns $
  */
 public abstract class Compiler {
 
@@ -370,21 +369,29 @@ public abstract class Compiler {
 
 		// Add default fileset (if exists)
 		File srcDir = getSourceDirectory(mojo.getMavenProject(), type);
-		mojo.getLog().debug("Checking for existence of "+getName()+" sourceDirectory: "+srcDir);
+		mojo.getLog().debug(
+				"Checking for existence of " + getName() + " sourceDirectory: "
+						+ srcDir);
 		if (srcDir.exists()) {
 			ConditionalFileSet fileSet = new ConditionalFileSet();
 			fileSet.setProject(mojo.getAntProject());
-			fileSet.setIncludes(StringUtils.join(finalIncludes.iterator(), ","));
-			fileSet.setExcludes(StringUtils.join(finalExcludes.iterator(), ","));
+			fileSet
+					.setIncludes(StringUtils
+							.join(finalIncludes.iterator(), ","));
+			fileSet
+					.setExcludes(StringUtils
+							.join(finalExcludes.iterator(), ","));
 			fileSet.setDir(srcDir);
 			compiler.addFileset(fileSet);
 		}
-		
+
 		// add other sources
 		for (Iterator i = mojo.getMavenProject().getCompileSourceRoots()
 				.iterator(); i.hasNext();) {
 			File dir = new File((String) i.next());
-			mojo.getLog().debug("Checking for existence of "+getName()+" sourceCompileRoot: "+dir);
+			mojo.getLog().debug(
+					"Checking for existence of " + getName()
+							+ " sourceCompileRoot: " + dir);
 			if (dir.exists()) {
 				ConditionalFileSet otherFileSet = new ConditionalFileSet();
 				otherFileSet.setProject(mojo.getAntProject());
@@ -403,47 +410,12 @@ public abstract class Compiler {
 
 	public void copyIncludeFiles(MavenProject mavenProject, File targetDirectory)
 			throws IOException {
-		String defaultExcludes = "**/*~,**/#*#,**/.#*,**/%*%,**/._*,";
-		defaultExcludes += "**/CVS,**/CVS/**,**/.cvsignore,";
-		defaultExcludes += "**/SCCS,**/SCCS/**,**/vssver.scc,";
-		defaultExcludes += "**/.svn,**/.svn/**,**/.DS_Store";
 		for (Iterator i = getIncludePaths(mavenProject, "dummy").iterator(); i
 				.hasNext();) {
 			File path = new File((String) i.next());
 			if (path.exists()) {
-				copyDirectoryStructure(path, targetDirectory, defaultExcludes);
-			}
-		}
-	}
-
-	private static void copyDirectoryStructure(File sourceDirectory,
-			File destinationDirectory, String excludes) throws IOException {
-		if (!sourceDirectory.exists()) {
-			throw new IOException("Source directory doesn't exists ("
-					+ sourceDirectory.getAbsolutePath() + ").");
-		}
-
-		List files = FileUtils.getFiles(sourceDirectory, null, excludes);
-		String sourcePath = sourceDirectory.getAbsolutePath();
-
-		for (Iterator i = files.iterator(); i.hasNext();) {
-			File file = (File) i.next();
-			String dest = file.getAbsolutePath();
-			dest = dest.substring(sourcePath.length() + 1);
-			File destination = new File(destinationDirectory, dest);
-			if (file.isFile()) {
-				destination = destination.getParentFile();
-				FileUtils.copyFileToDirectory(file, destination);
-			} else if (file.isDirectory()) {
-				if (!destination.exists() && !destination.mkdirs()) {
-					throw new IOException(
-							"Could not create destination directory '"
-									+ destination.getAbsolutePath() + "'.");
-				}
-				copyDirectoryStructure(file, destination, excludes);
-			} else {
-				throw new IOException("Unknown file type: "
-						+ file.getAbsolutePath());
+				NarUtil.copyDirectoryStructure(path, targetDirectory, null,
+						NarUtil.DEFAULT_EXCLUDES);
 			}
 		}
 	}

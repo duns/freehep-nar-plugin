@@ -3,10 +3,14 @@ package org.freehep.maven.nar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.SelectorUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Copies any resources, including AOL specific distributions, to the target
@@ -16,7 +20,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase process-resources
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 113f3bde20c0 2007/07/10 19:56:39 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 3ac1d2951571 2007/07/10 21:53:48 duns $
  */
 public class NarResourcesMojo extends AbstractNarMojo {
 
@@ -36,29 +40,50 @@ public class NarResourcesMojo extends AbstractNarMojo {
 		if (aolDir.exists()) {
 			String[] aols = aolDir.list();
 			for (int i = 0; i < aols.length; i++) {
-				copyResources(new File(aolDir, aols[i]), aols[i]);
+				boolean ignore = false;
+				for (Iterator j = FileUtils.getDefaultExcludesAsList()
+						.iterator(); j.hasNext();) {
+					if (SelectorUtils.matchPath((String) j.next(), aols[i])) {
+						ignore = true;
+						break;
+					}
+				}
+				if (!ignore) {
+					getLog().info("" + aols[i]);
+					copyResources(new File(aolDir, aols[i]));
+				}
 			}
 		}
 	}
 
-	private void copyResources(File aolDir, String aol) throws MojoExecutionException {
+	private void copyResources(File aolDir)
+			throws MojoExecutionException, MojoFailureException {
+		String aol = aolDir.getName();
 		getLog().info("Copying resources for " + aol);
 		try {
-			// include
+			// copy headers
 			File includeDir = new File(aolDir, "include");
 			if (includeDir.exists()) {
 				File includeDstDir = new File(getTargetDirectory(), "include");
-				// FIXME do not include .svn files
-				FileUtils.copyDirectoryStructure(includeDir, includeDstDir);
+				NarUtil.copyDirectoryStructure(includeDir, includeDstDir, null,
+						NarUtil.DEFAULT_EXCLUDES);
 			}
-			
+
+			// copy libraries
 			File libDir = new File(aolDir, "lib");
 			if (libDir.exists()) {
+				// FIXME, we need all type of libraries.
+				String type = "static";
 				File libDstDir = new File(getTargetDirectory(), "lib");
 				libDstDir = new File(libDstDir, aol);
-				libDstDir = new File(libDstDir, "static");
+				libDstDir = new File(libDstDir, type);
 				// FIXME filter files.
-				FileUtils.copyDirectoryStructure(libDir, libDstDir);
+				String includes = "**/*."
+						+ NarUtil.getDefaults().getProperty(
+								NarUtil.getAOLKey(aol) + "." + type
+										+ ".extension");
+				NarUtil.copyDirectoryStructure(libDir, libDstDir, includes,
+						NarUtil.DEFAULT_EXCLUDES);
 			}
 		} catch (IOException e) {
 			throw new MojoExecutionException("NAR: Could not copy resources", e);

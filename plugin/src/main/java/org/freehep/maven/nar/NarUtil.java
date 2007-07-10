@@ -3,6 +3,8 @@ package org.freehep.maven.nar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -12,6 +14,7 @@ import org.apache.bcel.classfile.JavaClass;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -20,13 +23,11 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 3ac1d2951571 2007/07/10 21:53:48 duns $
  */
 public class NarUtil {
 
 	private static Properties defaults;
-
-	private static String aolKey;
 
 	public static Properties getDefaults() throws MojoFailureException {
 		// read properties file with defaults
@@ -82,12 +83,14 @@ public class NarUtil {
 
 	public static String getAOLKey(String architecture, String os, Linker linker)
 			throws MojoFailureException {
-		if (aolKey == null) {
-			// construct AOL key prefix
-			aolKey = getArchitecture(architecture) + "." + getOS(os) + "."
-					+ getLinkerName(architecture, os, linker) + ".";
-		}
-		return aolKey;
+		// construct AOL key prefix
+		return getArchitecture(architecture) + "." + getOS(os) + "."
+				+ getLinkerName(architecture, os, linker) + ".";
+	}
+	
+	public static String getAOLKey(String aol) {
+		// FIXME, this may not always work correctly
+		return replace("-", ".", aol);
 	}
 
 	public static File getJavaHome(File javaHome, String os) {
@@ -207,8 +210,8 @@ public class NarUtil {
 		base = base.replaceAll("\\\\", "/");
 		filename = filename.replaceAll("\\\\", "/");
 		if (!filename.startsWith(base)) {
-			throw new IllegalArgumentException("Error " + filename + " does not start with "
-					+ base);
+			throw new IllegalArgumentException("Error " + filename
+					+ " does not start with " + base);
 		}
 		String header = filename.substring(base.length() + 1);
 		header = header.replaceAll("/", "_");
@@ -271,5 +274,43 @@ public class NarUtil {
 			}
 		}
 		return sb.toString();
+	}
+
+	public static final String DEFAULT_EXCLUDES = "**/*~,**/#*#,**/.#*,**/%*%,**/._*,"
+			+ "**/CVS,**/CVS/**,**/.cvsignore,"
+			+ "**/SCCS,**/SCCS/**,**/vssver.scc,"
+			+ "**/.svn,**/.svn/**,**/.DS_Store";
+
+	public static void copyDirectoryStructure(File sourceDirectory,
+			File destinationDirectory, String includes, String excludes)
+			throws IOException {
+		if (!sourceDirectory.exists()) {
+			throw new IOException("Source directory doesn't exists ("
+					+ sourceDirectory.getAbsolutePath() + ").");
+		}
+
+		List files = FileUtils.getFiles(sourceDirectory, includes, excludes);
+		String sourcePath = sourceDirectory.getAbsolutePath();
+
+		for (Iterator i = files.iterator(); i.hasNext();) {
+			File file = (File) i.next();
+			String dest = file.getAbsolutePath();
+			dest = dest.substring(sourcePath.length() + 1);
+			File destination = new File(destinationDirectory, dest);
+			if (file.isFile()) {
+				destination = destination.getParentFile();
+				FileUtils.copyFileToDirectory(file, destination);
+			} else if (file.isDirectory()) {
+				if (!destination.exists() && !destination.mkdirs()) {
+					throw new IOException(
+							"Could not create destination directory '"
+									+ destination.getAbsolutePath() + "'.");
+				}
+				copyDirectoryStructure(file, destination, includes, excludes);
+			} else {
+				throw new IOException("Unknown file type: "
+						+ file.getAbsolutePath());
+			}
+		}
 	}
 }
