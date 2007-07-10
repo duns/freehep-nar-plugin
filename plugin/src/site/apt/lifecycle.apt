@@ -18,7 +18,7 @@ standard maven goals) attached to them. The order is left to right, top to botto
 *------------------------+-------------------------------------------+ 
 | process-sources        | <<nar-unpack>>                            |
 *------------------------+-------------------------------------------+ 
-| process-resources      | resources                                 |
+| process-resources      | resources, <<nar-resources>>              |
 *------------------------+-------------------------------------------+ 
 | compile                | compile, <<nar-javah>>                    |
 *------------------------+-------------------------------------------+ 

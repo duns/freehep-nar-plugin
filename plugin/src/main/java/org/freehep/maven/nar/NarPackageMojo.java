@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 113f3bde20c0 2007/07/10 19:56:39 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -33,6 +33,8 @@ public class NarPackageMojo extends AbstractCompileMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
 			return;
+
+		File narDirectory = new File(getOutputDirectory(), "nar");
 
 		NarInfo info = new NarInfo(getMavenProject().getGroupId(),
 				getMavenProject().getArtifactId(), getMavenProject()
@@ -52,8 +54,6 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			// ignored
 		}
 
-		File narDirectory = new File(getOutputDirectory(), "nar");
-
 		// noarch
 		String include = "include";
 		if (new File(narDirectory, include).exists()) {
@@ -67,6 +67,7 @@ public class NarPackageMojo extends AbstractCompileMojo {
 					+ NAR_NO_ARCH);
 		}
 
+		// FIXME this should just scan for nar/lib/<aol>/<type>/ and build every -aol-type.nar
 		String bindingType = null;
 		for (Iterator i = getLibraries().iterator(); i.hasNext();) {
 			Library library = (Library) i.next();
@@ -90,8 +91,7 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			}
 		}
 
-		// FIXME hardcoded JNI as default
-		info.setBinding(null, bindingType != null ? bindingType : Library.JNI);
+		info.setBinding(null, bindingType != null ? bindingType : Library.NONE);
 
 		try {
 			info.writeToFile(propertiesFile);
@@ -128,4 +128,5 @@ public class NarPackageMojo extends AbstractCompileMojo {
 					"Error while creating NAR archive.", e);
 		}
 	}
+
 }

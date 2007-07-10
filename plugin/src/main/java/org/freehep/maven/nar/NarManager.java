@@ -58,7 +58,8 @@ public class NarManager {
 		List narDependencies = new ArrayList();
 		for (Iterator i = getDependencies(scope).iterator(); i.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
-
+			log.debug("Examining artifact for NarInfo: "+dependency);
+			
 			NarInfo narInfo = getNarInfo(dependency);
 			if (narInfo != null) {
 				narDependencies.add(new NarArtifact(dependency, narInfo));
@@ -283,6 +284,11 @@ public class NarManager {
 	public void unpackAttachedNars(List/* <NarArtifacts> */narArtifacts,
 			ArchiverManager manager, String classifier, String os)
 			throws MojoExecutionException, MojoFailureException {
+		log.debug("Unpack called for OS: "+os+", classifier: "+classifier+" for NarArtifacts {");
+		for (Iterator i = narArtifacts.iterator(); i.hasNext(); ) {
+			log.debug("  - "+((NarArtifact)i.next()));
+		}
+		log.debug("}");
 		// FIXME, kludge to get to download the -noarch, based on classifier
 		List dependencies = getAttachedNarDependencies(narArtifacts, classifier);
 		for (Iterator i = dependencies.iterator(); i.hasNext();) {

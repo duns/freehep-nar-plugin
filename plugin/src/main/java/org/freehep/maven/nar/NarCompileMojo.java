@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 113f3bde20c0 2007/07/10 19:56:39 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -120,9 +120,11 @@ public class NarCompileMojo extends AbstractCompileMojo {
 			NarArtifact narDependency = (NarArtifact) i.next();
 			String binding = narDependency.getNarInfo().getBinding(getAOL(),
 					Library.STATIC);
+			getLog().debug("Looking for "+narDependency+" found binding "+binding);
 			if (!binding.equals(Library.JNI)) {
 				File include = new File(getNarManager().getNarFile(
 						narDependency).getParentFile(), "nar/include");
+				getLog().debug("Looking for for directory: "+include);
 				if (include.exists()) {
 					task.createIncludePath().setPath(include.getPath());
 				}

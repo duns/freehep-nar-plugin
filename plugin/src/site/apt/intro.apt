@@ -35,21 +35,23 @@ allows you to build a jar file as well as nar files. The list below shows the se
     
     [[3]] {{{#nar-unpack}nar-unpack}}
     
-    [[4]] {{{#nar-javah}nar-javah}}
+    [[4]] {{{#nar-resources}nar-resources}}
     
-    [[5]] {{{#nar-compile}nar-compile}}
+    [[5]] {{{#nar-javah}nar-javah}}
     
-    [[6]] {{{#nar-testCompile}nar-testCompile}}
+    [[6]] {{{#nar-compile}nar-compile}}
     
-    [[7]] {{{#nar-test}nar-test}}
+    [[7]] {{{#nar-testCompile}nar-testCompile}}
+   
+    [[8]] {{{#nar-test}nar-test}}
     
-    [[8]] {{{#nar-package}nar-package}}
+    [[9]] {{{#nar-package}nar-package}}
     
-    [[9]] {{{#nar-integration-test}nar-integration-test}}
+    [[10]] {{{#nar-integration-test}nar-integration-test}}
     
-    [[10]] {{{#install}install (standard maven goal)}}
+    [[11]] {{{#install}install (standard maven goal)}}
     
-    [[11]] {{{#deploy}deploy (standard maven goal)}}
+    [[12]] {{{#deploy}deploy (standard maven goal)}}
 
 	[]
 	
@@ -95,6 +97,13 @@ class will then end up in this package.
 	Since a nar file is of no use to any native compilation process the nar-unpack goal unpacks the nar into
 the "nar" subdirectory of the local repository. A flag is set not to download and unpack this nar file again, 
 except if it is a SNAPSHOT artifact. <<TBD The actual nar file is deleted to preserve diskspace.>>
+        
+* {nar-resources}
+
+	This is an optional goal. It will take any resources in src/nar/resources and copy them into
+specific areas under target/nar. Resources may include pre-compiled/linked libraries and other 
+shareable items. This goal can be used to create a nar library from a distribution that comes
+with compiled shareable libraries.
                 
 * {nar-javah}
                 

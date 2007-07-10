@@ -15,6 +15,7 @@ NAR Configuration
   <os/>
   <javaHome/>
   <aol/>
+  <resourceDirectory/>
   <targetDirectory/>
   <output/>
   <failOnError/>
@@ -164,6 +165,11 @@ property java.home, corrected for MacOSX.
 
 	The Architecture-OS-Linker qualifier. Default is composed from the arch,
 os and linker.name value.
+
+* {resourceDirectory}
+
+	Directory with NAR related resources. Used by the nar-resources goal, which
+copies resources over to the target area. Defaults to ${basedir}/src/nar/resources.
 
 * {targetDirectory}
 

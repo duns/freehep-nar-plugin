@@ -9,7 +9,8 @@
                     <generate-sources>org.freehep:freehep-nar-plugin:nar-download,
                                       org.freehep:freehep-nar-plugin:nar-system-generate</generate-sources>
                     <process-sources>org.freehep:freehep-nar-plugin:nar-unpack</process-sources>
-                    <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+                    <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources,
+                                       org.freehep:freehep-nar-plugin:nar-resources</process-resources>
                     <compile>org.apache.maven.plugins:maven-compiler-plugin:compile,
                              org.freehep:freehep-nar-plugin:nar-javah</compile>
                     <process-classes>org.freehep:freehep-nar-plugin:nar-compile</process-classes>

@@ -8,7 +8,7 @@ import java.util.List;
  * Sets up a library to create
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java 113f3bde20c0 2007/07/10 19:56:39 duns $
  */
 public class Library implements Executable {
 
@@ -17,6 +17,7 @@ public class Library implements Executable {
 	public static final String EXECUTABLE = "executable";
 	public static final String JNI = "jni";
 	public static final String PLUGIN = "plugin";
+	public static final String NONE = "none";			// no library produced
 
 	/**
 	 * Type of the library to generate. Possible choices are: "plugin",
