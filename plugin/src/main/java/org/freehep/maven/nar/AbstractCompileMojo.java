@@ -6,10 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 
@@ -115,17 +116,17 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
     }
 
     protected C getC() {
-        if (c == null) c = new C();
+        if (c == null) c = new C(this);
         return c;
     }
    
     protected Cpp getCpp() {
-        if (cpp == null) cpp = new Cpp();
+        if (cpp == null) cpp = new Cpp(this);
         return cpp;
     }
    
     protected Fortran getFortran() {
-        if (fortran == null) fortran = new Fortran();
+        if (fortran == null) fortran = new Fortran(this);
         return fortran;
     }
 
@@ -161,12 +162,12 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
     }
 
     protected Javah getJavah() {
-        if (javah == null) javah = new Javah();
+        if (javah == null) javah = new Javah(this);
         return javah;
     }
           
     protected Java getJava() {
-        if (java == null) java = new Java();
+        if (java == null) java = new Java(this);
         return java;
     }
 }

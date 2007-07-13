@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 3ac1d2951571 2007/07/10 21:53:48 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public abstract class Compiler {
 
@@ -165,103 +165,92 @@ public abstract class Compiler {
 	 */
 	private boolean clearDefaultOptions;
 
-	protected File getSourceDirectory(MavenProject mavenProject, String type) {
+	private AbstractCompileMojo mojo;
+
+	protected Compiler(AbstractCompileMojo mojo) {
+		this.mojo = mojo;
+	}
+
+	public File getSourceDirectory() {
+		return getSourceDirectory("dummy");
+	}
+
+	protected File getSourceDirectory(String type) {
 		if (sourceDirectory == null) {
-			sourceDirectory = new File(mavenProject.getBasedir(), "src/"
-					+ (type.equals("test") ? "test" : "main"));
+			sourceDirectory = new File(mojo.getMavenProject().getBasedir(),
+					"src/" + (type.equals("test") ? "test" : "main"));
 		}
 		return sourceDirectory;
 	}
 
-	protected List/* <String> */getIncludePaths(MavenProject mavenProject,
-			String type) {
+	protected List/* <String> */getIncludePaths(String type) {
 		if (includePaths == null || (includePaths.size() == 0)) {
 			includePaths = new ArrayList();
-			includePaths.add(new File(getSourceDirectory(mavenProject, type),
-					"include").getPath());
+			includePaths.add(new File(getSourceDirectory(type), "include")
+					.getPath());
 		}
 		return includePaths;
 	}
 
-	public CompilerDef getCompiler(AbstractCompileMojo mojo, String type,
-			String output) throws MojoFailureException {
+	public Set getIncludes() throws MojoFailureException {
+		return getIncludes("main");
+	}
 
-		String prefix = mojo.getAOLKey() + getName() + ".";
-
-		// adjust default values
-		if (name == null)
-			name = NarUtil.getDefaults().getProperty(prefix + "compiler");
-		if (name == null) {
-			throw new MojoFailureException(
-					"NAR: Please specify <Name> as part of <Cpp>, <C> or <Fortran> for "
-							+ prefix);
-		}
-
-		Set finalIncludes = new HashSet();
-		Set finalExcludes = new HashSet();
-		if (!type.equals("test")) {
-			// add all includes and excludes
-			if (includes.isEmpty()) {
-				String defaultIncludes = NarUtil.getDefaults().getProperty(
-						prefix + "includes");
-				if (defaultIncludes == null) {
-					throw new MojoFailureException(
-							"NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "
-									+ prefix);
-				}
-				String[] include = defaultIncludes.split(" ");
-				for (int i = 0; i < include.length; i++) {
-					finalIncludes.add(include[i].trim());
-				}
-			} else {
-				finalIncludes.addAll(includes);
-			}
-			if (excludes.isEmpty()) {
-				String defaultExcludes = NarUtil.getDefaults().getProperty(
-						prefix + "excludes");
-				if (defaultExcludes != null) {
-					String[] exclude = defaultExcludes.split(" ");
-					for (int i = 0; i < exclude.length; i++) {
-						finalExcludes.add(exclude[i].trim());
-					}
-				}
-			} else {
-				finalExcludes.addAll(excludes);
-			}
+	protected Set getIncludes(String type) throws MojoFailureException {
+		Set result = new HashSet();
+		if (!type.equals("test") && !includes.isEmpty()) {
+			result.addAll(includes);
 		} else {
 			String defaultIncludes = NarUtil.getDefaults().getProperty(
-					prefix + "includes");
+					getPrefix() + "includes");
 			if (defaultIncludes == null) {
 				throw new MojoFailureException(
 						"NAR: Please specify <Includes> as part of <Cpp>, <C> or <Fortran> for "
-								+ prefix);
+								+ getPrefix());
 			}
 
 			String[] include = defaultIncludes.split(" ");
 			for (int i = 0; i < include.length; i++) {
-				finalIncludes.add(include[i].trim());
+				result.add(include[i].trim());
 			}
+		}
+		return result;
+	}
 
-			if (excludes.isEmpty()) {
-				String defaultExcludes = NarUtil.getDefaults().getProperty(
-						prefix + "excludes");
-				if (defaultExcludes != null) {
-					String[] exclude = defaultExcludes.split(" ");
-					for (int i = 0; i < exclude.length; i++) {
-						finalExcludes.add(exclude[i].trim());
-					}
-				}
-			} else {
-				finalExcludes.addAll(excludes);
-			}
+	protected Set getExcludes() throws MojoFailureException {
+		Set result = new HashSet();
 
-			// now add all but the current test to the excludes
-			for (Iterator i = mojo.getTests().iterator(); i.hasNext();) {
-				Test test = (Test) i.next();
-				if (!test.getName().equals(output)) {
-					finalExcludes.add("**/" + test.getName() + ".*");
+		// add all excludes
+		if (excludes.isEmpty()) {
+			String defaultExcludes = NarUtil.getDefaults().getProperty(
+					getPrefix() + "excludes");
+			if (defaultExcludes != null) {
+				String[] exclude = defaultExcludes.split(" ");
+				for (int i = 0; i < exclude.length; i++) {
+					result.add(exclude[i].trim());
 				}
 			}
+		} else {
+			result.addAll(excludes);
+		}
+
+		return result;
+	}
+
+	protected String getPrefix() throws MojoFailureException {
+		return mojo.getAOLKey() + getName() + ".";
+	}
+
+	public CompilerDef getCompiler(String type, String output)
+			throws MojoFailureException {
+
+		// adjust default values
+		if (name == null)
+			name = NarUtil.getDefaults().getProperty(getPrefix() + "compiler");
+		if (name == null) {
+			throw new MojoFailureException(
+					"NAR: Please specify <Name> as part of <Cpp>, <C> or <Fortran> for "
+							+ getPrefix());
 		}
 
 		CompilerDef compiler = new CompilerDef();
@@ -293,7 +282,7 @@ public abstract class Compiler {
 
 		if (!clearDefaultOptions) {
 			String optionsProperty = NarUtil.getDefaults().getProperty(
-					prefix + "options");
+					getPrefix() + "options");
 			if (optionsProperty != null) {
 				String[] option = optionsProperty.split(" ");
 				for (int i = 0; i < option.length; i++) {
@@ -320,7 +309,7 @@ public abstract class Compiler {
 		if (!clearDefaultDefines) {
 			DefineSet defineSet = new DefineSet();
 			String defaultDefines = NarUtil.getDefaults().getProperty(
-					prefix + "defines");
+					getPrefix() + "defines");
 			if (defaultDefines != null) {
 				defineSet
 						.setDefine(new CUtil.StringArrayBuilder(defaultDefines));
@@ -344,7 +333,7 @@ public abstract class Compiler {
 		if (!clearDefaultUndefines) {
 			DefineSet undefineSet = new DefineSet();
 			String defaultUndefines = NarUtil.getDefaults().getProperty(
-					prefix + "undefines");
+					getPrefix() + "undefines");
 			if (defaultUndefines != null) {
 				undefineSet.setUndefine(new CUtil.StringArrayBuilder(
 						defaultUndefines));
@@ -353,7 +342,7 @@ public abstract class Compiler {
 		}
 
 		// add include path
-		for (Iterator i = getIncludePaths(mojo.getMavenProject(), type)
+		for (Iterator i = getIncludePaths(type)
 				.iterator(); i.hasNext();) {
 			String path = (String) i.next();
 			compiler.createIncludePath().setPath(path);
@@ -368,19 +357,26 @@ public abstract class Compiler {
 		}
 
 		// Add default fileset (if exists)
-		File srcDir = getSourceDirectory(mojo.getMavenProject(), type);
+		File srcDir = getSourceDirectory(type);
+		Set includes = getIncludes();
+		Set excludes = getExcludes();
+
+		// now add all but the current test to the excludes
+		for (Iterator i = mojo.getTests().iterator(); i.hasNext();) {
+			Test test = (Test) i.next();
+			if (!test.getName().equals(output)) {
+				excludes.add("**/" + test.getName() + ".*");
+			}
+		}
+
 		mojo.getLog().debug(
 				"Checking for existence of " + getName() + " sourceDirectory: "
 						+ srcDir);
 		if (srcDir.exists()) {
 			ConditionalFileSet fileSet = new ConditionalFileSet();
 			fileSet.setProject(mojo.getAntProject());
-			fileSet
-					.setIncludes(StringUtils
-							.join(finalIncludes.iterator(), ","));
-			fileSet
-					.setExcludes(StringUtils
-							.join(finalExcludes.iterator(), ","));
+			fileSet.setIncludes(StringUtils.join(includes.iterator(), ","));
+			fileSet.setExcludes(StringUtils.join(excludes.iterator(), ","));
 			fileSet.setDir(srcDir);
 			compiler.addFileset(fileSet);
 		}
@@ -395,10 +391,10 @@ public abstract class Compiler {
 			if (dir.exists()) {
 				ConditionalFileSet otherFileSet = new ConditionalFileSet();
 				otherFileSet.setProject(mojo.getAntProject());
-				otherFileSet.setIncludes(StringUtils.join(finalIncludes
-						.iterator(), ","));
-				otherFileSet.setExcludes(StringUtils.join(finalExcludes
-						.iterator(), ","));
+				otherFileSet.setIncludes(StringUtils.join(includes.iterator(),
+						","));
+				otherFileSet.setExcludes(StringUtils.join(excludes.iterator(),
+						","));
 				otherFileSet.setDir(dir);
 				compiler.addFileset(otherFileSet);
 			}
@@ -410,7 +406,7 @@ public abstract class Compiler {
 
 	public void copyIncludeFiles(MavenProject mavenProject, File targetDirectory)
 			throws IOException {
-		for (Iterator i = getIncludePaths(mavenProject, "dummy").iterator(); i
+		for (Iterator i = getIncludePaths("dummy").iterator(); i
 				.hasNext();) {
 			File path = new File((String) i.next());
 			if (path.exists()) {

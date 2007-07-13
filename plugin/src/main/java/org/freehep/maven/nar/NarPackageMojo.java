@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 113f3bde20c0 2007/07/10 19:56:39 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -30,15 +30,17 @@ public class NarPackageMojo extends AbstractCompileMojo {
 	 */
 	private MavenProjectHelper projectHelper;
 
+	private File narDirectory;
+	private NarInfo info;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
 			return;
 
-		File narDirectory = new File(getOutputDirectory(), "nar");
+		narDirectory = new File(getOutputDirectory(), "nar");
 
-		NarInfo info = new NarInfo(getMavenProject().getGroupId(),
-				getMavenProject().getArtifactId(), getMavenProject()
-						.getVersion(), getLog());
+		info = new NarInfo(getMavenProject().getGroupId(), getMavenProject()
+				.getArtifactId(), getMavenProject().getVersion(), getLog());
 
 		// General properties.nar file
 		File propertiesDir = new File(getOutputDirectory(),
@@ -57,37 +59,29 @@ public class NarPackageMojo extends AbstractCompileMojo {
 		// noarch
 		String include = "include";
 		if (new File(narDirectory, include).exists()) {
-			File noarchFile = new File(getOutputDirectory(), getFinalName()
-					+ "-" + NAR_NO_ARCH + "." + NAR_EXTENSION);
-			nar(noarchFile, narDirectory, new String[] { include });
-			projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
-					NAR_NO_ARCH, noarchFile);
-			info.setNar(null, "noarch", getMavenProject().getGroupId() + ":"
-					+ getMavenProject().getArtifactId() + ":" + NAR_TYPE + ":"
-					+ NAR_NO_ARCH);
+			attachNar("include", null, NAR_NO_ARCH);
 		}
 
-		// FIXME this should just scan for nar/lib/<aol>/<type>/ and build every -aol-type.nar
+		// create nar with binaries
+		String bin = "bin";
+		String[] binAOLs = new File(narDirectory, bin).list();
+		for (int i = 0; i < (binAOLs != null ? binAOLs.length : 0); i++) {
+			attachNar(bin + "/" + binAOLs[i], binAOLs[i], bin);
+		}
+
+		// create nars for each type of library (static, shared).
 		String bindingType = null;
 		for (Iterator i = getLibraries().iterator(); i.hasNext();) {
 			Library library = (Library) i.next();
 			String type = library.getType();
 			if (bindingType == null)
 				bindingType = type;
-			// aol
-			String bin = "bin";
+
+			// create nar with libraries
 			String lib = "lib";
-			if (new File(narDirectory, bin).exists()
-					|| new File(narDirectory, lib).exists()) {
-				// aol
-				File archFile = new File(getOutputDirectory(), getFinalName()
-						+ "-" + getAOL() + "-" + type + "." + NAR_EXTENSION);
-				nar(archFile, narDirectory, new String[] { bin, lib });
-				projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
-						getAOL() + "-" + type, archFile);
-				info.setNar(null, type, getMavenProject().getGroupId() + ":"
-						+ getMavenProject().getArtifactId() + ":" + NAR_TYPE
-						+ ":" + "${aol}-" + type);
+			String[] libAOLs = new File(narDirectory, lib).list();
+			for (int j = 0; j < (libAOLs != null ? libAOLs.length : 0); j++) {
+				attachNar(lib + "/" + libAOLs[j] + "/" + type, libAOLs[j], type);
 			}
 		}
 
@@ -99,6 +93,19 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			throw new MojoExecutionException(
 					"Cannot write nar properties file", ioe);
 		}
+	}
+
+	private void attachNar(String dir, String aol, String type)
+			throws MojoExecutionException {
+		File libFile = new File(getOutputDirectory(), getFinalName() + "-"
+				+ (aol != null ? aol + "-" : "") + type + "." + NAR_EXTENSION);
+		nar(libFile, narDirectory, new String[] { dir });
+		projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
+				(aol != null ? aol + "-" : "") + type, libFile);
+		info.setNar(null, type, getMavenProject().getGroupId() + ":"
+				+ getMavenProject().getArtifactId() + ":" + NAR_TYPE + ":"
+				+ (aol != null ? "${aol}-" : "") + type);
+
 	}
 
 	private void nar(File nar, File dir, String[] dirs)

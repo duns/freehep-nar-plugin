@@ -21,171 +21,172 @@ import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Compiles native test source files.
- *
+ * 
  * @goal nar-testCompile
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-    	if (shouldSkip()) return;
-    	
-        // make sure destination is there
-        getTargetDirectory().mkdirs();
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (shouldSkip())
+			return;
 
-        for (Iterator i = getTests().iterator(); i.hasNext();) {
-            createTest(getAntProject(), (Test) i.next());
-        }
-    }
+		// make sure destination is there
+		getTargetDirectory().mkdirs();
 
-    private void createTest(Project antProject, Test test)
-            throws MojoExecutionException, MojoFailureException {
-        String type = "test";
+		for (Iterator i = getTests().iterator(); i.hasNext();) {
+			createTest(getAntProject(), (Test) i.next());
+		}
+	}
 
-        // configure task
-        CCTask task = new CCTask();
-        task.setProject(antProject);
+	private void createTest(Project antProject, Test test)
+			throws MojoExecutionException, MojoFailureException {
+		String type = "test";
 
-        // outtype
-        OutputTypeEnum outTypeEnum = new OutputTypeEnum();
-        outTypeEnum.setValue(Library.EXECUTABLE);
-        task.setOuttype(outTypeEnum);
+		// configure task
+		CCTask task = new CCTask();
+		task.setProject(antProject);
 
-        // outDir
-        File outDir = new File(getTargetDirectory(), "bin");
-        outDir = new File(outDir, getAOL());
-        outDir.mkdirs();
+		// outtype
+		OutputTypeEnum outTypeEnum = new OutputTypeEnum();
+		outTypeEnum.setValue(Library.EXECUTABLE);
+		task.setOuttype(outTypeEnum);
 
-        // outFile
-        File outFile = new File(outDir, test.getName());
-        getLog().debug("NAR - output: '" + outFile + "'");
-        task.setOutfile(outFile);
+		// outDir
+		File outDir = new File(getTargetDirectory(), "bin");
+		outDir = new File(outDir, getAOL());
+		outDir.mkdirs();
 
-        // object directory
-        File objDir = new File(getTargetDirectory(), "obj");
-        objDir = new File(objDir, getAOL());
-        objDir.mkdirs();
-        task.setObjdir(objDir);
+		// outFile
+		File outFile = new File(outDir, test.getName());
+		getLog().debug("NAR - output: '" + outFile + "'");
+		task.setOutfile(outFile);
 
-        // failOnError, libtool
-        task.setFailonerror(failOnError());
-        task.setLibtool(useLibtool());
+		// object directory
+		File objDir = new File(getTargetDirectory(), "obj");
+		objDir = new File(objDir, getAOL());
+		objDir.mkdirs();
+		task.setObjdir(objDir);
 
-        // runtime
-        RuntimeType runtimeType = new RuntimeType();
-        runtimeType.setValue(getRuntime());
-        task.setRuntime(runtimeType);
+		// failOnError, libtool
+		task.setFailonerror(failOnError());
+		task.setLibtool(useLibtool());
 
-        // add C++ compiler
-        task.addConfiguredCompiler(getCpp().getCompiler(this, type,
-                test.getName()));
+		// runtime
+		RuntimeType runtimeType = new RuntimeType();
+		runtimeType.setValue(getRuntime());
+		task.setRuntime(runtimeType);
 
-        // add C compiler
-        task.addConfiguredCompiler(getC().getCompiler(this, type, test.getName()));
+		// add C++ compiler
+		task.addConfiguredCompiler(getCpp().getCompiler(type, test.getName()));
 
-        // add Fortran compiler
-        task.addConfiguredCompiler(getFortran().getCompiler(this, type,
-                test.getName()));
+		// add C compiler
+		task.addConfiguredCompiler(getC().getCompiler(type, test.getName()));
 
-        // add java include paths
-        // FIXME, get rid of task
-        getJava().addIncludePaths(getMavenProject(), task, this, type, getLog());
+		// add Fortran compiler
+		task.addConfiguredCompiler(getFortran().getCompiler(type,
+				test.getName()));
 
-        // add dependency include paths
-        for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i.hasNext();) {
-            File include = new File(getNarManager().getNarFile((Artifact) i.next())
-                    .getParentFile(), "nar/include");
-            if (include.exists()) {
-                task.createIncludePath().setPath(include.getPath());
-            }
-        }
+		// add java include paths
+		getJava().addIncludePaths(task, type);
 
-        // add linker
-        task.addConfiguredLinker(getLinker().getLinker(this, antProject,
-                getOS(), getAOLKey() + "linker.", type));
+		// add dependency include paths
+		for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i
+				.hasNext();) {
+			File include = new File(getNarManager().getNarFile(
+					(Artifact) i.next()).getParentFile(), "nar/include");
+			if (include.exists()) {
+				task.createIncludePath().setPath(include.getPath());
+			}
+		}
 
-        // FIXME hardcoded values
-        String libName = getFinalName();
-        File includeDir = new File(getMavenProject().getBuild().getDirectory(),
-                "nar/include");
-        File libDir = new File(getMavenProject().getBuild().getDirectory(),
-                "nar/lib/" + getAOL() + "/" + test.getLink());
+		// add linker
+		task.addConfiguredLinker(getLinker().getLinker(this, antProject,
+				getOS(), getAOLKey() + "linker.", type));
 
-        // copy shared library
-        if (test.getLink().equals(Library.SHARED)) {
-            try {
-                // defaults are Unix
-                String libPrefix = NarUtil.getDefaults().getProperty(
-                        getAOLKey() + "lib.prefix", "lib");
-                String libExt = NarUtil.getDefaults().getProperty(
-                        getAOLKey() + "shared.extension", "so");
-                File copyDir = new File(getTargetDirectory(), (getOS().equals(
-                        "Windows") ? "bin" : "lib")
-                        + "/" + getAOL() + "/" + test.getLink());
-                FileUtils.copyFileToDirectory(new File(libDir, libPrefix
-                        + libName + "." + libExt), copyDir);
-                if (!getOS().equals("Windows")) {
-                    libDir = copyDir;
-                }
-            } catch (IOException e) {
-                throw new MojoExecutionException(
-                        "NAR: Could not copy shared library", e);
-            }
-        }
+		// FIXME hardcoded values
+		String libName = getFinalName();
+		File includeDir = new File(getMavenProject().getBuild().getDirectory(),
+				"nar/include");
+		File libDir = new File(getMavenProject().getBuild().getDirectory(),
+				"nar/lib/" + getAOL() + "/" + test.getLink());
 
-        // FIXME what about copying the other shared libs?
+		// copy shared library
+		if (test.getLink().equals(Library.SHARED)) {
+			try {
+				// defaults are Unix
+				String libPrefix = NarUtil.getDefaults().getProperty(
+						getAOLKey() + "lib.prefix", "lib");
+				String libExt = NarUtil.getDefaults().getProperty(
+						getAOLKey() + "shared.extension", "so");
+				File copyDir = new File(getTargetDirectory(), (getOS().equals(
+						"Windows") ? "bin" : "lib")
+						+ "/" + getAOL() + "/" + test.getLink());
+				FileUtils.copyFileToDirectory(new File(libDir, libPrefix
+						+ libName + "." + libExt), copyDir);
+				if (!getOS().equals("Windows")) {
+					libDir = copyDir;
+				}
+			} catch (IOException e) {
+				throw new MojoExecutionException(
+						"NAR: Could not copy shared library", e);
+			}
+		}
 
-        // add include of this package
-        if (includeDir.exists()) {
-            task.createIncludePath().setLocation(includeDir);
-        }
+		// FIXME what about copying the other shared libs?
 
-        // add library of this package
-        if (libDir.exists()) {
-            LibrarySet libSet = new LibrarySet();
-            libSet.setProject(antProject);
-            libSet.setLibs(new CUtil.StringArrayBuilder(libName));
-            LibraryTypeEnum libType = new LibraryTypeEnum();
-            libType.setValue(test.getLink());
-            libSet.setType(libType);
-            libSet.setDir(libDir);
-            task.addLibset(libSet);
-        }
+		// add include of this package
+		if (includeDir.exists()) {
+			task.createIncludePath().setLocation(includeDir);
+		}
 
-        // add dependency libraries
-        for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i.hasNext();) {
-            Artifact dependency = (Artifact) i.next();
-            File lib = new File(getNarManager().getNarFile(dependency).getParentFile(),
-                    "nar/lib/" + getAOL() + "/" + test.getLink());
-            if (lib.exists()) {
-                LibrarySet libset = new LibrarySet();
-                libset.setProject(antProject);
-                libset.setLibs(new CUtil.StringArrayBuilder(dependency
-                        .getArtifactId()
-                        + "-" + dependency.getVersion()));
-                libset.setDir(lib);
-                task.addLibset(libset);
-            }
-        }
+		// add library of this package
+		if (libDir.exists()) {
+			LibrarySet libSet = new LibrarySet();
+			libSet.setProject(antProject);
+			libSet.setLibs(new CUtil.StringArrayBuilder(libName));
+			LibraryTypeEnum libType = new LibraryTypeEnum();
+			libType.setValue(test.getLink());
+			libSet.setType(libType);
+			libSet.setDir(libDir);
+			task.addLibset(libSet);
+		}
 
-        // Add JVM to linker
-        // FIXME, use "this".
-        getJava().addRuntime(antProject, task,
-                getJavaHome(), getOS(), getAOLKey() + "java.", getLog());
+		// add dependency libraries
+		for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i
+				.hasNext();) {
+			Artifact dependency = (Artifact) i.next();
+			File lib = new File(getNarManager().getNarFile(dependency)
+					.getParentFile(), "nar/lib/" + getAOL() + "/"
+					+ test.getLink());
+			if (lib.exists()) {
+				LibrarySet libset = new LibrarySet();
+				libset.setProject(antProject);
+				libset.setLibs(new CUtil.StringArrayBuilder(dependency
+						.getArtifactId()
+						+ "-" + dependency.getVersion()));
+				libset.setDir(lib);
+				task.addLibset(libset);
+			}
+		}
 
-        // execute
-        try {
-            task.execute();            
-        } catch (BuildException e) {
-            throw new MojoExecutionException("NAR: Test-Compile failed", e);
-        }
-    }
+		// Add JVM to linker
+		getJava().addRuntime(task, getJavaHome(), getOS(),
+				getAOLKey() + "java.");
 
-    protected File getTargetDirectory() {
-        return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
-    }
+		// execute
+		try {
+			task.execute();
+		} catch (BuildException e) {
+			throw new MojoExecutionException("NAR: Test-Compile failed", e);
+		}
+	}
+
+	protected File getTargetDirectory() {
+		return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
+	}
 
 }

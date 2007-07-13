@@ -3,7 +3,11 @@ package org.freehep.maven.nar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -16,6 +20,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Compiles native source files.
@@ -24,18 +30,26 @@ import org.apache.tools.ant.Project;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 113f3bde20c0 2007/07/10 19:56:39 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (shouldSkip()) return;
+		if (shouldSkip())
+			return;
 
 		// make sure destination is there
 		getTargetDirectory().mkdirs();
 
-		for (Iterator i = getLibraries().iterator(); i.hasNext();) {
-			createLibrary(getAntProject(), (Library) i.next());
+		// check for source files
+		int noOfSources = 0;
+		noOfSources += getSourcesFor(getCpp()).size();
+		noOfSources += getSourcesFor(getC()).size();
+		noOfSources += getSourcesFor(getFortran()).size();
+		if (noOfSources > 0) {
+			for (Iterator i = getLibraries().iterator(); i.hasNext();) {
+				createLibrary(getAntProject(), (Library) i.next());
+			}
 		}
 
 		try {
@@ -45,6 +59,17 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException(
 					"NAR: could not copy include files", e);
+		}
+	}
+
+	private List getSourcesFor(Compiler compiler) throws MojoFailureException {
+		try {
+			File srcDir = compiler.getSourceDirectory();
+			return srcDir.exists() ? FileUtils.getFiles(srcDir, StringUtils
+					.join(compiler.getIncludes().iterator(), ","), null)
+					: Collections.EMPTY_LIST;
+		} catch (IOException e) {
+			return Collections.EMPTY_LIST;
 		}
 	}
 
@@ -64,9 +89,11 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setLinkCPP(library.linkCPP());
 
 		// outDir
-		File outDir = new File(getTargetDirectory(), type.equals(Library.EXECUTABLE) ? "bin" : "lib");
+		File outDir = new File(getTargetDirectory(), type
+				.equals(Library.EXECUTABLE) ? "bin" : "lib");
 		outDir = new File(outDir, getAOL());
-		if (!type.equals(Library.EXECUTABLE)) outDir = new File(outDir, type);
+		if (!type.equals(Library.EXECUTABLE))
+			outDir = new File(outDir, type);
 		outDir.mkdirs();
 
 		// outFile
@@ -96,22 +123,21 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setRuntime(runtimeType);
 
 		// add C++ compiler
-		task.addConfiguredCompiler(getCpp().getCompiler(this, type, getOutput()));
+		task.addConfiguredCompiler(getCpp().getCompiler(type, getOutput()));
 
 		// add C compiler
-		task.addConfiguredCompiler(getC().getCompiler(this, type, getOutput()));
+		task.addConfiguredCompiler(getC().getCompiler(type, getOutput()));
 
 		// add Fortran compiler
-		task.addConfiguredCompiler(getFortran().getCompiler(this, type, getOutput()));
+		task.addConfiguredCompiler(getFortran().getCompiler(type, getOutput()));
 
 		// add javah include path
-		File jniDirectory = getJavah().getJniDirectory(getMavenProject());
+		File jniDirectory = getJavah().getJniDirectory();
 		if (jniDirectory.exists())
 			task.createIncludePath().setPath(jniDirectory.getPath());
 
 		// add java include paths
-		// FIXME, get rid of task
-		getJava().addIncludePaths(getMavenProject(), task, this, type, getLog());
+		getJava().addIncludePaths(task, type);
 
 		// add dependency include paths
 		for (Iterator i = getNarManager().getNarDependencies("compile")
@@ -120,11 +146,13 @@ public class NarCompileMojo extends AbstractCompileMojo {
 			NarArtifact narDependency = (NarArtifact) i.next();
 			String binding = narDependency.getNarInfo().getBinding(getAOL(),
 					Library.STATIC);
-			getLog().debug("Looking for "+narDependency+" found binding "+binding);
+			getLog().debug(
+					"Looking for " + narDependency + " found binding "
+							+ binding);
 			if (!binding.equals(Library.JNI)) {
 				File include = new File(getNarManager().getNarFile(
 						narDependency).getParentFile(), "nar/include");
-				getLog().debug("Looking for for directory: "+include);
+				getLog().debug("Looking for for directory: " + include);
 				if (include.exists()) {
 					task.createIncludePath().setPath(include.getPath());
 				}
@@ -136,8 +164,10 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				getOS(), getAOLKey() + "linker.", type));
 
 		// add dependency libraries
-// FIXME: what about PLUGIN and STATIC, depending on STATIC, should we not add all libraries, see NARPLUGIN-96
-		if (type.equals(Library.SHARED) || type.equals(Library.JNI) || type.equals(Library.EXECUTABLE)) {
+		// FIXME: what about PLUGIN and STATIC, depending on STATIC, should we
+		// not add all libraries, see NARPLUGIN-96
+		if (type.equals(Library.SHARED) || type.equals(Library.JNI)
+				|| type.equals(Library.EXECUTABLE)) {
 			for (Iterator i = getNarManager().getNarDependencies("compile")
 					.iterator(); i.hasNext();) {
 				NarArtifact dependency = (NarArtifact) i.next();
@@ -167,8 +197,10 @@ public class NarCompileMojo extends AbstractCompileMojo {
 						libSet.setDir(dir);
 						task.addLibset(libSet);
 					} else {
-						getLog().debug("Library Directory " + dir
-								+ " does NOT exist.");
+						getLog()
+								.debug(
+										"Library Directory " + dir
+												+ " does NOT exist.");
 					}
 
 					String sysLibs = dependency.getNarInfo().getSysLibs(
@@ -187,9 +219,8 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 
 		// Add JVM to linker
-		// FIXME, use "this".
-		getJava().addRuntime(antProject, task, getJavaHome(), getOS(),
-				getAOLKey() + "java.", getLog());
+		getJava().addRuntime(task, getJavaHome(), getOS(),
+				getAOLKey() + "java.");
 
 		// execute
 		try {
@@ -197,5 +228,5 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		} catch (BuildException e) {
 			throw new MojoExecutionException("NAR: Compile failed", e);
 		}
-	}	
+	}
 }

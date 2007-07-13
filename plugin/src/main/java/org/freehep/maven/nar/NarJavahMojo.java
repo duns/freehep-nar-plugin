@@ -11,13 +11,13 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal nar-javah
  * @phase compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarJavahMojo.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarJavahMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarJavahMojo extends AbstractCompileMojo {
     
     public void execute() throws MojoExecutionException {
     	if (shouldSkip()) return;
     	
-        getJavah().execute(getMavenProject(), getLog());
+        getJavah().execute();
     }    
 }

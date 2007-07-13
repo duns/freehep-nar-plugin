@@ -171,7 +171,7 @@ public class NarManager {
 		List artifactList = new ArrayList();
 		NarInfo narInfo = getNarInfo(dependency);
 		String[] nars = narInfo.getAttachedNars(aol, type);
-		// FIXME Move this to info....
+		// FIXME Move this to NarInfo....
 		if (nars != null) {
 			for (int j = 0; j < nars.length; j++) {
 				log.debug("    Checking: " + nars[j]);

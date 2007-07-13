@@ -25,7 +25,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java f025de4b73d2 2007/07/09 16:33:07 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -51,8 +51,8 @@ public class NarTestMojo extends AbstractCompileMojo {
 			getLog().info("Running " + name);
 			int result = runCommand(generateCommandLine(getMavenProject()
 					.getBasedir()
-					+ "/" + name, test, getLog()), generateEnvironment(test,
-					getLog()), getLog());
+					+ "/" + name, test), generateEnvironment(test,
+					getLog()));
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
 						+ " failed with exit code: " + result);
@@ -67,8 +67,8 @@ public class NarTestMojo extends AbstractCompileMojo {
 					+ project.getArtifactId();
 			getLog().info("Running " + name);
 			int result = runCommand(generateCommandLine(project.getBasedir()
-					+ "/" + name, library, getLog()), generateEnvironment(
-					library, getLog()), getLog());
+					+ "/" + name, library), generateEnvironment(
+					library, getLog()));
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
 						+ " failed with exit code: " + result);
@@ -79,7 +79,7 @@ public class NarTestMojo extends AbstractCompileMojo {
 		return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
 	}
 
-	private String[] generateCommandLine(String name, Executable exec, Log log)
+	private String[] generateCommandLine(String name, Executable exec)
 			throws MojoExecutionException {
 
 		List cmdLine = new ArrayList();
@@ -88,7 +88,7 @@ public class NarTestMojo extends AbstractCompileMojo {
 
 		cmdLine.addAll(exec.getArgs());
 
-		log.debug("CommandLine: " + cmdLine.toString());
+		getLog().debug("CommandLine: " + cmdLine.toString());
 
 		return (String[]) cmdLine.toArray(new String[cmdLine.size()]);
 	}
@@ -147,15 +147,15 @@ public class NarTestMojo extends AbstractCompileMojo {
 	}
 
 	// NOTE: same as in Javah.java
-	private int runCommand(String[] cmdLine, String[] env, Log log)
+	private int runCommand(String[] cmdLine, String[] env)
 			throws MojoExecutionException {
 		try {
 			Runtime runtime = Runtime.getRuntime();
 			Process process = runtime.exec(cmdLine, env);
 			StreamGobbler errorGobbler = new StreamGobbler(process
-					.getErrorStream(), true, log);
+					.getErrorStream(), true, getLog());
 			StreamGobbler outputGobbler = new StreamGobbler(process
-					.getInputStream(), false, log);
+					.getInputStream(), false, getLog());
 
 			errorGobbler.start();
 			outputGobbler.start();

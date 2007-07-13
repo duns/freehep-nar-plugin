@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 3ac1d2951571 2007/07/10 21:53:48 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class NarUtil {
 
@@ -281,7 +281,7 @@ public class NarUtil {
 			+ "**/SCCS,**/SCCS/**,**/vssver.scc,"
 			+ "**/.svn,**/.svn/**,**/.DS_Store";
 
-	public static void copyDirectoryStructure(File sourceDirectory,
+	public static int copyDirectoryStructure(File sourceDirectory,
 			File destinationDirectory, String includes, String excludes)
 			throws IOException {
 		if (!sourceDirectory.exists()) {
@@ -292,6 +292,7 @@ public class NarUtil {
 		List files = FileUtils.getFiles(sourceDirectory, includes, excludes);
 		String sourcePath = sourceDirectory.getAbsolutePath();
 
+		int copied = 0;
 		for (Iterator i = files.iterator(); i.hasNext();) {
 			File file = (File) i.next();
 			String dest = file.getAbsolutePath();
@@ -300,17 +301,19 @@ public class NarUtil {
 			if (file.isFile()) {
 				destination = destination.getParentFile();
 				FileUtils.copyFileToDirectory(file, destination);
+				copied++;
 			} else if (file.isDirectory()) {
 				if (!destination.exists() && !destination.mkdirs()) {
 					throw new IOException(
 							"Could not create destination directory '"
 									+ destination.getAbsolutePath() + "'.");
 				}
-				copyDirectoryStructure(file, destination, includes, excludes);
+				copied += copyDirectoryStructure(file, destination, includes, excludes);
 			} else {
 				throw new IOException("Unknown file type: "
 						+ file.getAbsolutePath());
 			}
 		}
+		return copied;
 	}
 }

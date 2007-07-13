@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class Javah {
 
@@ -109,11 +109,17 @@ public class Javah {
      * @parameter
      */
     private File timestampFile;
+    
+    private AbstractCompileMojo mojo;
+    
+    Javah(AbstractCompileMojo mojo) {
+    	this.mojo = mojo;
+    }
 
-    protected List getClassPaths(MavenProject mavenProject) throws MojoExecutionException {
+    protected List getClassPaths() throws MojoExecutionException {
         if (classPaths.isEmpty()) {
             try {
-                classPaths.addAll(mavenProject.getCompileClasspathElements());
+                classPaths.addAll(mojo.getMavenProject().getCompileClasspathElements());
             } catch (DependencyResolutionRequiredException e) {
                 throw new MojoExecutionException("JAVAH, cannot get classpath", e);
             }
@@ -121,16 +127,16 @@ public class Javah {
         return classPaths;
     }
 
-    protected File getJniDirectory(MavenProject mavenProject) {
+    protected File getJniDirectory() {
         if (jniDirectory == null) {
-            jniDirectory = new File(mavenProject.getBuild().getDirectory(), "nar/javah-include");
+            jniDirectory = new File(mojo.getMavenProject().getBuild().getDirectory(), "nar/javah-include");
         }
         return jniDirectory;
     }
     
-    protected File getClassDirectory(MavenProject mavenProject) {
+    protected File getClassDirectory() {
         if (classDirectory == null) {
-            classDirectory = new File(mavenProject.getBuild().getDirectory(), "classes");
+            classDirectory = new File(mojo.getMavenProject().getBuild().getDirectory(), "classes");
         }
         return classDirectory;
     }
@@ -142,9 +148,9 @@ public class Javah {
         return includes;
     }
     
-    protected File getTimestampDirectory(MavenProject mavenProject) {
+    protected File getTimestampDirectory() {
         if (timestampDirectory == null) {
-            timestampDirectory = getJniDirectory(mavenProject);
+            timestampDirectory = getJniDirectory();
         }
         return timestampDirectory;
     }
@@ -156,18 +162,18 @@ public class Javah {
         return timestampFile; 
     }
         
-    public void execute(MavenProject mavenProject, Log log) throws MojoExecutionException {
-        getClassDirectory(mavenProject).mkdirs();
-              
+    public void execute() throws MojoExecutionException {
+        getClassDirectory().mkdirs();
+        
         try {        
             SourceInclusionScanner scanner = new StaleSourceScanner(staleMillis, getIncludes(), excludes);
-            if (getTimestampDirectory(mavenProject).exists()) {
+            if (getTimestampDirectory().exists()) {
                 scanner.addSourceMapping(new SingleTargetSourceMapping( ".class", getTimestampFile().getPath() ));
             } else {
                 scanner.addSourceMapping(new SuffixMapping( ".class", ".dummy" ));
             }
 
-            Set classes = scanner.getIncludedSources(getClassDirectory(mavenProject), getTimestampDirectory(mavenProject));
+            Set classes = scanner.getIncludedSources(getClassDirectory(), getTimestampDirectory());
                     
             if (!classes.isEmpty()) {
                 Set files = new HashSet();
@@ -181,12 +187,12 @@ public class Javah {
                 }
                 
                 if (!files.isEmpty()) {
-                    getJniDirectory(mavenProject).mkdirs();
-                    getTimestampDirectory(mavenProject).mkdirs();
+                    getJniDirectory().mkdirs();
+                    getTimestampDirectory().mkdirs();
 
-                    log.info( "Running "+name+" compiler on "+files.size()+" classes...");
-                    runCommand(generateCommandLine(mavenProject, files, log), log);
-                    FileUtils.fileWrite(getTimestampDirectory(mavenProject)+"/"+getTimestampFile(), "");
+                    mojo.getLog().info( "Running "+name+" compiler on "+files.size()+" classes...");
+                    runCommand(generateCommandLine(files));
+                    FileUtils.fileWrite(getTimestampDirectory()+"/"+getTimestampFile(), "");
                 }
             }
         } catch (InclusionScanException e) {
@@ -198,7 +204,7 @@ public class Javah {
         }
     }
 
-    private String[] generateCommandLine(MavenProject mavenProject, Set/*<String>*/ classes, Log log) throws MojoExecutionException {
+    private String[] generateCommandLine(Set/*<String>*/ classes) throws MojoExecutionException {
         
         List cmdLine = new ArrayList();
         
@@ -210,12 +216,12 @@ public class Javah {
         }
         
         cmdLine.add("-classpath");
-        cmdLine.add(StringUtils.join(getClassPaths(mavenProject).iterator(), File.pathSeparator));
+        cmdLine.add(StringUtils.join(getClassPaths().iterator(), File.pathSeparator));
         
         cmdLine.add("-d");
-        cmdLine.add(getJniDirectory(mavenProject).getPath());        
+        cmdLine.add(getJniDirectory().getPath());        
         
-        if (log.isDebugEnabled()) {
+        if (mojo.getLog().isDebugEnabled()) {
             cmdLine.add("-verbose");
         }
     
@@ -225,17 +231,17 @@ public class Javah {
             }
         }
         
-        log.debug(cmdLine.toString());
+        mojo.getLog().debug(cmdLine.toString());
         
         return (String[])cmdLine.toArray(new String[cmdLine.size()]);
     }
         
-    private int runCommand(String[] cmdLine, Log log) throws MojoExecutionException {
+    private int runCommand(String[] cmdLine) throws MojoExecutionException {
         try {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(cmdLine);
-            StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), true, log);
-            StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), false, log);
+            StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), true, mojo.getLog());
+            StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), false, mojo.getLog());
             
             errorGobbler.start();
             outputGobbler.start();

@@ -20,7 +20,7 @@ import org.apache.tools.ant.Project;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java 3604f9d76f3a 2007/07/07 14:33:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java f934ad2b8948 2007/07/13 14:17:10 duns $
  */
 public class Java {
 
@@ -64,9 +64,14 @@ public class Java {
      */
     private String runtime = "jvm";
     
-    // FIXME, NarCompileMojo, change to AbstractCompileMojo 
-    public void addIncludePaths(MavenProject mavenProject, CCTask task, AbstractCompileMojo mojo, String outType, Log log) throws MojoFailureException {
-        if (include || mojo.getJavah().getJniDirectory(mavenProject).exists()) {
+    private AbstractCompileMojo mojo;
+    
+    Java(AbstractCompileMojo mojo) {
+    	this.mojo = mojo;
+    }
+    
+    public void addIncludePaths(CCTask task, String outType) throws MojoFailureException {
+        if (include || mojo.getJavah().getJniDirectory().exists()) {
             if (includePaths != null) {
                 for (Iterator i=includePaths.iterator(); i.hasNext(); ) {
                     String path = (String)i.next();
@@ -85,7 +90,7 @@ public class Java {
         }
     }
     
-    public void addRuntime(Project antProject, CCTask task, File javaHome, String os, String prefix, Log log) throws MojoFailureException {
+    public void addRuntime(CCTask task, File javaHome, String os, String prefix) throws MojoFailureException {
         if (link) {
             if (os.equals(OS.MACOSX)) {
                 CommandLineArgument.LocationEnum end = new CommandLineArgument.LocationEnum();
@@ -108,10 +113,10 @@ public class Java {
                         throw new MojoFailureException("NAR: Please specify a <RuntimeDirectory> as part of <Java>");
                     }
                 }
-                log.debug("Using Java Rumtime Directory: "+runtimeDirectory);
+                mojo.getLog().debug("Using Java Rumtime Directory: "+runtimeDirectory);
                 
                 LibrarySet libset = new LibrarySet();
-                libset.setProject(antProject);
+                libset.setProject(mojo.getAntProject());
                 libset.setLibs(new CUtil.StringArrayBuilder(runtime));
                 libset.setDir(new File(javaHome, runtimeDirectory));
                 task.addLibset(libset);
