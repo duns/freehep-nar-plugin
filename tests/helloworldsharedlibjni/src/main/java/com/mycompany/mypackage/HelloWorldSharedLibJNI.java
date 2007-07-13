@@ -1,6 +1,6 @@
 package com.mycompany.mypackage;
 
-public class HelloWorldJNI {
+public class HelloWorldSharedLibJNI {
     static {
         NarSystem.loadLibrary();
     }
@@ -8,7 +8,7 @@ public class HelloWorldJNI {
     public native String sayHello();
 
     public static void main( String[] args ) {
-        HelloWorldJNI app = new HelloWorldJNI();
+        HelloWorldSharedLibJNI app = new HelloWorldSharedLibJNI();
         System.out.println( app.sayHello() );
     }
 }

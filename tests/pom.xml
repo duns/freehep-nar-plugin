@@ -49,6 +49,8 @@
     <module>helloworldstaticjni</module>
     <module>helloworldsharedlib</module>
     <module>helloworldstaticlib</module>
+    <module>helloworldsharedlibjni</module>
+    <module>hellothirdpartyjni</module>
     <module>helloworldsharedexe</module>
     <module>helloworldstaticexe</module>
   </modules>
