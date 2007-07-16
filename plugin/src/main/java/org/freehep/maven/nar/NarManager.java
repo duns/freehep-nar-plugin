@@ -62,6 +62,7 @@ public class NarManager {
 			
 			NarInfo narInfo = getNarInfo(dependency);
 			if (narInfo != null) {
+				log.debug("    - added as NarDependency");
 				narDependencies.add(new NarArtifact(dependency, narInfo));
 			}
 		}

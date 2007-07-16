@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $,
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java b1d1779e013f 2007/07/16 15:07:13 duns $,
  *          2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
@@ -764,19 +764,22 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 				// FIXME this should be overridable
 				// NarInfo info = dependency.getNarInfo();
 				// String binding = info.getBinding(getAOL(), Library.STATIC);
-				// NOTE: fixed to shared
-				String binding = Library.SHARED;
-				if (!binding.equals(Library.STATIC)) {
-					File depLibPathEntry = new File(getNarManager().getNarFile(
-							dependency).getParent(), "nar/lib/" + getAOL()
-							+ "/" + binding);
-					if (depLibPathEntry.exists()) {
-						getLog().debug(
-								"Adding dependency directory to java.library.path: "
-										+ depLibPathEntry);
-						if (javaLibraryPath.length() > 0)
-							javaLibraryPath.append(File.pathSeparator);
-						javaLibraryPath.append(depLibPathEntry);
+				// NOTE: fixed to shared, jni
+				String[] bindings = { Library.SHARED, Library.JNI };
+				for (int j = 0; j < bindings.length; j++) {
+					String binding = bindings[j];
+					if (!binding.equals(Library.STATIC)) {
+						File depLibPathEntry = new File(getNarManager()
+								.getNarFile(dependency).getParent(), "nar/lib/"
+								+ getAOL() + "/" + binding);
+						if (depLibPathEntry.exists()) {
+							getLog().debug(
+									"Adding dependency directory to java.library.path: "
+											+ depLibPathEntry);
+							if (javaLibraryPath.length() > 0)
+								javaLibraryPath.append(File.pathSeparator);
+							javaLibraryPath.append(depLibPathEntry);
+						}
 					}
 				}
 			}
@@ -822,7 +825,7 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 	// BEGINFREEHEP
 	private void addPathToEnv(String path) {
 		String pathName = null;
-		char separator = ' ' ;
+		char separator = ' ';
 		if (getOS().equals(OS.WINDOWS)) {
 			pathName = "PATH";
 			separator = ';';

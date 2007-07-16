@@ -8,7 +8,7 @@ Mark Donszelmann
 HelloWorld Examples
 
 	These example contain a simple C method "sayHello". This method can be called from a C program, a Java program, put into
-a static library, put into a shared library, ...
+a static library, put into a shared library, use a third party library, ...
 There are also some unit test which are run and call the same method. 
 
 	The following examples are available:
@@ -22,6 +22,13 @@ There are also some unit test which are run and call the same method.
 	
 	[helloworldsharedexe] A C executable which depends on "helloworldsharedlib" and links dynamically 
 	with it. The executable is created and run.
+	
+	[helloworldsharedlibjni] A C routine that is called from Java, which depends on 
+	"helloworldsharedlib" and links dynamically with it. A Java unit test is provided and run.
+	
+	[hellothirdpartyjni] A third party JNI library that is called from Java.
+	The third party library is "helloworldjni" and is added as resource to the project in the 
+	form of a JNI library and a corresponding jar file. A Java unit test is provided and run.
 	
 	[helloworldstaticlib] A C routine which gets archived into a static library. A C test executable 
 	is created and run.
