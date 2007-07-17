@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 631dc18040bb 2007/07/17 14:21:11 duns $
  */
 public abstract class Compiler {
 
@@ -167,10 +167,13 @@ public abstract class Compiler {
 
 	private AbstractCompileMojo mojo;
 
-	protected Compiler(AbstractCompileMojo mojo) {
-		this.mojo = mojo;
+	protected Compiler() {
 	}
 
+	public void setAbstractCompileMojo(AbstractCompileMojo mojo) {
+		this.mojo = mojo;
+	}
+	
 	public File getSourceDirectory() {
 		return getSourceDirectory("dummy");
 	}

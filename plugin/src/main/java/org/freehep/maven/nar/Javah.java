@@ -18,7 +18,6 @@ import org.apache.bcel.classfile.Method;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
@@ -31,7 +30,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java 631dc18040bb 2007/07/17 14:21:11 duns $
  */
 public class Javah {
 
@@ -112,10 +111,13 @@ public class Javah {
     
     private AbstractCompileMojo mojo;
     
-    Javah(AbstractCompileMojo mojo) {
-    	this.mojo = mojo;
+    public Javah() {
     }
 
+	public void setAbstractCompileMojo(AbstractCompileMojo mojo) {
+		this.mojo = mojo;
+	}
+	
     protected List getClassPaths() throws MojoExecutionException {
         if (classPaths.isEmpty()) {
             try {

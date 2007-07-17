@@ -5,12 +5,11 @@ package org.freehep.maven.nar;
  * C compiler tag
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/C.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/C.java 631dc18040bb 2007/07/17 14:21:11 duns $
  */
 public class C extends Compiler { 
     
-	C(AbstractCompileMojo mojo) {
-		super(mojo);
+	public C() {
 	}
 	
     public String getName() {

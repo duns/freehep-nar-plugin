@@ -5,11 +5,10 @@ package org.freehep.maven.nar;
  * Cpp compiler tag
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Cpp.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Cpp.java 631dc18040bb 2007/07/17 14:21:11 duns $
  */
 public class Cpp extends Compiler {
-	Cpp(AbstractCompileMojo mojo) {
-		super(mojo);
+	public Cpp() {
 	}
 	
     public String getName() {

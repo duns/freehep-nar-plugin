@@ -26,6 +26,9 @@
         <artifactId>freehep-nar-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <cpp>
+            <debug>true</debug>
+          </cpp>
           <libraries>
             <library>
               <type>jni</type>

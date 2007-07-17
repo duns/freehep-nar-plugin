@@ -12,15 +12,12 @@ import net.sf.antcontrib.cpptasks.types.LibrarySet;
 import net.sf.antcontrib.cpptasks.types.LinkerArgument;
 
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.Project;
 
 /**
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java 631dc18040bb 2007/07/17 14:21:11 duns $
  */
 public class Java {
 
@@ -66,9 +63,12 @@ public class Java {
     
     private AbstractCompileMojo mojo;
     
-    Java(AbstractCompileMojo mojo) {
-    	this.mojo = mojo;
+    public Java() {
     }
+    
+	public void setAbstractCompileMojo(AbstractCompileMojo mojo) {
+		this.mojo = mojo;
+	}    
     
     public void addIncludePaths(CCTask task, String outType) throws MojoFailureException {
         if (include || mojo.getJavah().getJniDirectory().exists()) {
