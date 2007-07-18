@@ -28,7 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 631dc18040bb 2007/07/17 14:21:11 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 6ae92433be9e 2007/07/18 17:45:27 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -77,6 +77,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		CCTask task = new CCTask();
 		task.setProject(antProject);
 
+		// set max cores
+		task.setMaxCores(maxCores);
+		
 		// outtype
 		OutputTypeEnum outTypeEnum = new OutputTypeEnum();
 		String type = library.getType();

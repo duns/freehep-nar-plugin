@@ -9,7 +9,7 @@ import org.apache.tools.ant.Project;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 631dc18040bb 2007/07/17 14:21:11 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 6ae92433be9e 2007/07/18 17:45:27 duns $
  */
 public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 
@@ -34,6 +34,13 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
      */
     private Fortran fortran;
 	
+    /**
+     * Maximum number of Cores/CPU's to use. 0 means unlimited.
+     * 
+     * @parameter expression=""
+     */
+    protected int maxCores = 0;
+    
     /**
      * Name of the output
      *

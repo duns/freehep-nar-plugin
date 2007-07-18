@@ -16,6 +16,7 @@ NAR Configuration
   <javaHome/>
   <aol/>
   <resourceDirectory/>
+  <maxCores/>
   <targetDirectory/>
   <output/>
   <failOnError/>
@@ -170,6 +171,11 @@ os and linker.name value.
 
 	Directory with NAR related resources. Used by the nar-resources goal, which
 copies resources over to the target area. Defaults to ${basedir}/src/nar/resources.
+
+* {maxCores}
+
+	Specifies the maximum number or Cores/CPUs to use for compilation. 
+If set to 0 it will use all the Cores/CPUs available.
 
 * {targetDirectory}
 
