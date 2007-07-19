@@ -1,0 +1,23 @@
+Compile Times Maven NAR
+
+Geant4 Full Size
+
+  Cores/CPUs		1	2	4	8
+Platform	
+i386-MacOSX-g++		1800	1034
+ppc-MacOSX-g++		--	1992
+*i386-Linux-g++				826
+x86-Windows-msvc	1701	1035
+
+
+Geant4 75 Files
+
+  Cores/CPUs		1	2	4	8
+Platform	
+i386-MacOSX-g++		120	93
+ppc-MacOSX-g++
+*i386-Linux-g++
+x86-Windows-msvc	161	120
+
+
+* on nfs
