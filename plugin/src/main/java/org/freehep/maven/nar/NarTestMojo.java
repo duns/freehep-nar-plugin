@@ -1,11 +1,7 @@
 // Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +21,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -49,10 +45,10 @@ public class NarTestMojo extends AbstractCompileMojo {
 		if (test.shouldRun()) {
 			String name = "target/test-nar/bin/" + getAOL() + "/" + test.getName();
 			getLog().info("Running " + name);
-			int result = runCommand(generateCommandLine(getMavenProject()
+			int result = NarUtil.runCommand(generateCommandLine(getMavenProject()
 					.getBasedir()
 					+ "/" + name, test), generateEnvironment(test,
-					getLog()));
+					getLog()), getLog());
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
 						+ " failed with exit code: " + result);
@@ -66,9 +62,9 @@ public class NarTestMojo extends AbstractCompileMojo {
 			String name = "target/nar/bin/" + getAOL() + "/"
 					+ project.getArtifactId();
 			getLog().info("Running " + name);
-			int result = runCommand(generateCommandLine(project.getBasedir()
+			int result = NarUtil.runCommand(generateCommandLine(project.getBasedir()
 					+ "/" + name, library), generateEnvironment(
-					library, getLog()));
+					library, getLog()), getLog());
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
 						+ " failed with exit code: " + result);
@@ -144,55 +140,5 @@ public class NarTestMojo extends AbstractCompileMojo {
 		log.debug("Environment:" + env.toString());
 
 		return (String[]) env.toArray(new String[env.size()]);
-	}
-
-	// NOTE: same as in Javah.java
-	private int runCommand(String[] cmdLine, String[] env)
-			throws MojoExecutionException {
-		try {
-			Runtime runtime = Runtime.getRuntime();
-			Process process = runtime.exec(cmdLine, env);
-			StreamGobbler errorGobbler = new StreamGobbler(process
-					.getErrorStream(), true, getLog());
-			StreamGobbler outputGobbler = new StreamGobbler(process
-					.getInputStream(), false, getLog());
-
-			errorGobbler.start();
-			outputGobbler.start();
-			return process.waitFor();
-		} catch (Throwable e) {
-			throw new MojoExecutionException("Could not launch " + cmdLine[0],
-					e);
-		}
-	}
-
-	class StreamGobbler extends Thread {
-		InputStream is;
-		boolean error;
-		Log log;
-
-		StreamGobbler(InputStream is, boolean error, Log log) {
-			this.is = is;
-			this.error = error;
-			this.log = log;
-		}
-
-		public void run() {
-			try {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(is));
-				String line = null;
-				while ((line = reader.readLine()) != null) {
-					if (error) {
-						log.error(line);
-					} else {
-						log.debug(line);
-					}
-				}
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 }

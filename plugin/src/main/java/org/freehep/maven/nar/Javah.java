@@ -26,11 +26,13 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+import sun.security.action.GetLongAction;
+
 /**
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java 631dc18040bb 2007/07/17 14:21:11 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
  */
 public class Javah {
 
@@ -193,7 +195,7 @@ public class Javah {
                     getTimestampDirectory().mkdirs();
 
                     mojo.getLog().info( "Running "+name+" compiler on "+files.size()+" classes...");
-                    runCommand(generateCommandLine(files));
+                    NarUtil.runCommand(generateCommandLine(files), null, mojo.getLog());
                     FileUtils.fileWrite(getTimestampDirectory()+"/"+getTimestampFile(), "");
                 }
             }
@@ -236,51 +238,6 @@ public class Javah {
         mojo.getLog().debug(cmdLine.toString());
         
         return (String[])cmdLine.toArray(new String[cmdLine.size()]);
-    }
-        
-    private int runCommand(String[] cmdLine) throws MojoExecutionException {
-        try {
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec(cmdLine);
-            StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), true, mojo.getLog());
-            StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), false, mojo.getLog());
-            
-            errorGobbler.start();
-            outputGobbler.start();
-            return process.waitFor();
-        } catch (Throwable e) {
-            throw new MojoExecutionException("Could not launch " + cmdLine[0], e);
-        }
-    }
-    
-    class StreamGobbler extends Thread {
-        InputStream is;
-        boolean error;
-        Log log;
-        
-        StreamGobbler(InputStream is, boolean error, Log log) {
-            this.is = is;
-            this.error = error;
-            this.log = log;
-        }
-        
-        public void run() {
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    if (error) {
-                        log.error(line);
-                    } else {
-                        log.debug(line);
-                    }
-                }
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-        
+    }        
 }
 

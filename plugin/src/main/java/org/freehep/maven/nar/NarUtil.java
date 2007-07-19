@@ -1,8 +1,11 @@
 // Copyright 2005-2007, FreeHEP.
 package org.freehep.maven.nar;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -23,7 +26,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
  */
 public class NarUtil {
 
@@ -87,7 +90,7 @@ public class NarUtil {
 		return getArchitecture(architecture) + "." + getOS(os) + "."
 				+ getLinkerName(architecture, os, linker) + ".";
 	}
-	
+
 	public static String getAOLKey(String aol) {
 		// FIXME, this may not always work correctly
 		return replace("-", ".", aol);
@@ -308,7 +311,8 @@ public class NarUtil {
 							"Could not create destination directory '"
 									+ destination.getAbsolutePath() + "'.");
 				}
-				copied += copyDirectoryStructure(file, destination, includes, excludes);
+				copied += copyDirectoryStructure(file, destination, includes,
+						excludes);
 			} else {
 				throw new IOException("Unknown file type: "
 						+ file.getAbsolutePath());
@@ -316,4 +320,87 @@ public class NarUtil {
 		}
 		return copied;
 	}
+
+	public static String getEnv(String envKey, String alternateSystemProperty,
+			String defaultValue) {
+		String envValue = null;
+		try {
+			envValue = System.getenv(envKey);
+			if (envValue == null && alternateSystemProperty != null) {
+				envValue = System.getProperty(alternateSystemProperty);
+			}
+		} catch (Error e) {
+			// JDK 1.4?
+			if (alternateSystemProperty != null) {
+				envValue = System.getProperty(alternateSystemProperty);
+			}
+		}
+
+		if (envValue == null) {
+			envValue = defaultValue;
+		}
+
+		return envValue;
+	}
+
+	public static int runCommand(String[] cmdLine, String[] env, Log log)
+			throws MojoExecutionException {
+		try {
+			log.debug("RunCommand:");
+			for (int i=0; i<cmdLine.length; i++) {
+				log.debug("  '"+cmdLine[i]+"'");
+			}
+			if ((env != null) && (env.length > 0)) {
+				log.debug("with Env:");
+				for (int i=0; i<env.length; i+=2) {
+					log.debug("   "+env[i]+"='"+env[i+1]+"'");
+				}
+			}
+			
+			Runtime runtime = Runtime.getRuntime();
+			Process process = runtime.exec(cmdLine, env);
+			StreamGobbler errorGobbler = new StreamGobbler(process
+					.getErrorStream(), true, log);
+			StreamGobbler outputGobbler = new StreamGobbler(process
+					.getInputStream(), false, log);
+
+			errorGobbler.start();
+			outputGobbler.start();
+			return process.waitFor();
+		} catch (Throwable e) {
+			throw new MojoExecutionException("Could not launch " + cmdLine[0],
+					e);
+		}
+	}
+
+	static class StreamGobbler extends Thread {
+		InputStream is;
+		boolean error;
+		Log log;
+
+		StreamGobbler(InputStream is, boolean error, Log log) {
+			this.is = is;
+			this.error = error;
+			this.log = log;
+		}
+
+		public void run() {
+			try {
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(is));
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					if (error) {
+						log.error(line);
+					} else {
+						log.debug(line);
+					}
+				}
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 }

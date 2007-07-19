@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java b1d1779e013f 2007/07/16 15:07:13 duns $,
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java fa60fc0e1a45 2007/07/19 21:47:21 duns $,
  *          2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
@@ -839,7 +839,7 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 
 		String value = (String) environmentVariables.get(pathName);
 		if (value == null) {
-			value = getEnv(pathName, pathName, null);
+			value = NarUtil.getEnv(pathName, pathName, null);
 		}
 
 		path = path.replace(File.pathSeparatorChar, separator);
@@ -850,29 +850,6 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 		}
 		environmentVariables.put(pathName, value);
 	}
-
-	private String getEnv(String envKey, String alternateSystemProperty,
-			String defaultValue) {
-		String envValue = null;
-		try {
-			envValue = System.getenv(envKey);
-			if (envValue == null && alternateSystemProperty != null) {
-				envValue = System.getProperty(alternateSystemProperty);
-			}
-		} catch (Error e) {
-			// JDK 1.4?
-			if (alternateSystemProperty != null) {
-				envValue = System.getProperty(alternateSystemProperty);
-			}
-		}
-
-		if (envValue == null) {
-			envValue = defaultValue;
-		}
-
-		return envValue;
-	}
-
 	// ENDFREEHEP
 
 	private void showMap(Map map, String setting) {
