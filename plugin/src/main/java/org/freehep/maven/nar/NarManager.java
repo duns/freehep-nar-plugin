@@ -315,11 +315,21 @@ public class NarManager {
 				try {
 					unpackNar(manager, file, narLocation);
 					if (!NarUtil.getOS(os).equals("Windows")) {
-						NarUtil.makeExecutable(new File(narLocation, "bin"),
+						NarUtil.makeExecutable(new File(narLocation, "bin/"+defaultAOL),
 								log);
+						// FIXME clumsy
+						if (defaultAOL.endsWith("g++")) {
+							NarUtil.makeExecutable(new File(narLocation, "bin/"+NarUtil.replace("g++", "gcc", defaultAOL)),
+									log);							
+						}
 					}
 					if (linkerName.equals("gcc") || linkerName.equals("g++")) {
-						NarUtil.runRanlib(new File(narLocation, "lib"), log);
+						NarUtil.runRanlib(new File(narLocation, "lib/"+defaultAOL), log);
+						// FIXME clumsy
+						if (defaultAOL.endsWith("g++")) {
+							NarUtil.runRanlib(new File(narLocation, "lib/"+NarUtil.replace("g++", "gcc", defaultAOL)),
+									log);							
+						}
 					}
 					FileUtils.fileDelete(flagFile.getPath());
 					FileUtils.fileWrite(flagFile.getPath(), "");

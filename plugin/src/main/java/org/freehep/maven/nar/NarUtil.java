@@ -22,7 +22,7 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 353465868c1e 2007/07/20 14:59:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 6790b64f01c0 2007/07/20 20:49:23 duns $
  */
 public class NarUtil {
 
@@ -129,9 +129,10 @@ public class NarUtil {
 
 	public static void runRanlib(File file, final Log log)
 			throws MojoExecutionException {
-		if (!file.exists())
+		if (!file.exists()) {
 			return;
-
+		}
+		
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
 			for (int i = 0; i < files.length; i++) {
