@@ -19,14 +19,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.PropertyUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 353465868c1e 2007/07/20 14:59:21 duns $
  */
 public class NarUtil {
 
@@ -121,28 +117,12 @@ public class NarUtil {
 		if (file.isFile() && file.canRead() && file.canWrite()
 				&& !file.isHidden()) {
 			// chmod +x file
-			Commandline commandLine = new Commandline();
-			commandLine.setExecutable("chmod");
-			commandLine.createArgument().setValue("+x");
-			commandLine.createArgument().setFile(file);
-
-			StreamConsumer consumer = new StreamConsumer() {
-				public void consumeLine(String line) {
-					log.debug(line);
-				}
-			};
-
-			log.info(commandLine.toString());
-			try {
-				int result = CommandLineUtils.executeCommandLine(commandLine,
-						consumer, consumer);
-				if (result != 0) {
-					throw new MojoExecutionException("Result of " + commandLine
-							+ " execution is: \'" + result + "\'.");
-				}
-			} catch (CommandLineException e) {
-				throw new MojoExecutionException("Failed to execute "
-						+ commandLine, e);
+			int result = runCommand(new String[] { "chmod", "+x",
+					file.getPath() }, null, log);
+			if (result != 0) {
+				throw new MojoExecutionException("Failed to execute 'chmod +x "
+						+ file.getPath() + "'" + " return code: \'" + result
+						+ "\'.");
 			}
 		}
 	}
@@ -161,27 +141,12 @@ public class NarUtil {
 		if (file.isFile() && file.canRead() && file.canWrite()
 				&& !file.isHidden() && file.getName().endsWith(".a")) {
 			// ranlib file
-			Commandline commandLine = new Commandline();
-			commandLine.setExecutable("ranlib");
-			commandLine.createArgument().setFile(file);
-
-			StreamConsumer consumer = new StreamConsumer() {
-				public void consumeLine(String line) {
-					log.debug(line);
-				}
-			};
-
-			log.info(commandLine.toString());
-			try {
-				int result = CommandLineUtils.executeCommandLine(commandLine,
-						consumer, consumer);
-				if (result != 0) {
-					throw new MojoExecutionException("Result of " + commandLine
-							+ " execution is: \'" + result + "\'.");
-				}
-			} catch (CommandLineException e) {
-				throw new MojoExecutionException("Failed to execute "
-						+ commandLine, e);
+			int result = runCommand(new String[] { "ranlib", file.getPath() },
+					null, log);
+			if (result != 0) {
+				throw new MojoExecutionException("Failed to execute 'ranlib "
+						+ file.getPath() + "'" + " return code: \'" + result
+						+ "\'.");
 			}
 		}
 	}
@@ -347,16 +312,16 @@ public class NarUtil {
 			throws MojoExecutionException {
 		try {
 			log.debug("RunCommand:");
-			for (int i=0; i<cmdLine.length; i++) {
-				log.debug("  '"+cmdLine[i]+"'");
+			for (int i = 0; i < cmdLine.length; i++) {
+				log.debug("  '" + cmdLine[i] + "'");
 			}
 			if ((env != null) && (env.length > 0)) {
 				log.debug("with Env:");
-				for (int i=0; i<env.length; i+=2) {
-					log.debug("   "+env[i]+"='"+env[i+1]+"'");
+				for (int i = 0; i < env.length; i++) {
+					log.debug("   '" + env[i]+"'");
 				}
 			}
-			
+
 			Runtime runtime = Runtime.getRuntime();
 			Process process = runtime.exec(cmdLine, env);
 			StreamGobbler errorGobbler = new StreamGobbler(process

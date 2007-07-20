@@ -21,8 +21,6 @@ import org.apache.tools.ant.Project;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-
 /**
  * Compiles native source files.
  * 
@@ -30,7 +28,7 @@ import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 353465868c1e 2007/07/20 14:59:21 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
