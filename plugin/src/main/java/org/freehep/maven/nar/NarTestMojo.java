@@ -21,7 +21,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java fd78a3770f65 2007/07/20 16:19:50 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -84,8 +84,6 @@ public class NarTestMojo extends AbstractCompileMojo {
 
 		cmdLine.addAll(exec.getArgs());
 
-		getLog().debug("CommandLine: " + cmdLine.toString());
-
 		return (String[]) cmdLine.toArray(new String[cmdLine.size()]);
 	}
 
@@ -137,8 +135,6 @@ public class NarTestMojo extends AbstractCompileMojo {
 			env.add(sharedPathName+"="+sharedPath);
 		}
 		
-		log.debug("Environment:" + env.toString());
-
 		return (String[]) env.toArray(new String[env.size()]);
 	}
 }
