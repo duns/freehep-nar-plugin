@@ -10,7 +10,7 @@ import org.apache.tools.ant.Project;
  * Logger to connect the Ant logging to the Maven logging.
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java cf4f977f2a86 2007/07/09 03:50:23 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarLogger.java 9589202406dd 2007/07/23 17:42:54 duns $
  */
 public class NarLogger implements BuildListener {
     
@@ -44,20 +44,24 @@ public class NarLogger implements BuildListener {
             case Project.MSG_ERR:
             	if (msg.indexOf("ar: creating archive") >= 0) {
             		log.debug(msg);
-            	} else if (msg.indexOf("warning") < 0) {
-            		log.error(msg);
-            	} else {
+            	} else if (msg.indexOf("warning") >= 0) {
             		log.warn(msg);
+            	} else {
+            		log.error(msg);
             	}
                 break;    
             case Project.MSG_WARN:
                 log.warn(msg);
                 break;    
             case Project.MSG_INFO:
-            	if ((msg.indexOf("files were compiled") < 0) && (msg.indexOf("Linking...") < 0)) {
-            		log.debug(msg);
-            	} else {
+            	if ((msg.indexOf("files were compiled") >= 0) || (msg.indexOf("Linking...") >= 0)) {
             		log.info(msg);
+            	} else if (msg.indexOf("error") >= 0) {
+            		log.error(msg);
+            	} else if (msg.indexOf("warning") >= 0) {
+            		log.warn(msg);
+            	} else {
+            		log.debug(msg);
             	}
                 break;    
             case Project.MSG_VERBOSE:

@@ -22,7 +22,7 @@ import org.codehaus.plexus.util.PropertyUtils;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 6790b64f01c0 2007/07/20 20:49:23 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 9589202406dd 2007/07/23 17:42:54 duns $
  */
 public class NarUtil {
 
@@ -332,7 +332,8 @@ public class NarUtil {
 
 			errorGobbler.start();
 			outputGobbler.start();
-			return process.waitFor();
+			process.waitFor();
+			return process.exitValue();
 		} catch (Throwable e) {
 			throw new MojoExecutionException("Could not launch " + cmdLine[0],
 					e);

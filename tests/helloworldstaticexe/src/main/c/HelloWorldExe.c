@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[]) {
 	printf("%s\n", HelloWorldLib_sayHello());
-	return 0;
+	exit(0);
 }
 
 
