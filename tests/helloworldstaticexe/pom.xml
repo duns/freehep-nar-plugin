@@ -8,9 +8,9 @@
   <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
   <artifactId>helloworldstaticexe</artifactId>
   <packaging>nar</packaging>
-  <name>FreeHEP NAR Example Helloworld Statically linked Executable</name>
+  <name>FreeHEP NAR Example Helloworld Static Executable</name>
   <version>1.0-SNAPSHOT</version>
-  <description>FreeHEP NAR Example Helloworld Statically linked Executable</description>
+  <description>FreeHEP NAR Example Helloworld Static Executable</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>
