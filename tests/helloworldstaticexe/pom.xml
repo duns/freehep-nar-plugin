@@ -6,11 +6,11 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
-  <artifactId>helloworldexe</artifactId>
+  <artifactId>helloworldstaticexe</artifactId>
   <packaging>nar</packaging>
-  <name>FreeHEP NAR Example HelloWorld Executable</name>
+  <name>FreeHEP NAR Example Helloworld Statically linked Executable</name>
   <version>1.0-SNAPSHOT</version>
-  <description>FreeHEP NAR Example HelloWorld Executable</description>
+  <description>FreeHEP NAR Example Helloworld Statically linked Executable</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>

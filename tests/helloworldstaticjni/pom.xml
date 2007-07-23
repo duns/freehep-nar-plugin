@@ -8,9 +8,9 @@
   <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
   <artifactId>helloworldstaticjni</artifactId>
   <packaging>nar</packaging>
-  <name>FreeHEP NAR Example HelloWorld Static JNI</name>
+  <name>FreeHEP NAR Example Helloworld Static JNI</name>
   <version>1.0-SNAPSHOT</version>
-  <description>FreeHEP NAR Example HelloWorld using JNI and Staticly linked C Runtime</description>
+  <description>FreeHEP NAR Example Helloworld using JNI and Statically linked C Runtime</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>

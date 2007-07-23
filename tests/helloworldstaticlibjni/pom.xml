@@ -6,11 +6,11 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
-  <artifactId>helloworldsharedlibjni</artifactId>
+  <artifactId>helloworldstaticlibjni</artifactId>
   <packaging>nar</packaging>
-  <name>FreeHEP NAR Example HelloWorld Shared Library JNI</name>
+  <name>FreeHEP NAR Example HelloWorld JNI using Static Library</name>
   <version>1.0-SNAPSHOT</version>
-  <description>FreeHEP NAR Example HelloWorld using a Shared Library and JNI</description>
+  <description>FreeHEP NAR Example HelloWorld JNI using Static Library</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>
@@ -46,7 +46,7 @@
   <dependencies>
     <dependency>
       <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
-      <artifactId>helloworldsharedlib</artifactId>
+      <artifactId>helloworldstaticlib</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
