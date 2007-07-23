@@ -50,6 +50,7 @@
     <module>helloworldstaticexe</module>
 
     <module>helloworldjni</module>
+    <module>helloworldstaticjni</module>
     <module>hellothirdpartyjni</module>
     
     <module>helloworldsharedlib</module>

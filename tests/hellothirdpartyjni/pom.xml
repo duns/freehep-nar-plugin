@@ -8,9 +8,9 @@
   <groupId>org.freehep.freehep-nar-plugin.tests</groupId>
   <artifactId>hellothirdpartyjni</artifactId>
   <packaging>nar</packaging>
-  <name>FreeHEP NAR Example Hello Third Party JNI</name>
+  <name>FreeHEP NAR Example Helloworld Third Party JNI</name>
   <version>1.0-SNAPSHOT</version>
-  <description>FreeHEP NAR Example Hello Third Party using JNI</description>
+  <description>FreeHEP NAR Example Helloworld Third Party JNI</description>
   <repositories>
     <repository>
       <id>freehep-maven</id>
