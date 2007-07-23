@@ -26,6 +26,7 @@
         <artifactId>freehep-nar-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <runtime>static</runtime>
           <libraries>
             <library>
               <type>executable</type>

@@ -45,13 +45,19 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>helloworldjni</module>
-    <module>helloworldstaticjni</module>
-    <module>helloworldsharedlib</module>
-    <module>helloworldstaticlib</module>
-    <module>helloworldsharedlibjni</module>
-    <module>hellothirdpartyjni</module>
-    <module>helloworldsharedexe</module>
+
+    <module>helloworldexe</module>
     <module>helloworldstaticexe</module>
+
+    <module>helloworldjni</module>
+    <module>hellothirdpartyjni</module>
+    
+    <module>helloworldsharedlib</module>
+    <module>helloworldsharedlibexe</module>
+    <module>helloworldsharedlibjni</module>
+
+    <module>helloworldstaticlib</module>
+    <module>helloworldstaticlibexe</module>
+    <module>helloworldstaticlibjni</module>
   </modules>
 </project>
