@@ -41,7 +41,7 @@
                 <classifier/>
             </configuration>
         </component>
-
+        
         <component>
             <role>org.codehaus.plexus.archiver.Archiver</role>
             <role-hint>nar-library</role-hint>

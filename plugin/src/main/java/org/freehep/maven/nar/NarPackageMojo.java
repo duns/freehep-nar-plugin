@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 76e8ff7ad2b0 2007/07/24 04:15:54 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -37,6 +37,9 @@ public class NarPackageMojo extends AbstractCompileMojo {
 		if (shouldSkip())
 			return;
 
+		// FIX for NARPLUGIN-??? where -DupdateReleaseInfo copies to a .nar file
+		getMavenProject().getArtifact().setArtifactHandler(new NarArtifactHandler());
+		
 		narDirectory = new File(getOutputDirectory(), "nar");
 
 		info = new NarInfo(getMavenProject().getGroupId(), getMavenProject()

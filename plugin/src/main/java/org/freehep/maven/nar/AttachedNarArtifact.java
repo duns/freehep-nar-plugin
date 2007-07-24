@@ -11,22 +11,24 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * NarArtifact with its own type, classifier and artifactHandler.
  *
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java 76e8ff7ad2b0 2007/07/24 04:15:54 duns $
  */
 public class AttachedNarArtifact extends DefaultArtifact {
 
     public AttachedNarArtifact(String groupId, String artifactId, String version, String scope, 
                        String type, String classifier, boolean optional) throws InvalidVersionSpecificationException {
         super(groupId, artifactId, VersionRange.createFromVersionSpec(version), scope, 
-              type, classifier, new Handler(classifier), optional);              
+              type, classifier, null, optional);
+        setArtifactHandler(new Handler(classifier));
     }
 
     public AttachedNarArtifact(Artifact parent, String type, String classifier) {
         super(parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), 
-              type, classifier, new Handler(classifier), parent.isOptional());
+              type, classifier, null, parent.isOptional());
+        setArtifactHandler(new Handler(classifier));
     }
      
-    private static class Handler implements ArtifactHandler {
+    private class Handler implements ArtifactHandler {
         private String classifier;
         
         Handler(String classifier) {
@@ -34,6 +36,7 @@ public class AttachedNarArtifact extends DefaultArtifact {
         }
         
         public String getExtension() {
+        	System.err.println("**** "+classifier+" "+AttachedNarArtifact.this.isRelease());
             return "nar";
         }
 
