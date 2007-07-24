@@ -1,4 +1,4 @@
-// Copyright 2005-2006, FreeHEP.
+// Copyright 2005-2007, FreeHEP.
 package org.freehep.maven.nar;
  
 import org.apache.maven.artifact.Artifact;
@@ -11,7 +11,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * NarArtifact with its own type, classifier and artifactHandler.
  *
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java 76e8ff7ad2b0 2007/07/24 04:15:54 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AttachedNarArtifact.java 54f05023f537 2007/07/24 05:44:30 duns $
  */
 public class AttachedNarArtifact extends DefaultArtifact {
 
@@ -36,7 +36,6 @@ public class AttachedNarArtifact extends DefaultArtifact {
         }
         
         public String getExtension() {
-        	System.err.println("**** "+classifier+" "+AttachedNarArtifact.this.isRelease());
             return "nar";
         }
 
