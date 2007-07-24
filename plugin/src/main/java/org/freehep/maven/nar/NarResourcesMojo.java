@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.SelectorUtils;
  * @phase process-resources
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 4fd422622b8b 2007/07/24 20:55:00 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 5e00ca537ba0 2007/07/24 21:06:32 duns $
  */
 public class NarResourcesMojo extends AbstractCompileMojo {
 
@@ -55,10 +55,8 @@ public class NarResourcesMojo extends AbstractCompileMojo {
 				for (Iterator j = FileUtils.getDefaultExcludesAsList()
 						.iterator(); j.hasNext();) {
 					String exclude = (String)j.next();
-					System.err.println("Checking "+aols[i]+" "+exclude);
-					if (SelectorUtils.matchPath(exclude, aols[i])) {
+					if (SelectorUtils.matchPath(exclude.replace('/', File.separatorChar), aols[i])) {
 						ignore = true;
-						System.err.println(true);
 						break;
 					}
 				}
