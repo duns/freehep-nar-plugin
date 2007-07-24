@@ -2,9 +2,12 @@
 package org.freehep.maven.nar;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.LinkerDef;
@@ -17,204 +20,225 @@ import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Linker tag
- *
+ * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java fa60fc0e1a45 2007/07/19 21:47:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java 3738e21b3a51 2007/07/24 13:49:41 duns $
  */
 public class Linker {
 
-    /**
-     * The Linker
-     * Some choices are: "msvc", "g++", "CC", "icpc", ...
-     * Default is Architecture-OS-Linker specific:
-     * FIXME: table missing
-     *
-     * @parameter expression=""
-     */
-    private String name;  
-    
-    /**
-     * Enables or disables incremental linking.
-     *
-     * @parameter expression="" default-value="false"
-     * @required
-     */
-    private boolean incremental = false;
-
-    /**
-     * Enables or disables the production of a map file.
-     *
-     * @parameter expression="" default-value="false"
-     * @required
-     */
-    private boolean map = false;
-
-    /**
-     * Options for the linker
-     * Defaults to Architecture-OS-Linker specific values.
-     * FIXME table missing
-     *
-     * @parameter expression=""
-     */
-    private List options;
-
-    /**
-     * Clears default options
-	 *
-     * @parameter expression="" default-value="false"
-     * @required
+	/**
+	 * The Linker Some choices are: "msvc", "g++", "CC", "icpc", ... Default is
+	 * Architecture-OS-Linker specific: FIXME: table missing
+	 * 
+	 * @parameter expression=""
 	 */
-    private boolean clearDefaultOptions;
+	private String name;
 
-    /**
-     * (Windows only, Shared libs only) list of definition files.
-     * Defaults to none
-     *
-     * @parameter expression=""
-     */
-    private List definitions;
+	/**
+	 * Enables or disables incremental linking.
+	 * 
+	 * @parameter expression="" default-value="false"
+	 * @required
+	 */
+	private boolean incremental = false;
 
-    /**
-     * Adds libraries to the linker.
-     * 
-     * @parameter expression=""
-     */
-    private List/*<Lib>*/ libs; 
-     
-    /**
-     * Adds system libraries to the linker.
-     * 
-     * @parameter expression=""
-     */
-    private List/*<SysLib>*/ sysLibs; 
+	/**
+	 * Enables or disables the production of a map file.
+	 * 
+	 * @parameter expression="" default-value="false"
+	 * @required
+	 */
+	private boolean map = false;
 
-    public Linker() {
-    	// default constructor for use as TAG
-    }
-    
-    /**
-     * For use with specific named linker.
-     * 
-     * @param name
-     */
-    public Linker(String name) {
-    	this.name = name;
-    }
-    
-    public String getName(Properties defaults, String prefix) throws MojoFailureException {
-        if ((name == null) && (defaults != null) && (prefix != null)) {
-            name = defaults.getProperty(prefix+"linker");
-        }
-        if (name == null) {
-            throw new MojoFailureException("NAR: Please specify a <Name> as part of <Linker>");
-        }        
-        return name;
-    }
+	/**
+	 * Options for the linker Defaults to Architecture-OS-Linker specific
+	 * values. FIXME table missing
+	 * 
+	 * @parameter expression=""
+	 */
+	private List options;
 
-    public LinkerDef getLinker(AbstractDependencyMojo mojo, Project antProject, String os, 
-                               String prefix, String type) 
-                throws MojoFailureException, MojoExecutionException {
-        if (name == null) {
-            throw new MojoFailureException("NAR: Please specify a <Name> as part of <Linker>");
-        }        
+	/**
+	 * Clears default options
+	 * 
+	 * @parameter expression="" default-value="false"
+	 * @required
+	 */
+	private boolean clearDefaultOptions;
 
-        LinkerDef linker = new LinkerDef();
-        linker.setProject(antProject);
-        LinkerEnum linkerEnum = new LinkerEnum();
-        linkerEnum.setValue(name);
-        linker.setName(linkerEnum);
+	/**
+	 * Adds libraries to the linker.
+	 * 
+	 * @parameter expression=""
+	 */
+	private List/* <Lib> */libs;
 
-        // incremental, map
-        linker.setIncremental(incremental);
-        linker.setMap(map);
+	/**
+	 * Adds system libraries to the linker.
+	 * 
+	 * @parameter expression=""
+	 */
+	private List/* <SysLib> */sysLibs;
 
-        // Add definitions (Window only)
-        if (os.equals("Windows") && type.equals("shared") && (definitions != null)) {
-            for (Iterator i=definitions.iterator(); i.hasNext(); ) {
-                LinkerArgument arg = new LinkerArgument();
-                arg.setValue("/def:"+(String)i.next());
-                linker.addConfiguredLinkerArg(arg);
-            }
-        }
+	public Linker() {
+		// default constructor for use as TAG
+	}
 
-        // Add options to linker
-        if (options != null) {
-            for (Iterator i=options.iterator(); i.hasNext(); ) {
-                LinkerArgument arg = new LinkerArgument();
-                arg.setValue((String)i.next());
-                linker.addConfiguredLinkerArg(arg);
-            }
-        }
-        
-        if (!clearDefaultOptions) {
-            String options = NarUtil.getDefaults().getProperty(prefix+"options");
-            if (options != null) {
-                String[] option = options.split(" ");
-                for (int i=0; i<option.length; i++) {
-                    LinkerArgument arg = new LinkerArgument();
-                    arg.setValue(option[i]);
-                    linker.addConfiguredLinkerArg(arg);
-                }          
-            }
-        }
+	/**
+	 * For use with specific named linker.
+	 * 
+	 * @param name
+	 */
+	public Linker(String name) {
+		this.name = name;
+	}
 
-        // Add Libraries to linker
-        if (libs != null) {
-            for (Iterator i=libs.iterator(); i.hasNext(); ) {
-                Lib lib = (Lib)i.next();
-                lib.addLibSet(mojo, linker, antProject);
-            }
-        } else {
-            String libsList = NarUtil.getDefaults().getProperty(prefix+"libs");
-            if (libsList != null) {
-                String[] lib = libsList.split(", ");
-                for (int i=0; i<lib.length; i++) {
-                    String[] libInfo = lib[i].split(":", 3);
-                    LibrarySet libSet = new LibrarySet();
-                    libSet.setProject(antProject);
-                    libSet.setLibs(new CUtil.StringArrayBuilder(libInfo[0]));
-                    if (libInfo.length > 1) {
-                        LibraryTypeEnum libType = new LibraryTypeEnum();
-                        libType.setValue(libInfo[1]);
-                        libSet.setType(libType);
-                        if (libInfo.length > 2) {
-                            libSet.setDir(new File(libInfo[2]));
-                        }
-                    }
-                    
-                    linker.addLibset(libSet);
-                }            
-            }
-        }
+	public String getName(Properties defaults, String prefix)
+			throws MojoFailureException {
+		if ((name == null) && (defaults != null) && (prefix != null)) {
+			name = defaults.getProperty(prefix + "linker");
+		}
+		if (name == null) {
+			throw new MojoFailureException(
+					"NAR: Please specify a <Name> as part of <Linker>");
+		}
+		return name;
+	}
 
-        // Add System Libraries to linker
-        if (sysLibs != null) {
-            for (Iterator i=sysLibs.iterator(); i.hasNext(); ) {
-                SysLib sysLib = (SysLib)i.next();
-                linker.addSyslibset(sysLib.getSysLibSet(antProject));
-            }
-        } else {
-            String sysLibsList = NarUtil.getDefaults().getProperty(prefix+"sysLibs");
-            if (sysLibsList != null) {
-                String[] sysLib = sysLibsList.split(", ");
-                for (int i=0; i<sysLib.length; i++) {
-                    String[] sysLibInfo = sysLib[i].split(":", 2);
-                    SystemLibrarySet sysLibSet = new SystemLibrarySet();
-                    sysLibSet.setProject(antProject);
-                    sysLibSet.setLibs(new CUtil.StringArrayBuilder(sysLibInfo[0]));
-                    if (sysLibInfo.length > 1) {
-                        LibraryTypeEnum sysLibType = new LibraryTypeEnum();
-                        sysLibType.setValue(sysLibInfo[1]);
-                        sysLibSet.setType(sysLibType);
-                    }
-                    linker.addSyslibset(sysLibSet);
-                }            
-            }
-        }
+	public LinkerDef getLinker(AbstractCompileMojo mojo, Project antProject,
+			String os, String prefix, String type) throws MojoFailureException,
+			MojoExecutionException {
+		if (name == null) {
+			throw new MojoFailureException(
+					"NAR: Please specify a <Name> as part of <Linker>");
+		}
 
-        return linker;
-    }
+		LinkerDef linker = new LinkerDef();
+		linker.setProject(antProject);
+		LinkerEnum linkerEnum = new LinkerEnum();
+		linkerEnum.setValue(name);
+		linker.setName(linkerEnum);
+
+		// incremental, map
+		linker.setIncremental(incremental);
+		linker.setMap(map);
+
+		// Add definitions (Window only)
+		if (os.equals(OS.WINDOWS)
+				&& (type.equals(Library.SHARED) || type.equals(Library.JNI))) {
+			Set defs = new HashSet();
+			try {
+				File cSrcDir = mojo.getC().getSourceDirectory();
+				if (cSrcDir.exists())
+					defs.addAll(FileUtils.getFiles(cSrcDir, "**/*.def", null));
+			} catch (IOException e) {
+			}
+			try {
+				File cppSrcDir = mojo.getCpp().getSourceDirectory();
+				if (cppSrcDir.exists())
+					defs
+							.addAll(FileUtils.getFiles(cppSrcDir, "**/*.def",
+									null));
+			} catch (IOException e) {
+			}
+			try {
+				File fortranSrcDir = mojo.getFortran().getSourceDirectory();
+				if (fortranSrcDir.exists())
+					defs.addAll(FileUtils.getFiles(fortranSrcDir, "**/*.def",
+							null));
+			} catch (IOException e) {
+			}
+
+			for (Iterator i = defs.iterator(); i.hasNext();) {
+				LinkerArgument arg = new LinkerArgument();
+				arg.setValue("/def:" + (File) i.next());
+				linker.addConfiguredLinkerArg(arg);
+			}
+		}
+
+		// Add options to linker
+		if (options != null) {
+			for (Iterator i = options.iterator(); i.hasNext();) {
+				LinkerArgument arg = new LinkerArgument();
+				arg.setValue((String) i.next());
+				linker.addConfiguredLinkerArg(arg);
+			}
+		}
+
+		if (!clearDefaultOptions) {
+			String options = NarUtil.getDefaults().getProperty(
+					prefix + "options");
+			if (options != null) {
+				String[] option = options.split(" ");
+				for (int i = 0; i < option.length; i++) {
+					LinkerArgument arg = new LinkerArgument();
+					arg.setValue(option[i]);
+					linker.addConfiguredLinkerArg(arg);
+				}
+			}
+		}
+
+		// Add Libraries to linker
+		if (libs != null) {
+			for (Iterator i = libs.iterator(); i.hasNext();) {
+				Lib lib = (Lib) i.next();
+				lib.addLibSet(mojo, linker, antProject);
+			}
+		} else {
+			String libsList = NarUtil.getDefaults()
+					.getProperty(prefix + "libs");
+			if (libsList != null) {
+				String[] lib = libsList.split(", ");
+				for (int i = 0; i < lib.length; i++) {
+					String[] libInfo = lib[i].split(":", 3);
+					LibrarySet libSet = new LibrarySet();
+					libSet.setProject(antProject);
+					libSet.setLibs(new CUtil.StringArrayBuilder(libInfo[0]));
+					if (libInfo.length > 1) {
+						LibraryTypeEnum libType = new LibraryTypeEnum();
+						libType.setValue(libInfo[1]);
+						libSet.setType(libType);
+						if (libInfo.length > 2) {
+							libSet.setDir(new File(libInfo[2]));
+						}
+					}
+
+					linker.addLibset(libSet);
+				}
+			}
+		}
+
+		// Add System Libraries to linker
+		if (sysLibs != null) {
+			for (Iterator i = sysLibs.iterator(); i.hasNext();) {
+				SysLib sysLib = (SysLib) i.next();
+				linker.addSyslibset(sysLib.getSysLibSet(antProject));
+			}
+		} else {
+			String sysLibsList = NarUtil.getDefaults().getProperty(
+					prefix + "sysLibs");
+			if (sysLibsList != null) {
+				String[] sysLib = sysLibsList.split(", ");
+				for (int i = 0; i < sysLib.length; i++) {
+					String[] sysLibInfo = sysLib[i].split(":", 2);
+					SystemLibrarySet sysLibSet = new SystemLibrarySet();
+					sysLibSet.setProject(antProject);
+					sysLibSet.setLibs(new CUtil.StringArrayBuilder(
+							sysLibInfo[0]));
+					if (sysLibInfo.length > 1) {
+						LibraryTypeEnum sysLibType = new LibraryTypeEnum();
+						sysLibType.setValue(sysLibInfo[1]);
+						sysLibSet.setType(sysLibType);
+					}
+					linker.addSyslibset(sysLibSet);
+				}
+			}
+		}
+
+		return linker;
+	}
 }

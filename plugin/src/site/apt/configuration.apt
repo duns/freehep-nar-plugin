@@ -53,9 +53,6 @@ NAR Configuration
       <option/>
     </options>
     <clearDefaultOptions/>
-    <definitions>
-      <definition>
-    </definitions>
     <libs>
       <lib>
         <name/>
@@ -261,11 +258,6 @@ the command line for compatible compilers/linkers. Default is false.
 ** {linker clearDefaultOptions}
 
 	Clear options specified in AOL properties.
-
-** {linker definitions}
-
-   	(Windows only, Shared libs only) list of definition files.
-    Defaults to none.
 
 ** {linker libs}
 
