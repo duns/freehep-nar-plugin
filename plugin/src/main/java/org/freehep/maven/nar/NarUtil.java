@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -19,10 +20,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.PropertyUtils;
+import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 9589202406dd 2007/07/23 17:42:54 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java eeac31f37379 2007/07/24 04:02:00 duns $
  */
 public class NarUtil {
 
@@ -104,7 +106,7 @@ public class NarUtil {
 	}
 
 	public static void makeExecutable(File file, final Log log)
-			throws MojoExecutionException {
+			throws MojoExecutionException, MojoFailureException {
 		if (!file.exists())
 			return;
 
@@ -117,7 +119,7 @@ public class NarUtil {
 		if (file.isFile() && file.canRead() && file.canWrite()
 				&& !file.isHidden()) {
 			// chmod +x file
-			int result = runCommand(new String[] { "chmod", "+x",
+			int result = runCommand("chmod", new String[] { "+x",
 					file.getPath() }, null, log);
 			if (result != 0) {
 				throw new MojoExecutionException("Failed to execute 'chmod +x "
@@ -128,11 +130,11 @@ public class NarUtil {
 	}
 
 	public static void runRanlib(File file, final Log log)
-			throws MojoExecutionException {
+			throws MojoExecutionException, MojoFailureException {
 		if (!file.exists()) {
 			return;
 		}
-		
+
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
 			for (int i = 0; i < files.length; i++) {
@@ -142,7 +144,7 @@ public class NarUtil {
 		if (file.isFile() && file.canRead() && file.canWrite()
 				&& !file.isHidden() && file.getName().endsWith(".a")) {
 			// ranlib file
-			int result = runCommand(new String[] { "ranlib", file.getPath() },
+			int result = runCommand("ranlib", new String[] { file.getPath() },
 					null, log);
 			if (result != 0) {
 				throw new MojoExecutionException("Failed to execute 'ranlib "
@@ -309,22 +311,65 @@ public class NarUtil {
 		return envValue;
 	}
 
-	public static int runCommand(String[] cmdLine, String[] env, Log log)
-			throws MojoExecutionException {
-		try {
-			log.debug("RunCommand:");
-			for (int i = 0; i < cmdLine.length; i++) {
-				log.debug("  '" + cmdLine[i] + "'");
-			}
-			if ((env != null) && (env.length > 0)) {
-				log.debug("with Env:");
-				for (int i = 0; i < env.length; i++) {
-					log.debug("   '" + env[i]+"'");
-				}
-			}
+	public static String addLibraryPathToEnv(String path, Map environment,
+			String os) {
+		String pathName = null;
+		char separator = ' ';
+		if (os.equals(OS.WINDOWS)) {
+			pathName = "PATH";
+			separator = ';';
+		} else if (os.equals(OS.MACOSX)) {
+			pathName = "DYLD_LIBRARY_PATH";
+			separator = ':';
+		} else {
+			pathName = "LD_LIBRARY_PATH";
+			separator = ':';
+		}
 
-			Runtime runtime = Runtime.getRuntime();
-			Process process = runtime.exec(cmdLine, env);
+		String value = environment != null ? (String) environment.get(pathName)
+				: null;
+		if (value == null) {
+			value = NarUtil.getEnv(pathName, pathName, null);
+		}
+
+		path = path.replace(File.pathSeparatorChar, separator);
+		if (value != null) {
+			value += separator + path;
+		} else {
+			value = path;
+		}
+		if (environment != null) {
+			environment.put(pathName, value);
+		}
+		return pathName + "=" + value;
+	}
+
+	public static int runCommand(String cmd, String[] args, String[] env,
+			Log log) throws MojoExecutionException, MojoFailureException {
+		log.debug("RunCommand: " + cmd);
+		Commandline cmdLine = new Commandline();
+		cmdLine.setExecutable(cmd);
+		if (args != null) {
+			for (int i = 0; i < args.length; i++) {
+				log.debug("  '" + args[i] + "'");
+			}
+			cmdLine.addArguments(args);
+		}
+
+		if (env != null) {
+			log.debug("with Env:");
+			for (int i = 0; i < env.length; i++) {
+				String[] nameValue = env[i].split("=", 2);
+				if (nameValue.length < 2)
+					throw new MojoFailureException("   Misformed env: '"
+							+ env[i] + "'");
+				log.debug("   '" + env[i] + "'");
+				cmdLine.addEnvironment(nameValue[0], nameValue[1]);
+			}
+		}
+
+		try {
+			Process process = cmdLine.execute();
 			StreamGobbler errorGobbler = new StreamGobbler(process
 					.getErrorStream(), true, log);
 			StreamGobbler outputGobbler = new StreamGobbler(process
@@ -335,7 +380,7 @@ public class NarUtil {
 			process.waitFor();
 			return process.exitValue();
 		} catch (Throwable e) {
-			throw new MojoExecutionException("Could not launch " + cmdLine[0],
+			throw new MojoExecutionException("Could not launch " + cmdLine,
 					e);
 		}
 	}

@@ -73,7 +73,7 @@ import org.codehaus.plexus.util.StringUtils;
  * maven-surefire-plugin.
  * 
  * @author Jason van Zyl (modified by Mark Donszelmann, noted by FREEHEP)
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java fa60fc0e1a45 2007/07/19 21:47:21 duns $,
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarIntegrationTestMojo.java eeac31f37379 2007/07/24 04:02:00 duns $,
  *          2.3 maven repository maven-surefire-plugin
  * @requiresDependencyResolution test
  * @goal nar-integration-test
@@ -792,7 +792,12 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 				// spaces as
 				// SureFireBooter splits the line in parts and then quotes
 				// it wrongly
-				addPathToEnv(javaLibraryPath.toString());
+				NarUtil.addLibraryPathToEnv(javaLibraryPath.toString(), environmentVariables, getOS());
+			}
+			
+			// necessary to find WinSxS
+			if (getOS().equals(OS.WINDOWS)) {
+				environmentVariables.put("SystemRoot", NarUtil.getEnv("SystemRoot", "SystemRoot", "C:\\Windows"));
 			}
 			// ENDFREEHEP
 
@@ -821,36 +826,6 @@ public class NarIntegrationTestMojo extends AbstractCompileMojo {
 
 		return surefireBooter;
 	}
-
-	// BEGINFREEHEP
-	private void addPathToEnv(String path) {
-		String pathName = null;
-		char separator = ' ';
-		if (getOS().equals(OS.WINDOWS)) {
-			pathName = "PATH";
-			separator = ';';
-		} else if (getOS().equals(OS.MACOSX)) {
-			pathName = "DYLD_LIBRARY_PATH";
-			separator = ':';
-		} else {
-			pathName = "LD_LIBRARY_PATH";
-			separator = ':';
-		}
-
-		String value = (String) environmentVariables.get(pathName);
-		if (value == null) {
-			value = NarUtil.getEnv(pathName, pathName, null);
-		}
-
-		path = path.replace(File.pathSeparatorChar, separator);
-		if (value != null) {
-			value += separator + path;
-		} else {
-			value = path;
-		}
-		environmentVariables.put(pathName, value);
-	}
-	// ENDFREEHEP
 
 	private void showMap(Map map, String setting) {
 		for (Iterator i = map.keySet().iterator(); i.hasNext();) {

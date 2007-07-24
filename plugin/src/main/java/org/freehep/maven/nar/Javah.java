@@ -14,6 +14,7 @@ import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
@@ -26,7 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Sets up the javah configuration
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java 353465868c1e 2007/07/20 14:59:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Javah.java eeac31f37379 2007/07/24 04:02:00 duns $
  */
 public class Javah {
 
@@ -160,7 +161,7 @@ public class Javah {
         return timestampFile; 
     }
         
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         getClassDirectory().mkdirs();
         
         try {        
@@ -189,7 +190,10 @@ public class Javah {
                     getTimestampDirectory().mkdirs();
 
                     mojo.getLog().info( "Running "+name+" compiler on "+files.size()+" classes...");
-                    NarUtil.runCommand(generateCommandLine(files), null, mojo.getLog());
+                    int result = NarUtil.runCommand(name, generateArgs(files), null, mojo.getLog());
+                    if (result != 0) {
+                    	throw new MojoFailureException(name+" failed with exit code "+result+" 0x"+Integer.toHexString(result));
+                    }
                     FileUtils.fileWrite(getTimestampDirectory()+"/"+getTimestampFile(), "");
                 }
             }
@@ -202,36 +206,32 @@ public class Javah {
         }
     }
 
-    private String[] generateCommandLine(Set/*<String>*/ classes) throws MojoExecutionException {
+    private String[] generateArgs(Set/*<String>*/ classes) throws MojoExecutionException {
         
-        List cmdLine = new ArrayList();
-        
-        cmdLine.add(name);
+        List args = new ArrayList();
         
         if (!bootClassPaths.isEmpty()) {
-            cmdLine.add("-bootclasspath");        
-            cmdLine.add(StringUtils.join(bootClassPaths.iterator(), File.pathSeparator));
+            args.add("-bootclasspath");        
+            args.add(StringUtils.join(bootClassPaths.iterator(), File.pathSeparator));
         }
         
-        cmdLine.add("-classpath");
-        cmdLine.add(StringUtils.join(getClassPaths().iterator(), File.pathSeparator));
+        args.add("-classpath");
+        args.add(StringUtils.join(getClassPaths().iterator(), File.pathSeparator));
         
-        cmdLine.add("-d");
-        cmdLine.add(getJniDirectory().getPath());        
+        args.add("-d");
+        args.add(getJniDirectory().getPath());        
         
         if (mojo.getLog().isDebugEnabled()) {
-            cmdLine.add("-verbose");
+            args.add("-verbose");
         }
     
         if (classes != null) {
             for (Iterator i = classes.iterator(); i.hasNext(); ) {
-                cmdLine.add((String)i.next());
+                args.add((String)i.next());
             }
         }
         
-        mojo.getLog().debug(cmdLine.toString());
-        
-        return (String[])cmdLine.toArray(new String[cmdLine.size()]);
+        return (String[])args.toArray(new String[args.size()]);
     }        
 }
 

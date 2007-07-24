@@ -28,7 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 353465868c1e 2007/07/20 14:59:21 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java eeac31f37379 2007/07/24 04:02:00 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -231,14 +231,15 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 		
 		// FIXME, this should be done in CPPTasks at some point
-		if (getOS().equals(OS.WINDOWS) && 
+		if (getRuntime().equals("dynamic") &&
+			getOS().equals(OS.WINDOWS) && 
 		    getLinker().getName(null, null).equals("msvc") && 
 		    NarUtil.getEnv("MSVCVer", "MSVCVer", "6.0").startsWith("8.")) {
 			String libType = library.getType();
 			if (libType.equals(Library.JNI) || libType.equals(Library.SHARED)) {
 				String dll = outFile.getPath()+".dll";
 				String manifest = dll+".manifest";
-				int result = NarUtil.runCommand(new String[] {"mt.exe", "/manifest", manifest, "/outputresource:"+dll+";#2"}, null, getLog());
+				int result = NarUtil.runCommand("mt.exe", new String[] {"/manifest", manifest, "/outputresource:"+dll+";#2"}, null, getLog());
 				if (result != 0)
 					throw new MojoFailureException("MT.EXE failed with exit code: " + result);
 			}

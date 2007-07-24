@@ -21,7 +21,7 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java fd78a3770f65 2007/07/20 16:19:50 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java eeac31f37379 2007/07/24 04:02:00 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
 
@@ -45,13 +45,14 @@ public class NarTestMojo extends AbstractCompileMojo {
 		if (test.shouldRun()) {
 			String name = "target/test-nar/bin/" + getAOL() + "/" + test.getName();
 			getLog().info("Running " + name);
-			int result = NarUtil.runCommand(generateCommandLine(getMavenProject()
+			List args = test.getArgs();
+			int result = NarUtil.runCommand(getMavenProject()
 					.getBasedir()
-					+ "/" + name, test), generateEnvironment(test,
+					+ "/" + name, (String[]) args.toArray(new String[args.size()]), generateEnvironment(test,
 					getLog()), getLog());
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
-						+ " failed with exit code: " + result);
+						+ " failed with exit code: " + result+" 0x"+Integer.toHexString(result));
 		}
 	}
 
@@ -62,29 +63,18 @@ public class NarTestMojo extends AbstractCompileMojo {
 			String name = "target/nar/bin/" + getAOL() + "/"
 					+ project.getArtifactId();
 			getLog().info("Running " + name);
-			int result = NarUtil.runCommand(generateCommandLine(project.getBasedir()
-					+ "/" + name, library), generateEnvironment(
+			List args = library.getArgs();
+			int result = NarUtil.runCommand(project.getBasedir()
+					+ "/" + name, (String[]) args.toArray(new String[args.size()]), generateEnvironment(
 					library, getLog()), getLog());
 			if (result != 0)
 				throw new MojoFailureException("Test " + name
-						+ " failed with exit code: " + result);
+						+ " failed with exit code: " + result+" 0x"+Integer.toHexString(result));
 		}
 	}
 
 	protected File getTargetDirectory() {
 		return new File(getMavenProject().getBuild().getDirectory(), "test-nar");
-	}
-
-	private String[] generateCommandLine(String name, Executable exec)
-			throws MojoExecutionException {
-
-		List cmdLine = new ArrayList();
-
-		cmdLine.add(name);
-
-		cmdLine.addAll(exec.getArgs());
-
-		return (String[]) cmdLine.toArray(new String[cmdLine.size()]);
 	}
 
 	private String[] generateEnvironment(Executable exec, Log log)
@@ -130,11 +120,16 @@ public class NarTestMojo extends AbstractCompileMojo {
 				sharedPath += ((File)i.next()).getPath();
 				if (i.hasNext()) sharedPath += File.pathSeparator;
 			}
-			
-			String sharedPathName = getOS().equals(OS.MACOSX) ? "DYLD_LIBRARY_PATH" : getOS().startsWith("Windows") ? "PATH" : "LD_LIBRARY_PATH";
-			env.add(sharedPathName+"="+sharedPath);
+		
+			String sharedEnv = NarUtil.addLibraryPathToEnv(sharedPath, null, getOS());
+			env.add(sharedEnv);
 		}
 		
-		return (String[]) env.toArray(new String[env.size()]);
+		// necessary to find WinSxS
+		if (getOS().equals(OS.WINDOWS)) {
+			env.add("SystemRoot="+NarUtil.getEnv("SystemRoot", "SystemRoot", "C:\\Windows"));
+		}
+		
+		return env.size() > 0 ? (String[]) env.toArray(new String[env.size()]) : null;
 	}
 }
