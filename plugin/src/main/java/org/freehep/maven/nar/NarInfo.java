@@ -15,7 +15,7 @@ import org.apache.maven.plugin.logging.Log;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java 374f8c441944 2007/07/25 05:22:18 duns $
  */
 public class NarInfo {
 
@@ -85,6 +85,10 @@ public class NarInfo {
 		return getProperty(aol, aol, aol);
 	}
 
+	public String getOptions(String aol) {
+		return getProperty(aol, "linker.options", null);
+	}
+	
 	public String getLibs(String aol) {
 		return getProperty(aol, "libs.names", artifactId+"-"+version);
 	}

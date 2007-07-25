@@ -9,9 +9,11 @@ import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
+import net.sf.antcontrib.cpptasks.LinkerDef;
 import net.sf.antcontrib.cpptasks.OutputTypeEnum;
 import net.sf.antcontrib.cpptasks.RuntimeType;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
+import net.sf.antcontrib.cpptasks.types.LinkerArgument;
 import net.sf.antcontrib.cpptasks.types.SystemLibrarySet;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,7 +30,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java eeac31f37379 2007/07/24 04:02:00 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 374f8c441944 2007/07/25 05:22:18 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -161,8 +163,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 
 		// add linker
-		task.addConfiguredLinker(getLinker().getLinker(this, antProject,
-				getOS(), getAOLKey() + "linker.", type));
+		LinkerDef linkerDefinition = getLinker().getLinker(this, antProject,
+				getOS(), getAOLKey() + "linker.", type);
+		task.addConfiguredLinker(linkerDefinition);
 
 		// add dependency libraries
 		// FIXME: what about PLUGIN and STATIC, depending on STATIC, should we
@@ -204,6 +207,15 @@ public class NarCompileMojo extends AbstractCompileMojo {
 												+ " does NOT exist.");
 					}
 
+					// FIXME, look again at this, for multiple dependencies we may need to remove duplicates
+					String options = dependency.getNarInfo().getOptions(getAOL());
+					if (options != null) {
+						getLog().debug("Using OPTIONS = " + options);
+						LinkerArgument arg = new LinkerArgument();
+						arg.setValue(options);
+						linkerDefinition.addConfiguredLinkerArg(arg);
+					}
+					
 					String sysLibs = dependency.getNarInfo().getSysLibs(
 							getAOL());
 					if (sysLibs != null) {
