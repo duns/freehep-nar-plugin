@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java eeac31f37379 2007/07/24 04:02:00 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 4701ecc36070 2007/07/25 22:22:37 duns $
  */
 public class NarUtil {
 
@@ -47,8 +47,10 @@ public class NarUtil {
 		// adjust OS if not given
 		if (os == null) {
 			os = System.getProperty("os.name");
-			if (os.startsWith("Windows"))
-				os = OS.WINDOWS;
+                        if (os.startsWith("Windows"))
+                            os = OS.WINDOWS;
+                        if (os.startsWith("windows"))
+                            os = OS.WINDOWS;
 			if (os.equals("Mac OS X"))
 				os = OS.MACOSX;
 		}
