@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java f934ad2b8948 2007/07/13 14:17:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java e0ab95b852ae 2007/07/26 16:58:18 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -115,11 +115,12 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 				"nar/lib/" + getAOL() + "/" + test.getLink());
 
 		// copy shared library
+		// FIXME why do we do this ?
 		if (test.getLink().equals(Library.SHARED)) {
 			try {
 				// defaults are Unix
 				String libPrefix = NarUtil.getDefaults().getProperty(
-						getAOLKey() + "lib.prefix", "lib");
+						getAOLKey() + "shared.prefix", "lib");
 				String libExt = NarUtil.getDefaults().getProperty(
 						getAOLKey() + "shared.extension", "so");
 				File copyDir = new File(getTargetDirectory(), (getOS().equals(
@@ -127,7 +128,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 						+ "/" + getAOL() + "/" + test.getLink());
 				FileUtils.copyFileToDirectory(new File(libDir, libPrefix
 						+ libName + "." + libExt), copyDir);
-				if (!getOS().equals("Windows")) {
+				if (!getOS().equals(OS.WINDOWS)) {
 					libDir = copyDir;
 				}
 			} catch (IOException e) {
