@@ -14,7 +14,7 @@ i386-MacOSX-g++		1800	1034
 ppc-MacOSX-g++		3467	1992
 i386-Linux-g++				826
 x86-Windows-msvc	1701	1035
-
+x86-Windows-g++		5232	2894
 
 Geant4 75 Files
 
