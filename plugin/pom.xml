@@ -54,7 +54,7 @@
     <dependency>
       <groupId>net.sf.antcontrib</groupId>
       <artifactId>cpptasks</artifactId>
-      <version>1.0-beta-4-parallel-1</version>
+      <version>1.0-beta-4-parallel-2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>bcel</groupId>
