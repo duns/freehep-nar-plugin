@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 76e8ff7ad2b0 2007/07/24 04:15:54 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 2126b860c9c5 2007/07/31 23:19:30 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -38,8 +38,9 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			return;
 
 		// FIX for NARPLUGIN-??? where -DupdateReleaseInfo copies to a .nar file
-		getMavenProject().getArtifact().setArtifactHandler(new NarArtifactHandler());
-		
+		getMavenProject().getArtifact().setArtifactHandler(
+				new NarArtifactHandler());
+
 		narDirectory = new File(getOutputDirectory(), "nar");
 
 		info = new NarInfo(getMavenProject().getGroupId(), getMavenProject()
@@ -88,7 +89,11 @@ public class NarPackageMojo extends AbstractCompileMojo {
 			}
 		}
 
-		info.setBinding(null, bindingType != null ? bindingType : Library.NONE);
+		// override binding if not set
+		if (info.getBinding(null, null) == null) {
+			info.setBinding(null, bindingType != null ? bindingType
+					: Library.NONE);
+		}
 
 		try {
 			info.writeToFile(propertiesFile);

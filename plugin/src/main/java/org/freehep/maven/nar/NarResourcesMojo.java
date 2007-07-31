@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.SelectorUtils;
  * @phase process-resources
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 5e00ca537ba0 2007/07/24 21:06:32 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarResourcesMojo.java 2126b860c9c5 2007/07/31 23:19:30 duns $
  */
 public class NarResourcesMojo extends AbstractCompileMojo {
 
@@ -31,9 +31,34 @@ public class NarResourcesMojo extends AbstractCompileMojo {
 	 * Directory for nar resources. Defaults to src/nar/resources
 	 * 
 	 * @parameter expression="${basedir}/src/nar/resources"
+	 * @required
 	 */
 	private File resourceDirectory;
 
+	/**
+	 * Binary directory (relative to ${resourceDirectory}/aol/${aol}
+	 * 
+	 * @parameter expression="bin"
+	 * @required
+	 */
+	private String resourceBinDir;
+	
+	/**
+	 * Include directory (relative to ${resourceDirectory}/aol/${aol}
+	 * 
+	 * @parameter expression="include"
+	 * @required
+	 */
+	private String resourceIncludeDir;
+	
+	/**
+	 * Library directory (relative to ${resourceDirectory}/aol/${aol}
+	 * 
+	 * @parameter expression="lib"
+	 * @required
+	 */
+	private String resourceLibDir;
+	
     /**
      * To look up Archiver/UnArchiver implementations
      *
@@ -73,7 +98,7 @@ public class NarResourcesMojo extends AbstractCompileMojo {
 		int copied = 0;
 		try {
 			// copy headers
-			File includeDir = new File(aolDir, "include");
+			File includeDir = new File(aolDir, resourceIncludeDir);
 			if (includeDir.exists()) {
 				File includeDstDir = new File(getTargetDirectory(), "include");
 				copied += NarUtil.copyDirectoryStructure(includeDir,
@@ -81,7 +106,7 @@ public class NarResourcesMojo extends AbstractCompileMojo {
 			}
 
 			// copy binaries
-			File binDir = new File(aolDir, "bin");
+			File binDir = new File(aolDir, resourceBinDir);
 			if (binDir.exists()) {
 				File binDstDir = new File(getTargetDirectory(), "bin");
 				binDstDir = new File(binDstDir, aol);
@@ -91,7 +116,7 @@ public class NarResourcesMojo extends AbstractCompileMojo {
 			}
 
 			// copy libraries
-			File libDir = new File(aolDir, "lib");
+			File libDir = new File(aolDir, resourceLibDir);
 			if (libDir.exists()) {
 				// create all types of libs
 				for (Iterator i = getLibraries().iterator(); i.hasNext();) {

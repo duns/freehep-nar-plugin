@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -15,7 +16,7 @@ import org.apache.maven.plugin.logging.Log;
 /**
  * 
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java 374f8c441944 2007/07/25 05:22:18 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarInfo.java 2126b860c9c5 2007/07/31 23:19:30 duns $
  */
 public class NarInfo {
 
@@ -31,6 +32,28 @@ public class NarInfo {
         this.log = log;
         info = new Properties();
     }
+	
+	public String toString() {
+		StringBuffer s = new StringBuffer("NarInfo for ");
+		s.append(groupId);
+		s.append(":");
+		s.append(artifactId);
+		s.append("-");
+		s.append(version);
+		s.append(" {\n");
+		
+		for (Iterator i=info.keySet().iterator(); i.hasNext(); ) {
+			String key = (String)i.next();
+			s.append("   ");
+			s.append(key);
+			s.append("='");
+			s.append(info.getProperty(key, "<null>"));
+			s.append("'\n");
+		}
+		
+		s.append("}\n");
+		return s.toString();
+	}
     
     public boolean exists(JarFile jar) {
         return getNarPropertiesEntry(jar) != null;

@@ -16,6 +16,9 @@ NAR Configuration
   <javaHome/>
   <aol/>
   <resourceDirectory/>
+  <resourceBinDir/>
+  <resourceIncludeDir/>
+  <resourceLibDir/>
   <maxCores/>
   <targetDirectory/>
   <output/>
@@ -168,6 +171,18 @@ os and linker.name value.
 
 	Directory with NAR related resources. Used by the nar-resources goal, which
 copies resources over to the target area. Defaults to ${basedir}/src/nar/resources.
+
+* {resourceBinDir}
+
+	Directory with binaries, relative to ${resourceDirectory}. Defaults to bin.
+
+* {resourceIncludeDir}
+
+	Directory with includes, relative to ${resourceDirectory}. Defaults to include.
+
+* {resourceLibDir}
+
+	Directory with libraries, relative to ${resourceDirectory}. Defaults to lib.
 
 * {maxCores}
 
