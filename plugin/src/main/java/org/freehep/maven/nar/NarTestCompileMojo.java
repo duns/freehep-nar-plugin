@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java e0ab95b852ae 2007/07/26 16:58:18 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 8c1556b1d379 2007/08/07 23:21:18 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -116,6 +116,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
 		// copy shared library
 		// FIXME why do we do this ?
+/* Removed in alpha-10
 		if (test.getLink().equals(Library.SHARED)) {
 			try {
 				// defaults are Unix
@@ -136,7 +137,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 						"NAR: Could not copy shared library", e);
 			}
 		}
-
+*/
 		// FIXME what about copying the other shared libs?
 
 		// add include of this package

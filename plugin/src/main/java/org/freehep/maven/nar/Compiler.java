@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 631dc18040bb 2007/07/17 14:21:11 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 8c1556b1d379 2007/08/07 23:21:18 duns $
  */
 public abstract class Compiler {
 
@@ -173,7 +173,7 @@ public abstract class Compiler {
 	public void setAbstractCompileMojo(AbstractCompileMojo mojo) {
 		this.mojo = mojo;
 	}
-	
+
 	public File getSourceDirectory() {
 		return getSourceDirectory("dummy");
 	}
@@ -345,8 +345,7 @@ public abstract class Compiler {
 		}
 
 		// add include path
-		for (Iterator i = getIncludePaths(type)
-				.iterator(); i.hasNext();) {
+		for (Iterator i = getIncludePaths(type).iterator(); i.hasNext();) {
 			String path = (String) i.next();
 			compiler.createIncludePath().setPath(path);
 		}
@@ -385,21 +384,23 @@ public abstract class Compiler {
 		}
 
 		// add other sources
-		for (Iterator i = mojo.getMavenProject().getCompileSourceRoots()
-				.iterator(); i.hasNext();) {
-			File dir = new File((String) i.next());
-			mojo.getLog().debug(
-					"Checking for existence of " + getName()
-							+ " sourceCompileRoot: " + dir);
-			if (dir.exists()) {
-				ConditionalFileSet otherFileSet = new ConditionalFileSet();
-				otherFileSet.setProject(mojo.getAntProject());
-				otherFileSet.setIncludes(StringUtils.join(includes.iterator(),
-						","));
-				otherFileSet.setExcludes(StringUtils.join(excludes.iterator(),
-						","));
-				otherFileSet.setDir(dir);
-				compiler.addFileset(otherFileSet);
+		if (!type.equals("test")) {
+			for (Iterator i = mojo.getMavenProject().getCompileSourceRoots()
+					.iterator(); i.hasNext();) {
+				File dir = new File((String) i.next());
+				mojo.getLog().debug(
+						"Checking for existence of " + getName()
+								+ " sourceCompileRoot: " + dir);
+				if (dir.exists()) {
+					ConditionalFileSet otherFileSet = new ConditionalFileSet();
+					otherFileSet.setProject(mojo.getAntProject());
+					otherFileSet.setIncludes(StringUtils.join(includes
+							.iterator(), ","));
+					otherFileSet.setExcludes(StringUtils.join(excludes
+							.iterator(), ","));
+					otherFileSet.setDir(dir);
+					compiler.addFileset(otherFileSet);
+				}
 			}
 		}
 		return compiler;
@@ -409,8 +410,7 @@ public abstract class Compiler {
 
 	public void copyIncludeFiles(MavenProject mavenProject, File targetDirectory)
 			throws IOException {
-		for (Iterator i = getIncludePaths("dummy").iterator(); i
-				.hasNext();) {
+		for (Iterator i = getIncludePaths("dummy").iterator(); i.hasNext();) {
 			File path = new File((String) i.next());
 			if (path.exists()) {
 				NarUtil.copyDirectoryStructure(path, targetDirectory, null,
