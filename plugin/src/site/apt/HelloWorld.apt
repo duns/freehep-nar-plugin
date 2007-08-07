@@ -13,9 +13,9 @@ There are also some unit test which are run and call the same method.
 
 	The following examples are available:
 
-  [helloworldexe] A C routine.
+  	[helloworldexe] A C routine.
   
-  [helloworldstaticexe] A C routine statically linked with the C-runtime library.
+  	[helloworldstaticexe] A C routine statically linked with the C-runtime library.
 
 	[helloworldjni] A C routine called from Java and a Java unit test.
 	
@@ -48,6 +48,6 @@ There are also some unit test which are run and call the same method.
 	These examples are now all run as tests when you try to run maven on the freehep-nar-plugin from its top-level directory.
 
 	For the sources of these tests, see: 
-{{{http://java.freehep.org/svn/repobrowser.svn?path=%2ffreehep%2ftrunk%2fmaven-plugins%2ffreehep-nar-plugin%2ftests/&revision=HEAD}
+{{{http://java.freehep.org/svn/repobrowser.svn?path=%2ffreehep%2ftrunk%2fmaven-plugins%2ffreehep-nar-plugin%2ftests&revision=HEAD&name=freehep&bypassEmpty=true}
 the SVN repository}}.
 
