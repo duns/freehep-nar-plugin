@@ -13,6 +13,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Tests NAR files. Runs Native Tests and executables if produced.
@@ -21,9 +22,18 @@ import org.apache.maven.project.MavenProject;
  * @phase test
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java eeac31f37379 2007/07/24 04:02:00 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestMojo.java 51709c87671c 2007/08/08 22:49:17 duns $
  */
 public class NarTestMojo extends AbstractCompileMojo {
+
+	/**
+	 * The classpath elements of the project being tested.
+	 * 
+	 * @parameter expression="${project.testClasspathElements}"
+	 * @required
+	 * @readonly
+	 */
+	private List classpathElements;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
@@ -129,6 +139,9 @@ public class NarTestMojo extends AbstractCompileMojo {
 		if (getOS().equals(OS.WINDOWS)) {
 			env.add("SystemRoot="+NarUtil.getEnv("SystemRoot", "SystemRoot", "C:\\Windows"));
 		}
+		
+		// add CLASSPATH
+		env.add("CLASSPATH="+StringUtils.join(classpathElements.iterator(), File.pathSeparator));
 		
 		return env.size() > 0 ? (String[]) env.toArray(new String[env.size()]) : null;
 	}

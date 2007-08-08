@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 8c1556b1d379 2007/08/07 23:21:18 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 51709c87671c 2007/08/08 22:49:17 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -106,7 +106,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 		// add linker
 		task.addConfiguredLinker(getLinker().getLinker(this, antProject,
 				getOS(), getAOLKey() + "linker.", type));
-
+		
 		// FIXME hardcoded values
 		String libName = getFinalName();
 		File includeDir = new File(getMavenProject().getBuild().getDirectory(),
@@ -161,6 +161,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 		for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i
 				.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
+			// FIXME: this should be preferred binding
 			File lib = new File(getNarManager().getNarFile(dependency)
 					.getParentFile(), "nar/lib/" + getAOL() + "/"
 					+ test.getLink());
