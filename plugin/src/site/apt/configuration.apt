@@ -221,10 +221,14 @@ the command line for compatible compilers/linkers. Default is false.
 
 	[linkCPP] Specifies if the stdc++ library should be linked with. Default is true.
 
-	[packageName] If specified a NarSystem class will be generated in this package and 
+	[narSystemPackage] If specified a NarSystem class will be generated in this package and 
 	added to the main jar artifact. The NarSystem class contains the following methods:
 	
 	* loadLibrary() - which will load the <artifact>-<version> JNI library. 
+
+	[narSystemName] Specifies the NarSystem class. Defaults to NarSystem.
+
+	[narSystemDirectory] Specifies the NarSystem source directory. Defaults to target/nar/nar-generated.
 	
 	[]
 	

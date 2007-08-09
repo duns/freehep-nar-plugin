@@ -29,7 +29,7 @@
           <libraries>
             <library>
               <type>jni</type>
-              <packageName>com.mycompany.mypackage</packageName>
+              <narSystemPackage>com.mycompany.mypackage</narSystemPackage>
               <linkCPP>false</linkCPP>
             </library>
           </libraries>

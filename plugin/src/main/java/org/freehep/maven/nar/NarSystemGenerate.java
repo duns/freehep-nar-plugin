@@ -17,25 +17,9 @@ import org.apache.maven.plugin.MojoFailureException;
  * @phase generate-sources
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarSystemGenerate.java eda4d0bbde3d 2007/07/03 16:52:10 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarSystemGenerate.java 5c98d4df247d 2007/08/09 21:59:34 duns $
  */
 public class NarSystemGenerate extends AbstractCompileMojo {
-
-	/**
-	 * Name of the NarSystem class
-	 * 
-	 * @parameter expression="NarSystem"
-	 * @required
-	 */
-	private String narSystemName;
-
-	/**
-	 * The target directory into which to generate the output.
-	 * 
-	 * @parameter expression="${project.build.directory}/nar/nar-generated"
-	 * @required
-	 */
-	private File narGenerated;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
@@ -43,11 +27,15 @@ public class NarSystemGenerate extends AbstractCompileMojo {
 
 		// get packageName if specified for JNI.
 		String packageName = null;
+		String narSystemName = null;
+		File narSystemDirectory = null;
 		for (Iterator i = getLibraries().iterator(); i.hasNext()
 				&& (packageName == null);) {
 			Library library = (Library) i.next();
 			if (library.getType().equals(Library.JNI)) {
-				packageName = library.getPackageName();
+				packageName = library.getNarSystemPackage();
+				narSystemName = library.getNarSystemName();
+				narSystemDirectory = library.getNarSystemDirectory();
 			}
 		}
 
@@ -55,11 +43,11 @@ public class NarSystemGenerate extends AbstractCompileMojo {
 			return;
 
 		// make sure destination is there
-		narGenerated.mkdirs();
+		narSystemDirectory.mkdirs();
 
-		getMavenProject().addCompileSourceRoot(narGenerated.getPath());
+		getMavenProject().addCompileSourceRoot(narSystemDirectory.getPath());
 
-		File fullDir = new File(narGenerated, packageName.replace('.', '/'));
+		File fullDir = new File(narSystemDirectory, packageName.replace('.', '/'));
 		fullDir.mkdirs();
 
 		File narSystem = new File(fullDir, narSystemName + ".java");

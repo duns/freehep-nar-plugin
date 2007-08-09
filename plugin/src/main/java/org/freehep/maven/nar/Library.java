@@ -1,6 +1,7 @@
 // Copyright FreeHEP, 2005-2007.
 package org.freehep.maven.nar;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  * Sets up a library to create
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java 113f3bde20c0 2007/07/10 19:56:39 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java 5c98d4df247d 2007/08/09 21:59:34 duns $
  */
 public class Library implements Executable {
 
@@ -40,7 +41,23 @@ public class Library implements Executable {
 	 * 
 	 * @parameter expression=""
 	 */
-	protected String packageName = null;
+	protected String narSystemPackage = null;
+	
+	/**
+	 * Name of the NarSystem class
+	 * 
+	 * @parameter expression="NarSystem"
+	 * @required
+	 */
+	protected String narSystemName = "NarSystem";
+
+	/**
+	 * The target directory into which to generate the output.
+	 * 
+	 * @parameter expression="${project.build.dir}/nar/nar-generated"
+	 * @required
+	 */
+	protected File narSystemDirectory = new File("target/nar/nar-generated");
 	
 	/**
      * When true and if type is "executable" run this executable.
@@ -67,8 +84,8 @@ public class Library implements Executable {
 		return linkCPP;
 	}
 	
-	public String getPackageName() {
-		return packageName;
+	public String getNarSystemPackage() {
+		return narSystemPackage;
 	}
 	
 	public boolean shouldRun() {
@@ -77,5 +94,13 @@ public class Library implements Executable {
 	
     public List/*<String>*/ getArgs() {
     	return args;
-    }	
+    }
+
+	public String getNarSystemName() {
+		return narSystemName;
+	}
+
+	public File getNarSystemDirectory() {
+		return narSystemDirectory;
+	}	
 }
