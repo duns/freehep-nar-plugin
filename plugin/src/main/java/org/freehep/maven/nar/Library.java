@@ -9,7 +9,7 @@ import java.util.List;
  * Sets up a library to create
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java 5c98d4df247d 2007/08/09 21:59:34 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Library.java 19804ec9b6b9 2007/09/04 23:36:51 duns $
  */
 public class Library implements Executable {
 
@@ -34,6 +34,13 @@ public class Library implements Executable {
 	 * @parameter expression=""
 	 */
 	protected boolean linkCPP = true;
+
+	/**
+	 * Link with fortran runtime if necessary Defaults to false.
+	 * 
+	 * @parameter expression=""
+	 */
+	protected boolean linkFortran = false;
 
 	/**
 	 * If specified will create the NarSystem class with methods
@@ -82,6 +89,10 @@ public class Library implements Executable {
 
 	public boolean linkCPP() {
 		return linkCPP;
+	}
+	
+	public boolean linkFortran() {
+		return linkFortran;
 	}
 	
 	public String getNarSystemPackage() {

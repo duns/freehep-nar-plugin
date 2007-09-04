@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 374f8c441944 2007/07/25 05:22:18 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 19804ec9b6b9 2007/09/04 23:36:51 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -90,6 +90,9 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 		// stdc++
 		task.setLinkCPP(library.linkCPP());
+
+		// fortran
+		task.setLinkFortran(library.linkFortran());
 
 		// outDir
 		File outDir = new File(getTargetDirectory(), type

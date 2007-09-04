@@ -30,6 +30,7 @@ NAR Configuration
     <library>
       <type/>
       <linkCPP/>
+      <linkFortran/>
       <run/>
       <args>
         <arg/>
@@ -220,6 +221,8 @@ the command line for compatible compilers/linkers. Default is false.
 	[type] The type of the library: shared, static, jni, plugin, executable. Default is shared.
 
 	[linkCPP] Specifies if the stdc++ library should be linked with. Default is true.
+
+	[linkFortran] Specifies if the fortran library should be linked with. Default is false.
 
 	[narSystemPackage] If specified a NarSystem class will be generated in this package and 
 	added to the main jar artifact. The NarSystem class contains the following methods:
