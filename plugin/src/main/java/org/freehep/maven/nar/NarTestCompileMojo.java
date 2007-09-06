@@ -4,6 +4,8 @@ package org.freehep.maven.nar;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -26,7 +28,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 51709c87671c 2007/08/08 22:49:17 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -158,8 +160,38 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 		}
 
 		// add dependency libraries
-		for (Iterator i = getNarManager().getNarDependencies("test").iterator(); i
-				.hasNext();) {
+        List depLibOrder = getDependencyLibOrder();
+        List depLibs = getNarManager().getNarDependencies("test");
+
+        // reorder the libraries that come from the nar dependencies
+        // to comply with the order specified by the user
+        if ((depLibOrder != null) && !depLibOrder.isEmpty()) {
+
+            List tmp = new LinkedList();
+
+            for (Iterator i = depLibOrder.iterator(); i.hasNext();) {
+
+                String depToOrderName = (String)i.next();
+
+                for (Iterator j = depLibs.iterator(); j.hasNext();) {
+
+                    NarArtifact dep = (NarArtifact)j.next();
+                    String depName = dep.getGroupId() + ":" + dep.getArtifactId();
+
+                    if (depName.equals(depToOrderName)) {
+
+                        tmp.add(dep);
+                        j.remove();
+                    }
+                }
+            }
+
+            tmp.addAll(depLibs);
+            depLibs = tmp;
+        }
+
+        for (Iterator i = depLibs.iterator(); i.hasNext();) {
+
 			Artifact dependency = (Artifact) i.next();
 			// FIXME: this should be preferred binding
 			File lib = new File(getNarManager().getNarFile(dependency)

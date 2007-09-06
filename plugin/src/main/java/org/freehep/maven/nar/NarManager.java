@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
 import java.util.jar.JarFile;
 
 import org.apache.maven.artifact.Artifact;
@@ -55,7 +56,7 @@ public class NarManager {
 	 */
 	public List/* <NarArtifact> */getNarDependencies(String scope)
 			throws MojoExecutionException {
-		List narDependencies = new ArrayList();
+		List narDependencies = new LinkedList();
 		for (Iterator i = getDependencies(scope).iterator(); i.hasNext();) {
 			Artifact dependency = (Artifact) i.next();
 			log.debug("Examining artifact for NarInfo: "+dependency);

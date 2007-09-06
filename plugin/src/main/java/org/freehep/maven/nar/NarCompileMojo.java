@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -30,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 19804ec9b6b9 2007/09/04 23:36:51 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -173,11 +174,41 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		// add dependency libraries
 		// FIXME: what about PLUGIN and STATIC, depending on STATIC, should we
 		// not add all libraries, see NARPLUGIN-96
-		if (type.equals(Library.SHARED) || type.equals(Library.JNI)
-				|| type.equals(Library.EXECUTABLE)) {
-			for (Iterator i = getNarManager().getNarDependencies("compile")
-					.iterator(); i.hasNext();) {
-				NarArtifact dependency = (NarArtifact) i.next();
+		if (type.equals(Library.SHARED) || type.equals(Library.JNI) || type.equals(Library.EXECUTABLE)) {
+
+            List depLibOrder = getDependencyLibOrder();
+            List depLibs = getNarManager().getNarDependencies("compile");
+
+            // reorder the libraries that come from the nar dependencies
+            // to comply with the order specified by the user
+            if ((depLibOrder != null) && !depLibOrder.isEmpty()) {
+
+                List tmp = new LinkedList();
+
+                for (Iterator i = depLibOrder.iterator(); i.hasNext();) {
+                    
+                    String depToOrderName = (String)i.next();
+
+                    for (Iterator j = depLibs.iterator(); j.hasNext();) {
+
+                        NarArtifact dep = (NarArtifact)j.next();
+                        String depName = dep.getGroupId() + ":" + dep.getArtifactId();
+
+                        if (depName.equals(depToOrderName)) {
+
+                            tmp.add(dep);
+                            j.remove();
+                        }
+                    }
+                }
+
+                tmp.addAll(depLibs);
+                depLibs = tmp;
+            }
+
+            for (Iterator i = depLibs.iterator(); i.hasNext();) {
+
+			    NarArtifact dependency = (NarArtifact) i.next();
 
 				// FIXME no handling of "local"
 

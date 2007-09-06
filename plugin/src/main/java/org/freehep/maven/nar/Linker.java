@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.LinkedList;
 
 import net.sf.antcontrib.cpptasks.CUtil;
 import net.sf.antcontrib.cpptasks.LinkerDef;
@@ -26,7 +27,7 @@ import org.codehaus.plexus.util.FileUtils;
  * Linker tag
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java 3738e21b3a51 2007/07/24 13:49:41 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Linker.java 22df3eb318cc 2007/09/06 18:55:15 duns $
  */
 public class Linker {
 
@@ -62,7 +63,16 @@ public class Linker {
 	 */
 	private List options;
 
-	/**
+    /**
+     * Options for the linker as a whitespace separated list.
+     * Defaults to Architecture-OS-Linker specific values.
+     * Will work in combination with &lt;options&gt;.
+     *
+     * @parameter expression=""
+     */
+    private String optionSet;
+
+    /**
 	 * Clears default options
 	 * 
 	 * @parameter expression="" default-value="false"
@@ -77,14 +87,47 @@ public class Linker {
 	 */
 	private List/* <Lib> */libs;
 
-	/**
+    /**
+     * Adds libraries to the linker. Will work in combination with &lt;libs&gt;.
+     * The format is comma separated, colon-delimited values (name:type:dir),
+     * like "myLib:shared:/home/me/libs/, otherLib:static:/some/path".
+     *
+     * @parameter expression=""
+     */
+    private String libSet;
+
+    /**
 	 * Adds system libraries to the linker.
 	 * 
 	 * @parameter expression=""
 	 */
 	private List/* <SysLib> */sysLibs;
 
-	public Linker() {
+    /**
+     * Adds system libraries to the linker. Will work in combination with &lt;sysLibs&gt;.
+     * The format is comma separated, colon-delimited values (name:type),
+     * like "dl:shared, pthread:shared".
+     *
+     * @parameter expression=""
+     */
+    private String sysLibSet;
+
+    /**
+     * <p>
+     * Specifies the link ordering of libraries that come from nar dependencies. The format is
+     * a comma separated list of dependency names, given as groupId:artifactId.
+     * </p>
+     *
+     * <p>
+     * Example: &lt;narDependencyLibOrder&gt;someGroup:myProduct, other.group:productB&lt;narDependencyLibOrder&gt;
+     * </p>
+     *
+     * @parameter expression="" 
+     */
+    private String narDependencyLibOrder;
+
+
+    public Linker() {
 		// default constructor for use as TAG
 	}
 
@@ -169,7 +212,20 @@ public class Linker {
 			}
 		}
 
-		if (!clearDefaultOptions) {
+        if (optionSet != null) {
+
+            String[] opts = optionSet.split("\\s");
+
+            for (int i = 0; i < opts.length; i++) {
+
+                LinkerArgument arg = new LinkerArgument();
+
+                arg.setValue(opts[i]);
+                linker.addConfiguredLinkerArg(arg);
+            }
+        }
+
+        if (!clearDefaultOptions) {
 			String options = NarUtil.getDefaults().getProperty(
 					prefix + "options");
 			if (options != null) {
@@ -182,63 +238,111 @@ public class Linker {
 			}
 		}
 
-		// Add Libraries to linker
-		if (libs != null) {
-			for (Iterator i = libs.iterator(); i.hasNext();) {
-				Lib lib = (Lib) i.next();
-				lib.addLibSet(mojo, linker, antProject);
-			}
-		} else {
-			String libsList = NarUtil.getDefaults()
+        // record the preference for nar dependency library link order
+        if (narDependencyLibOrder != null) {
+
+            List libOrder = new LinkedList();
+
+            String[] libs = narDependencyLibOrder.split(",");
+
+            for (int i = 0; i < libs.length; i++) {
+                libOrder.add(libs[i].trim());
+            }
+
+            mojo.setDependencyLibOrder(libOrder);
+        }
+
+        // Add Libraries to linker
+		if ((libs != null) || (libSet != null)) {
+
+            if (libs != null) {
+
+                for (Iterator i = libs.iterator(); i.hasNext();) {
+
+                    Lib lib = (Lib) i.next();
+                    lib.addLibSet(mojo, linker, antProject);
+                }
+            }
+
+            if (libSet != null) {
+                addLibraries(libSet, linker, antProject, false);
+            }
+        }
+        else {
+
+            String libsList = NarUtil.getDefaults()
 					.getProperty(prefix + "libs");
-			if (libsList != null) {
-				String[] lib = libsList.split(", ");
-				for (int i = 0; i < lib.length; i++) {
-					String[] libInfo = lib[i].split(":", 3);
-					LibrarySet libSet = new LibrarySet();
-					libSet.setProject(antProject);
-					libSet.setLibs(new CUtil.StringArrayBuilder(libInfo[0]));
-					if (libInfo.length > 1) {
-						LibraryTypeEnum libType = new LibraryTypeEnum();
-						libType.setValue(libInfo[1]);
-						libSet.setType(libType);
-						if (libInfo.length > 2) {
-							libSet.setDir(new File(libInfo[2]));
-						}
-					}
 
-					linker.addLibset(libSet);
-				}
-			}
-		}
+            addLibraries(libsList, linker, antProject, false);
+        }
 
-		// Add System Libraries to linker
-		if (sysLibs != null) {
-			for (Iterator i = sysLibs.iterator(); i.hasNext();) {
-				SysLib sysLib = (SysLib) i.next();
-				linker.addSyslibset(sysLib.getSysLibSet(antProject));
-			}
-		} else {
-			String sysLibsList = NarUtil.getDefaults().getProperty(
-					prefix + "sysLibs");
-			if (sysLibsList != null) {
-				String[] sysLib = sysLibsList.split(", ");
-				for (int i = 0; i < sysLib.length; i++) {
-					String[] sysLibInfo = sysLib[i].split(":", 2);
-					SystemLibrarySet sysLibSet = new SystemLibrarySet();
-					sysLibSet.setProject(antProject);
-					sysLibSet.setLibs(new CUtil.StringArrayBuilder(
-							sysLibInfo[0]));
-					if (sysLibInfo.length > 1) {
-						LibraryTypeEnum sysLibType = new LibraryTypeEnum();
-						sysLibType.setValue(sysLibInfo[1]);
-						sysLibSet.setType(sysLibType);
-					}
-					linker.addSyslibset(sysLibSet);
-				}
-			}
-		}
+        // Add System Libraries to linker
+        if ((sysLibs != null) || (sysLibSet != null)) {
+
+            if (sysLibs != null) {
+
+                for (Iterator i = sysLibs.iterator(); i.hasNext();) {
+
+                    SysLib sysLib = (SysLib) i.next();
+                    linker.addSyslibset(sysLib.getSysLibSet(antProject));
+                }
+            }
+
+            if (sysLibSet != null) {
+                addLibraries(sysLibSet, linker, antProject, true);
+            }
+        }
+        else {
+
+            String sysLibsList = NarUtil.getDefaults().getProperty(
+                    prefix + "sysLibs");
+
+            addLibraries(sysLibsList, linker, antProject, true);
+        }
 
 		return linker;
 	}
+
+
+    private void addLibraries(String libraryList, LinkerDef linker, Project antProject, boolean isSystem) {
+
+        if (libraryList == null) {
+            return;
+        }
+
+        String[] lib = libraryList.split(",");
+
+        for (int i = 0; i < lib.length; i++) {
+
+            String[] libInfo = lib[i].trim().split(":", 3);
+
+            LibrarySet librarySet = new LibrarySet();
+
+            if (isSystem) {
+                librarySet = new SystemLibrarySet();
+            }
+
+            librarySet.setProject(antProject);
+            librarySet.setLibs(new CUtil.StringArrayBuilder(libInfo[0]));
+
+            if (libInfo.length > 1) {
+
+                LibraryTypeEnum libType = new LibraryTypeEnum();
+
+                libType.setValue(libInfo[1]);
+                librarySet.setType(libType);
+
+                if (!isSystem && (libInfo.length > 2)) {
+                    librarySet.setDir(new File(libInfo[2]));
+                }
+            }
+
+            if (!isSystem) {
+                linker.addLibset(librarySet);
+            }
+            else {
+                linker.addSyslibset((SystemLibrarySet)librarySet);
+            }
+        }
+    }
 }

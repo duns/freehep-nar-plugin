@@ -9,7 +9,7 @@ import org.apache.tools.ant.Project;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 6ae92433be9e 2007/07/18 17:45:27 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
  */
 public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 
@@ -108,7 +108,9 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
      * @parameter expression=""
      */
     private Java java;
-    
+
+    private List/*<String>*/ dependencyLibOrder;
+
     private Project antProject;
 
     protected Project getAntProject() {
@@ -180,5 +182,13 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
         if (java == null) java = new Java();
         java.setAbstractCompileMojo(this);
         return java;
+    }
+
+    public void setDependencyLibOrder(List/*<String>*/ order) {
+        dependencyLibOrder = order;
+    }
+
+    protected List/*<String>*/  getDependencyLibOrder() {
+        return dependencyLibOrder;
     }
 }

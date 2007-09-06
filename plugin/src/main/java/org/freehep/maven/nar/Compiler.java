@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 8c1556b1d379 2007/08/07 23:21:18 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 22df3eb318cc 2007/09/06 18:55:15 duns $
  */
 public abstract class Compiler {
 
@@ -112,7 +112,15 @@ public abstract class Compiler {
 	 */
 	private List defines;
 
-	/**
+    /**
+     * Defines for the compiler as a comma separated list of name[=value] pairs, where the value is optional.
+     * Will work in combination with &lt;defines&gt;.
+     *
+     * @parameter expression=""
+     */
+    private String defineSet;
+
+    /**
 	 * Clears default defines
 	 * 
 	 * @parameter expression="" default-value="false"
@@ -127,7 +135,15 @@ public abstract class Compiler {
 	 */
 	private List undefines;
 
-	/**
+    /**
+     * Undefines for the compiler as a comma separated list of name[=value] pairs where the value is optional.
+     * Will work in combination with &lt;undefines&gt;.
+     *
+     * @parameter expression=""
+     */
+    private String undefineSet;
+
+    /**
 	 * Clears default undefines
 	 * 
 	 * @parameter expression="" default-value="false"
@@ -157,7 +173,15 @@ public abstract class Compiler {
 	 */
 	private List options;
 
-	/**
+    /**
+     * Options for the compiler as a whitespace separated list.
+     * Will work in combination with &lt;options&gt;.
+     *
+     * @parameter expression=""
+     */
+    private String optionSet;
+
+    /**
 	 * Clears default options
 	 * 
 	 * @parameter expression="" default-value="false"
@@ -283,7 +307,20 @@ public abstract class Compiler {
 			}
 		}
 
-		if (!clearDefaultOptions) {
+        if (optionSet != null) {
+
+            String[] opts = optionSet.split("\\s");
+
+            for (int i = 0; i < opts.length; i++) {
+
+                CompilerArgument arg = new CompilerArgument();
+
+                arg.setValue(opts[i]);
+                compiler.addConfiguredCompilerArg(arg);
+            }
+        }
+
+        if (!clearDefaultOptions) {
 			String optionsProperty = NarUtil.getDefaults().getProperty(
 					getPrefix() + "options");
 			if (optionsProperty != null) {
@@ -309,7 +346,26 @@ public abstract class Compiler {
 			compiler.addConfiguredDefineset(defineSet);
 		}
 
-		if (!clearDefaultDefines) {
+        if (defineSet != null) {
+
+            String[] defList = defineSet.split(",");
+            DefineSet defSet = new DefineSet();
+
+            for (int i = 0; i < defList.length; i++) {
+
+                String[] pair = defList[i].trim().split("=", 2);
+                DefineArgument def = new DefineArgument();
+
+                def.setName(pair[0]);
+                def.setValue(pair.length > 1 ? pair[1] : null);
+
+                defSet.addDefine(def);
+            }
+
+            compiler.addConfiguredDefineset(defSet);
+        }
+
+        if (!clearDefaultDefines) {
 			DefineSet defineSet = new DefineSet();
 			String defaultDefines = NarUtil.getDefaults().getProperty(
 					getPrefix() + "defines");
@@ -333,7 +389,26 @@ public abstract class Compiler {
 			compiler.addConfiguredDefineset(undefineSet);
 		}
 
-		if (!clearDefaultUndefines) {
+        if (undefineSet != null) {
+
+            String[] undefList = undefineSet.split(",");
+            DefineSet undefSet = new DefineSet();
+
+            for (int i = 0; i < undefList.length; i++) {
+
+                String[] pair = undefList[i].trim().split("=", 2);
+                DefineArgument undef = new DefineArgument();
+
+                undef.setName(pair[0]);
+                undef.setValue(pair.length > 1 ? pair[1] : null);
+
+                undefSet.addUndefine(undef);
+            }
+
+            compiler.addConfiguredDefineset(undefSet);
+        }
+
+        if (!clearDefaultUndefines) {
 			DefineSet undefineSet = new DefineSet();
 			String defaultUndefines = NarUtil.getDefaults().getProperty(
 					getPrefix() + "undefines");
