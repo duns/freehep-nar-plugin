@@ -10,7 +10,7 @@
   <artifactId>freehep-nar-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>FreeHEP Maven Native Archive Plugin</name>
-  <version>2.0-alpha-10</version>
+  <version>2.0-alpha-11-SNAPSHOT</version>
   <description>Native Archive Plug-in to compile and link c++, c and fortran (for Maven 2),
   see Introduction</description>
   <repositories>
@@ -67,10 +67,5 @@
       <version>1.6.5</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:svn://svn.freehep.org/svn/freehep/tags/freehep-nar-plugin-2.0-alpha-10</connection>
-    <developerConnection>scm:svn:svn://svn.freehep.org/svn/freehep/tags/freehep-nar-plugin-2.0-alpha-10</developerConnection>
-  </scm>
 </project>
 
