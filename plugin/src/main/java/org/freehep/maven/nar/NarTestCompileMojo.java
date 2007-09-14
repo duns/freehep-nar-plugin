@@ -2,10 +2,9 @@
 package org.freehep.maven.nar;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -19,7 +18,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Compiles native test source files.
@@ -28,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 43298538bf45 2007/09/14 17:09:01 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 

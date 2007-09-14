@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 import net.sf.antcontrib.cpptasks.CUtil;
@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 43298538bf45 2007/09/14 17:09:01 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -230,10 +230,12 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 						// FIXME, no way to override
 						String libs = dependency.getNarInfo().getLibs(getAOL());
-						getLog().debug("Using LIBS = " + libs);
-						libSet.setLibs(new CUtil.StringArrayBuilder(libs));
-						libSet.setDir(dir);
-						task.addLibset(libSet);
+						if ((libs != null) && !libs.equals("")) {
+							getLog().debug("Using LIBS = " + libs);
+							libSet.setLibs(new CUtil.StringArrayBuilder(libs));
+							libSet.setDir(dir);
+							task.addLibset(libSet);
+						}
 					} else {
 						getLog()
 								.debug(
@@ -243,7 +245,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 					// FIXME, look again at this, for multiple dependencies we may need to remove duplicates
 					String options = dependency.getNarInfo().getOptions(getAOL());
-					if (options != null) {
+					if ((options != null) && !options.equals("")) {
 						getLog().debug("Using OPTIONS = " + options);
 						LinkerArgument arg = new LinkerArgument();
 						arg.setValue(options);
@@ -252,7 +254,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 					
 					String sysLibs = dependency.getNarInfo().getSysLibs(
 							getAOL());
-					if (sysLibs != null) {
+					if ((sysLibs != null) && !sysLibs.equals("")) {
 						getLog().debug("Using SYSLIBS = " + sysLibs);
 						SystemLibrarySet sysLibSet = new SystemLibrarySet();
 						sysLibSet.setProject(antProject);
