@@ -17,7 +17,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Java specifications for NAR
  *
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java 631dc18040bb 2007/07/17 14:21:11 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Java.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public class Java {
 
@@ -75,15 +75,15 @@ public class Java {
             if (includePaths != null) {
                 for (Iterator i=includePaths.iterator(); i.hasNext(); ) {
                     String path = (String)i.next();
-                    task.createIncludePath().setPath(new File(mojo.getJavaHome(), path).getPath());
+                    task.createIncludePath().setPath(new File(mojo.getJavaHome(mojo.getAOL()), path).getPath());
                 }
             } else {
-                String prefix = mojo.getAOLKey()+"java.";
+                String prefix = mojo.getAOL().getKey()+".java.";
                 String includes = NarUtil.getDefaults().getProperty(prefix+"include");
                 if (includes != null) {
                     String[] path = includes.split(";");
                     for (int i=0; i<path.length; i++) {
-                        task.createIncludePath().setPath(new File(mojo.getJavaHome(), path[i]).getPath());
+                        task.createIncludePath().setPath(new File(mojo.getJavaHome(mojo.getAOL()), path[i]).getPath());
                     }
                 }
             }

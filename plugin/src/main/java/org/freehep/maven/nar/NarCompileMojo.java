@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @phase compile
  * @requiresDependencyResolution compile
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 43298538bf45 2007/09/14 17:09:01 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarCompileMojo.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public class NarCompileMojo extends AbstractCompileMojo {
 
@@ -81,7 +81,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		task.setProject(antProject);
 
 		// set max cores
-		task.setMaxCores(maxCores);
+		task.setMaxCores(getMaxCores(getAOL()));
 		
 		// outtype
 		OutputTypeEnum outTypeEnum = new OutputTypeEnum();
@@ -98,7 +98,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		// outDir
 		File outDir = new File(getTargetDirectory(), type
 				.equals(Library.EXECUTABLE) ? "bin" : "lib");
-		outDir = new File(outDir, getAOL());
+		outDir = new File(outDir, getAOL().toString());
 		if (!type.equals(Library.EXECUTABLE))
 			outDir = new File(outDir, type);
 		outDir.mkdirs();
@@ -109,34 +109,34 @@ public class NarCompileMojo extends AbstractCompileMojo {
 			// executable has no version number
 			outFile = new File(outDir, getMavenProject().getArtifactId());
 		} else {
-			outFile = new File(outDir, getOutput());
+			outFile = new File(outDir, getOutput(getAOL()));
 		}
 		getLog().debug("NAR - output: '" + outFile + "'");
 		task.setOutfile(outFile);
 
 		// object directory
 		File objDir = new File(getTargetDirectory(), "obj");
-		objDir = new File(objDir, getAOL());
+		objDir = new File(objDir, getAOL().toString());
 		objDir.mkdirs();
 		task.setObjdir(objDir);
 
 		// failOnError, libtool
-		task.setFailonerror(failOnError());
-		task.setLibtool(useLibtool());
+		task.setFailonerror(failOnError(getAOL()));
+		task.setLibtool(useLibtool(getAOL()));
 
 		// runtime
 		RuntimeType runtimeType = new RuntimeType();
-		runtimeType.setValue(getRuntime());
+		runtimeType.setValue(getRuntime(getAOL()));
 		task.setRuntime(runtimeType);
 
 		// add C++ compiler
-		task.addConfiguredCompiler(getCpp().getCompiler(type, getOutput()));
+		task.addConfiguredCompiler(getCpp().getCompiler(type, getOutput(getAOL())));
 
 		// add C compiler
-		task.addConfiguredCompiler(getC().getCompiler(type, getOutput()));
+		task.addConfiguredCompiler(getC().getCompiler(type, getOutput(getAOL())));
 
 		// add Fortran compiler
-		task.addConfiguredCompiler(getFortran().getCompiler(type, getOutput()));
+		task.addConfiguredCompiler(getFortran().getCompiler(type, getOutput(getAOL())));
 
 		// add javah include path
 		File jniDirectory = getJavah().getJniDirectory();
@@ -168,7 +168,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 
 		// add linker
 		LinkerDef linkerDefinition = getLinker().getLinker(this, antProject,
-				getOS(), getAOLKey() + "linker.", type);
+				getOS(), getAOL().getKey() + ".linker.", type);
 		task.addConfiguredLinker(linkerDefinition);
 
 		// add dependency libraries
@@ -216,13 +216,13 @@ public class NarCompileMojo extends AbstractCompileMojo {
 				String binding = dependency.getNarInfo().getBinding(getAOL(),
 						Library.STATIC);
 				getLog().debug("Using Binding: " + binding);
-				String aol = getAOL();
+				AOL aol = getAOL();
 				aol = dependency.getNarInfo().getAOL(getAOL());
-				getLog().debug("Using Library AOL: " + aol);
+				getLog().debug("Using Library AOL: " + aol.toString());
 
 				if (!binding.equals(Library.JNI)) {
 					File dir = new File(getNarManager().getNarFile(dependency)
-							.getParentFile(), "nar/lib/" + aol + "/" + binding);
+							.getParentFile(), "nar/lib/" + aol.toString() + "/" + binding);
 					getLog().debug("Looking for Library Directory: " + dir);
 					if (dir.exists()) {
 						LibrarySet libSet = new LibrarySet();
@@ -268,8 +268,8 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 
 		// Add JVM to linker
-		getJava().addRuntime(task, getJavaHome(), getOS(),
-				getAOLKey() + "java.");
+		getJava().addRuntime(task, getJavaHome(getAOL()), getOS(),
+				getAOL().getKey() + "java.");
 
 		// execute
 		try {
@@ -279,7 +279,7 @@ public class NarCompileMojo extends AbstractCompileMojo {
 		}
 		
 		// FIXME, this should be done in CPPTasks at some point
-		if (getRuntime().equals("dynamic") &&
+		if (getRuntime(getAOL()).equals("dynamic") &&
 			getOS().equals(OS.WINDOWS) && 
 		    getLinker().getName(null, null).equals("msvc") && 
 		    NarUtil.getEnv("MSVCVer", "MSVCVer", "6.0").startsWith("8.")) {

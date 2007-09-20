@@ -9,7 +9,7 @@ import org.apache.tools.ant.Project;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 22df3eb318cc 2007/09/06 18:55:15 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractCompileMojo.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 
@@ -39,7 +39,7 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
      * 
      * @parameter expression=""
      */
-    protected int maxCores = 0;
+    private int maxCores = 0;
     
     /**
      * Name of the output
@@ -108,6 +108,8 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
      * @parameter expression=""
      */
     private Java java;
+   
+    private NarInfo narInfo;
 
     private List/*<String>*/ dependencyLibOrder;
 
@@ -141,25 +143,29 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
         return fortran;
     }
 
-    protected boolean useLibtool() {
-        return libtool;
+    protected int getMaxCores(AOL aol) {
+    	return getNarInfo().getProperty(aol, "maxCores", maxCores);
     }
     
-    protected boolean failOnError() {
-        return failOnError;
+    protected boolean useLibtool(AOL aol) {
+        return getNarInfo().getProperty(aol, "libtool", libtool);
     }
     
-    protected String getRuntime() {
-        return runtime;
+    protected boolean failOnError(AOL aol) {
+        return getNarInfo().getProperty(aol, "failOnError", failOnError);
     }
     
-    protected String getOutput() {
-        return output;
+    protected String getRuntime(AOL aol) {
+    	return getNarInfo().getProperty(aol, "runtime", runtime);
+    }
+    
+    protected String getOutput(AOL aol) {
+        return getNarInfo().getProperty(aol, "output", output);
     }
 
-    protected File getJavaHome() {
-    	javaHome = NarUtil.getJavaHome(javaHome, getOS());    	
-    	return javaHome;       
+    protected File getJavaHome(AOL aol) {
+    	// FIXME should be easier by specifying default...
+    	return getNarInfo().getProperty(aol, "javaHome", NarUtil.getJavaHome(javaHome, getOS()));    	
     }
 
     protected List getLibraries() {
@@ -190,5 +196,13 @@ public abstract class AbstractCompileMojo extends AbstractDependencyMojo {
 
     protected List/*<String>*/  getDependencyLibOrder() {
         return dependencyLibOrder;
+    }
+    
+    protected NarInfo getNarInfo() {
+    	if (narInfo == null) {
+    		narInfo = new NarInfo(getMavenProject().getGroupId(), getMavenProject()
+    				.getArtifactId(), getMavenProject().getVersion(), getLog());
+    	}
+    	return narInfo;
     }
 }

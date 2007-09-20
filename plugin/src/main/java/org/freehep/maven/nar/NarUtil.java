@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author Mark Donszelmann
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 4701ecc36070 2007/07/25 22:22:37 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarUtil.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public class NarUtil {
 
@@ -47,10 +47,10 @@ public class NarUtil {
 		// adjust OS if not given
 		if (os == null) {
 			os = System.getProperty("os.name");
-                        if (os.startsWith("Windows"))
-                            os = OS.WINDOWS;
-                        if (os.startsWith("windows"))
-                            os = OS.WINDOWS;
+			if (os.startsWith("Windows"))
+				os = OS.WINDOWS;
+			if (os.startsWith("windows"))
+				os = OS.WINDOWS;
 			if (os.equals("Mac OS X"))
 				os = OS.MACOSX;
 		}
@@ -74,16 +74,14 @@ public class NarUtil {
 				getArchitecture(architecture) + "." + getOS(os) + ".");
 	}
 
-	public static String getAOL(String architecture, String os, Linker linker,
+	public static AOL getAOL(String architecture, String os, Linker linker,
 			String aol) throws MojoFailureException {
 		// adjust aol
-		if (aol == null) {
-			aol = getArchitecture(architecture) + "-" + getOS(os) + "-"
-					+ getLinkerName(architecture, os, linker);
-		}
-		return aol;
+		return aol == null ? new AOL(getArchitecture(architecture), getOS(os),
+				getLinkerName(architecture, os, linker)) : new AOL(aol);
 	}
 
+	// FIXME, should go to AOL.
 	public static String getAOLKey(String architecture, String os, Linker linker)
 			throws MojoFailureException {
 		// construct AOL key prefix
@@ -382,8 +380,7 @@ public class NarUtil {
 			process.waitFor();
 			return process.exitValue();
 		} catch (Throwable e) {
-			throw new MojoExecutionException("Could not launch " + cmdLine,
-					e);
+			throw new MojoExecutionException("Could not launch " + cmdLine, e);
 		}
 	}
 

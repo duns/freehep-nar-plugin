@@ -35,7 +35,7 @@ public class NarManager {
 
 	private ArtifactRepository repository;
 
-	private String defaultAOL;
+	private AOL defaultAOL;
 	private String linkerName;
 	
 	private String[] narTypes = { "noarch", Library.STATIC, Library.SHARED, Library.JNI, Library.PLUGIN };
@@ -100,15 +100,15 @@ public class NarManager {
 	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
 			List/* <NarArtifacts> */narArtifacts, String classifier)
 			throws MojoExecutionException, MojoFailureException {
-		String aol = null;
+		AOL aol = null;
 		String type = null;
 		if (classifier != null) {
 			int dash = classifier.lastIndexOf('-');
 			if (dash < 0) {
-				aol = classifier;
+				aol = new AOL(classifier);
 				type = null;
 			} else {
-				aol = classifier.substring(0, dash);
+				aol = new AOL(classifier.substring(0, dash));
 				type = classifier.substring(dash + 1);
 			}
 		}
@@ -132,7 +132,7 @@ public class NarManager {
 	 * @throws MojoFailureException
 	 */
 	public List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-			List/* <NarArtifacts> */narArtifacts, String aol, String type)
+			List/* <NarArtifacts> */narArtifacts, AOL aol, String type)
 			throws MojoExecutionException, MojoFailureException {
 		boolean noarch = false;
 		if (aol == null) {
@@ -153,7 +153,7 @@ public class NarManager {
 			String binding = narInfo.getBinding(aol, type != null ? type
 					: "static");
 
-			// FIXME kludge
+			// FIXME kludge, but does not work anymore since AOL is now a class
 			if (aol.equals("noarch")) {
 				// FIXME no handling of local
 				artifactList.addAll(getAttachedNarDependencies(dependency,
@@ -167,7 +167,7 @@ public class NarManager {
 	}
 
 	private List/* <AttachedNarArtifact> */getAttachedNarDependencies(
-			Artifact dependency, String aol, String type)
+			Artifact dependency, AOL aol, String type)
 			throws MojoExecutionException, MojoFailureException {
 		log.debug("GetNarDependencies for " + dependency + ", aol: " + aol + ", type: " + type);
 		List artifactList = new ArrayList();
@@ -189,7 +189,7 @@ public class NarManager {
 						// translate for instance g++ to gcc...
 						aol = narInfo.getAOL(aol);
 						if (aol != null) {
-							classifier = NarUtil.replace("${aol}", aol,
+							classifier = NarUtil.replace("${aol}", aol.toString(),
 									classifier);
 						}
 						String version = nar.length >= 5 ? nar[4].trim()
@@ -249,7 +249,7 @@ public class NarManager {
 		if (dependency.isSnapshot())
 			;
 		return new File(repository.getBasedir(), NarUtil.replace("${aol}",
-				defaultAOL, repository.pathOf(dependency)));
+				defaultAOL.toString(), repository.pathOf(dependency)));
 	}
 
 	private List getDependencies(String scope) {
@@ -319,16 +319,16 @@ public class NarManager {
 						NarUtil.makeExecutable(new File(narLocation, "bin/"+defaultAOL),
 								log);
 						// FIXME clumsy
-						if (defaultAOL.endsWith("g++")) {
-							NarUtil.makeExecutable(new File(narLocation, "bin/"+NarUtil.replace("g++", "gcc", defaultAOL)),
+						if (defaultAOL.hasLinker("g++")) {
+							NarUtil.makeExecutable(new File(narLocation, "bin/"+NarUtil.replace("g++", "gcc", defaultAOL.toString())),
 									log);							
 						}
 					}
 					if (linkerName.equals("gcc") || linkerName.equals("g++")) {
 						NarUtil.runRanlib(new File(narLocation, "lib/"+defaultAOL), log);
 						// FIXME clumsy
-						if (defaultAOL.endsWith("g++")) {
-							NarUtil.runRanlib(new File(narLocation, "lib/"+NarUtil.replace("g++", "gcc", defaultAOL)),
+						if (defaultAOL.hasLinker("g++")) {
+							NarUtil.runRanlib(new File(narLocation, "lib/"+NarUtil.replace("g++", "gcc", defaultAOL.toString())),
 									log);							
 						}
 					}

@@ -26,7 +26,7 @@ import org.apache.tools.ant.Project;
  * @phase test-compile
  * @requiresDependencyResolution test
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 43298538bf45 2007/09/14 17:09:01 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarTestCompileMojo.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public class NarTestCompileMojo extends AbstractCompileMojo {
 
@@ -57,7 +57,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
 		// outDir
 		File outDir = new File(getTargetDirectory(), "bin");
-		outDir = new File(outDir, getAOL());
+		outDir = new File(outDir, getAOL().toString());
 		outDir.mkdirs();
 
 		// outFile
@@ -67,17 +67,17 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
 		// object directory
 		File objDir = new File(getTargetDirectory(), "obj");
-		objDir = new File(objDir, getAOL());
+		objDir = new File(objDir, getAOL().toString());
 		objDir.mkdirs();
 		task.setObjdir(objDir);
 
 		// failOnError, libtool
-		task.setFailonerror(failOnError());
-		task.setLibtool(useLibtool());
+		task.setFailonerror(failOnError(getAOL()));
+		task.setLibtool(useLibtool(getAOL()));
 
 		// runtime
 		RuntimeType runtimeType = new RuntimeType();
-		runtimeType.setValue(getRuntime());
+		runtimeType.setValue(getRuntime(getAOL()));
 		task.setRuntime(runtimeType);
 
 		// add C++ compiler
@@ -105,7 +105,7 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 
 		// add linker
 		task.addConfiguredLinker(getLinker().getLinker(this, antProject,
-				getOS(), getAOLKey() + "linker.", type));
+				getOS(), getAOL().getKey() + "linker.", type));
 		
 		// FIXME hardcoded values
 		String libName = getFinalName();
@@ -207,8 +207,8 @@ public class NarTestCompileMojo extends AbstractCompileMojo {
 		}
 
 		// Add JVM to linker
-		getJava().addRuntime(task, getJavaHome(), getOS(),
-				getAOLKey() + "java.");
+		getJava().addRuntime(task, getJavaHome(getAOL()), getOS(),
+				getAOL().getKey() + ".java.");
 
 		// execute
 		try {

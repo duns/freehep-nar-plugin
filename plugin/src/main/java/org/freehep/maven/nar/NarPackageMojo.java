@@ -19,7 +19,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @phase package
  * @requiresProject
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 2126b860c9c5 2007/07/31 23:19:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/NarPackageMojo.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public class NarPackageMojo extends AbstractCompileMojo {
 
@@ -31,7 +31,6 @@ public class NarPackageMojo extends AbstractCompileMojo {
 	private MavenProjectHelper projectHelper;
 
 	private File narDirectory;
-	private NarInfo info;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (shouldSkip())
@@ -42,23 +41,6 @@ public class NarPackageMojo extends AbstractCompileMojo {
 				new NarArtifactHandler());
 
 		narDirectory = new File(getOutputDirectory(), "nar");
-
-		info = new NarInfo(getMavenProject().getGroupId(), getMavenProject()
-				.getArtifactId(), getMavenProject().getVersion(), getLog());
-
-		// General properties.nar file
-		File propertiesDir = new File(getOutputDirectory(),
-				"classes/META-INF/nar/" + getMavenProject().getGroupId() + "/"
-						+ getMavenProject().getArtifactId());
-		if (!propertiesDir.exists()) {
-			propertiesDir.mkdirs();
-		}
-		File propertiesFile = new File(propertiesDir, NarInfo.NAR_PROPERTIES);
-		try {
-			info.read(propertiesFile);
-		} catch (IOException ioe) {
-			// ignored
-		}
 
 		// noarch
 		String include = "include";
@@ -90,13 +72,19 @@ public class NarPackageMojo extends AbstractCompileMojo {
 		}
 
 		// override binding if not set
-		if (info.getBinding(null, null) == null) {
-			info.setBinding(null, bindingType != null ? bindingType
+		if (getNarInfo().getBinding(null, null) == null) {
+			getNarInfo().setBinding(null, bindingType != null ? bindingType
 					: Library.NONE);
 		}
 
 		try {
-			info.writeToFile(propertiesFile);
+			File propertiesDir = new File(getOutputDirectory(), "classes/META-INF/nar/"
+					+ getMavenProject().getGroupId() + "/" + getMavenProject().getArtifactId());
+			if (!propertiesDir.exists()) {
+				propertiesDir.mkdirs();
+			}
+			File propertiesFile = new File(propertiesDir, NarInfo.NAR_PROPERTIES);
+			getNarInfo().writeToFile(propertiesFile);
 		} catch (IOException ioe) {
 			throw new MojoExecutionException(
 					"Cannot write nar properties file", ioe);
@@ -110,7 +98,7 @@ public class NarPackageMojo extends AbstractCompileMojo {
 		nar(libFile, narDirectory, new String[] { dir });
 		projectHelper.attachArtifact(getMavenProject(), NAR_TYPE,
 				(aol != null ? aol + "-" : "") + type, libFile);
-		info.setNar(null, type, getMavenProject().getGroupId() + ":"
+		getNarInfo().setNar(null, type, getMavenProject().getGroupId() + ":"
 				+ getMavenProject().getArtifactId() + ":" + NAR_TYPE + ":"
 				+ (aol != null ? "${aol}-" : "") + type);
 

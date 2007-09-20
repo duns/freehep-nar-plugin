@@ -10,7 +10,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractNarMojo.java c867ab546be1 2007/07/05 21:26:30 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/AbstractNarMojo.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public abstract class AbstractNarMojo extends AbstractMojo implements NarConstants {
     
@@ -99,9 +99,8 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
         return os;
     }
     
-    protected String getAOL() throws MojoFailureException {
-    	aol = NarUtil.getAOL(architecture, os, linker, aol);    	
-        return aol;
+    protected AOL getAOL() throws MojoFailureException {
+    	return NarUtil.getAOL(architecture, os, linker, aol);    	
     }
     
     protected Linker getLinker() {
@@ -115,10 +114,6 @@ public abstract class AbstractNarMojo extends AbstractMojo implements NarConstan
    
     protected String getFinalName() {
         return finalName;
-    }
-
-    protected String getAOLKey() throws MojoFailureException {
-    	return NarUtil.getAOLKey(architecture, os, linker);    	
     }
     
     protected File getTargetDirectory() {

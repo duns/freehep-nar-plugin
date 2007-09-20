@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Abstract Compiler class
  * 
  * @author <a href="Mark.Donszelmann@slac.stanford.edu">Mark Donszelmann</a>
- * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 22df3eb318cc 2007/09/06 18:55:15 duns $
+ * @version $Id: plugin/src/main/java/org/freehep/maven/nar/Compiler.java 0ee9148b7c6a 2007/09/20 18:42:29 duns $
  */
 public abstract class Compiler {
 
@@ -265,7 +265,7 @@ public abstract class Compiler {
 	}
 
 	protected String getPrefix() throws MojoFailureException {
-		return mojo.getAOLKey() + getName() + ".";
+		return mojo.getAOL().getKey() + "." + getName() + ".";
 	}
 
 	public CompilerDef getCompiler(String type, String output)
